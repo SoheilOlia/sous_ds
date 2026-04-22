@@ -540,31 +540,25 @@ body {
   opacity: 0.92;
 }
 
-.palette-note {
-  max-width: 48ch;
-  margin-top: var(--ds-space-7);             /* 32px — minimum breathing room under the bento */
-  color: var(--ds-text-muted);                /* matches the #666-intent body-copy color; dark-safe AA at 5.58:1 */
-}
-
 /*
-  Text specimens — each ink rendered in its own color, with role.
-  These are components, not swatches: they demonstrate the type
-  as it would actually appear in UI.
+  Text specimens — compact tiles that sit directly under the bento.
+  Each renders a real sentence in its own ink color; meta block shows
+  hex + contrast ratio + usage in a single row.
 */
 .text-specimens {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--ds-space-3);
-  margin-top: var(--ds-space-7);
+  margin-top: var(--ds-space-3);             /* 8px — sits just under the bento, same rhythm as bento gap */
 }
 
 .text-specimen {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: var(--ds-space-5);
-  padding: var(--ds-space-5);
-  min-height: 180px;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-4);                /* 12px — more compact than the bento cards */
+  min-height: 120px;
   border: 1px solid var(--ds-line);
   border-radius: var(--ds-radius-md);
   background: var(--ds-surface);
@@ -589,29 +583,36 @@ body {
 .text-specimen--muted     .text-specimen__sample { color: var(--ds-text-muted); }
 
 .text-specimen__meta {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
   gap: var(--ds-space-4);
-  padding-top: var(--ds-space-4);
-  border-top: 1px solid var(--ds-line);
-}
-
-.text-specimen__label {
   font-family: var(--ds-font-mono);
   font-size: 10px;
   line-height: 14px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ds-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
-.text-specimen__value {
-  margin-top: var(--ds-space-1);
-  font-family: var(--ds-font-mono);
-  font-size: 11px;
-  line-height: 15px;
+.text-specimen__meta b {
   color: var(--ds-text-secondary);
-  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+/*
+  Body copy lives in its own container below the specimens with generous
+  breathing room. This is the takeaway paragraph; it earns its own space.
+*/
+.palette-summary {
+  margin-top: var(--ds-space-7);             /* 32px — the floor the user specified */
+}
+
+.palette-note {
+  max-width: 48ch;
+  margin: 0;
+  color: var(--ds-text-muted);                /* matches #666 muted-body intent; dark-safe AA 5.58:1 */
 }
 
 @media (max-width: 980px) {
@@ -1626,52 +1627,36 @@ body {
         </div>
       </div>
 
-      <p class="palette-note site-copy">
-        Three surfaces, three inks, two semantic accents. Neutrals do the visual work; hue is reserved for meaning. <span class="mono">accent-success</span> marks committed / goal-met state, <span class="mono">accent-live</span> stays on the attention rail (alert, anomaly, live-now). Never decorative, never a CTA.
-      </p>
-
       <div class="text-specimens" role="list" aria-label="Text color specimens in use">
         <div class="text-specimen text-specimen--primary" role="listitem">
           <div class="text-specimen__sample">Anchor ink. The heading you read first.</div>
           <div class="text-specimen__meta">
-            <div>
-              <div class="text-specimen__label">text-primary</div>
-              <div class="text-specimen__value">#F0F0F0 · 18.9:1 · AAA</div>
-            </div>
-            <div>
-              <div class="text-specimen__label">use</div>
-              <div class="text-specimen__value">Display · h1 – h3 · core body</div>
-            </div>
+            <span>text-primary</span>
+            <span><b>#F0F0F0</b> · 18.9:1 · AAA</span>
           </div>
         </div>
 
         <div class="text-specimen text-specimen--secondary" role="listitem">
           <div class="text-specimen__sample">Supporting body. Descriptive copy under a heading.</div>
           <div class="text-specimen__meta">
-            <div>
-              <div class="text-specimen__label">text-secondary</div>
-              <div class="text-specimen__value">#A0A0A0 · 7.58:1 · AAA</div>
-            </div>
-            <div>
-              <div class="text-specimen__label">use</div>
-              <div class="text-specimen__value">Body · captions · paragraph prose</div>
-            </div>
+            <span>text-secondary</span>
+            <span><b>#A0A0A0</b> · 7.58:1 · AAA</span>
           </div>
         </div>
 
         <div class="text-specimen text-specimen--muted" role="listitem">
           <div class="text-specimen__sample">Meta. Timestamps, counts, least emphasis.</div>
           <div class="text-specimen__meta">
-            <div>
-              <div class="text-specimen__label">text-muted</div>
-              <div class="text-specimen__value">#888888 · 5.58:1 · AA</div>
-            </div>
-            <div>
-              <div class="text-specimen__label">use</div>
-              <div class="text-specimen__value">Labels · timestamps · metadata</div>
-            </div>
+            <span>text-muted</span>
+            <span><b>#888888</b> · 5.58:1 · AA</span>
           </div>
         </div>
+      </div>
+
+      <div class="palette-summary">
+        <p class="palette-note site-copy">
+          Three surfaces, three inks, two semantic accents. Neutrals do the visual work; hue is reserved for meaning. <span class="mono">accent-success</span> marks committed / goal-met state, <span class="mono">accent-live</span> stays on the attention rail (alert, anomaly, live-now). Never decorative, never a CTA.
+        </p>
       </div>
     </section>
 
