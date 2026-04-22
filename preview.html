@@ -296,7 +296,7 @@ body {
   max-width: var(--ds-measure);
   color: var(--ds-text-secondary);
   font-size: 15px;
-  line-height: 24px;
+  line-height: 110%;
 }
 
 .site-copy {
@@ -384,27 +384,32 @@ body {
 }
 
 /*
-  Bento grid — monochromatic as hero (big cells), accents as small corner pops.
-  4 cols × 3 rows, 8 cards:
+  Bento grid — matches the reference proportions. Monochromatic dominates;
+  accents are small 1×1 corner pops. 7 cards total, 4 cols × 3 rows:
 
-     C1          C2          C3          C4
-  R1 [SURFACE 2×2          ] [TEXT-PRIMARY 2×1           ]
-  R2 [                     ] [TEXT-SEC  ] [TEXT-MUTED    ]
-  R3 [BG       ] [RAISED  ] [SUCCESS   ] [LIVE           ]
+     C1          C2          C3            C4
+  R1 [SURFACE 2×2          ] [BG 1×2     ] [TEXT-PRIMARY 1×1 ]
+  R2 [                     ] [           ] [TEXT-SECONDARY   ]
+  R3 [SURFACE-RAISED 2×1   ] [SUCCESS 1×1] [LIVE 1×1         ]
 
-  Grid positions declare hierarchy: surface and text-primary are the anchors
-  (interface mass + anchor ink). Accents are 1×1 cells in the bottom row,
-  deliberately small — they are semantic pops, not brand decoration.
+  - SURFACE is the big hero (interface mass).
+  - BG is the tall dark column (canvas).
+  - TEXT-PRIMARY / SECONDARY stack top-right as ink anchors.
+  - SURFACE-RAISED is the wide footer band (overlay tone).
+  - The two semantic accents are the small bottom-right corners — deliberately
+    small because hue is reserved for meaning, not mass.
+
+  text-muted is intentionally absent here: it gets its own slot in the
+  text-specimens row below, where the demonstration is truer.
 */
 
 .palette-card--surface       { grid-column: 1 / span 2; grid-row: 1 / span 2; }
-.palette-card--text-primary  { grid-column: 3 / span 2; grid-row: 1; }
-.palette-card--text-secondary{ grid-column: 3; grid-row: 2; }
-.palette-card--text-muted    { grid-column: 4; grid-row: 2; }
-.palette-card--bg            { grid-column: 1; grid-row: 3; }
-.palette-card--raised        { grid-column: 2; grid-row: 3; }
-.palette-card--success       { grid-column: 3; grid-row: 3; }
-.palette-card--live          { grid-column: 4; grid-row: 3; }
+.palette-card--bg            { grid-column: 3;          grid-row: 1 / span 2; }
+.palette-card--text-primary  { grid-column: 4;          grid-row: 1; }
+.palette-card--text-secondary{ grid-column: 4;          grid-row: 2; }
+.palette-card--raised        { grid-column: 1 / span 2; grid-row: 3; }
+.palette-card--success       { grid-column: 3;          grid-row: 3; }
+.palette-card--live          { grid-column: 4;          grid-row: 3; }
 
 .palette-card__head {
   display: flex;
@@ -572,7 +577,7 @@ body {
 
 .text-specimen__sample {
   font-family: var(--ds-font-display);
-  font-size: 22px;
+  font-size: 16px;                             /* actual body-text size, not display-22 */
   line-height: 1.1;
   letter-spacing: -0.0075em;
   font-weight: 400;
@@ -603,16 +608,12 @@ body {
 
 /*
   Body copy lives in its own container below the specimens with generous
-  breathing room. This is the takeaway paragraph; it earns its own space.
+  breathing room. Inherits .section p typography (15px / 110% / text-secondary /
+  max-width: --ds-measure / margin: 0). No class-level overrides; the
+  wrapper owns the vertical spacing, the cascade owns everything else.
 */
 .palette-summary {
-  margin-top: var(--ds-space-7);             /* 32px — the floor the user specified */
-}
-
-.palette-note {
-  max-width: 48ch;
-  margin: 0;
-  color: var(--ds-text-muted);                /* matches #666 muted-body intent; dark-safe AA 5.58:1 */
+  margin-top: var(--ds-space-7);             /* 32px — body-copy breathing room floor */
 }
 
 @media (max-width: 980px) {
@@ -627,7 +628,6 @@ body {
   .palette-card--surface,
   .palette-card--text-primary,
   .palette-card--text-secondary,
-  .palette-card--text-muted,
   .palette-card--bg,
   .palette-card--raised,
   .palette-card--success,
@@ -1487,7 +1487,7 @@ body {
     <section class="section" data-col="12" style="animation-delay:80ms">
       <div class="section-head">
         <span class="section-num">03<b>/ Palette</b></span>
-        <span class="section-aside">Eight swatches · three surfaces · three inks · two accents</span>
+        <span class="section-aside">Seven swatches · three surfaces · two inks · two accents</span>
       </div>
       <div class="palette-showcase">
         <div class="palette-card palette-card--bg" style="--swatch-fill: var(--ds-bg); --swatch-ink: var(--ds-text-primary); --swatch-border: var(--ds-line-strong);">
@@ -1575,23 +1575,6 @@ body {
           </div>
         </div>
 
-        <div class="palette-card palette-card--text-muted" style="--swatch-fill: var(--ds-text-muted); --swatch-ink: var(--ds-text-on-primary); --swatch-border: rgba(0, 0, 0, 0.08);">
-          <div class="palette-card__head">
-            <div class="palette-card__name">text-muted</div>
-            <div class="palette-card__role">meta · timestamp · least emphasis</div>
-          </div>
-          <div class="palette-card__meta">
-            <div>
-              <div class="palette-card__meta-label">HEX</div>
-              <div class="palette-card__meta-value">#888888</div>
-            </div>
-            <div>
-              <div class="palette-card__meta-label">RGB</div>
-              <div class="palette-card__meta-value">136, 136, 136</div>
-            </div>
-          </div>
-        </div>
-
         <div class="palette-card palette-card--success" style="--swatch-fill: var(--ds-accent-success); --swatch-ink: var(--ds-text-on-success); --swatch-border: rgba(0, 0, 0, 0.08);">
           <div class="palette-card__head">
             <div class="palette-card__name">accent-success</div>
@@ -1654,8 +1637,8 @@ body {
       </div>
 
       <div class="palette-summary">
-        <p class="palette-note site-copy">
-          Three surfaces, three inks, two semantic accents. Neutrals do the visual work; hue is reserved for meaning. <span class="mono">accent-success</span> marks committed / goal-met state, <span class="mono">accent-live</span> stays on the attention rail (alert, anomaly, live-now). Never decorative, never a CTA.
+        <p>
+          Seven swatches — three surfaces, two inks, two semantic accents. Neutrals do the visual work; hue is reserved for meaning. <span class="mono">accent-success</span> marks committed / goal-met state, <span class="mono">accent-live</span> stays on the attention rail (alert, anomaly, live-now). Never decorative, never a CTA.
         </p>
       </div>
     </section>
