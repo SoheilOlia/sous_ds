@@ -7,7 +7,13 @@
       "Bash(git init *)",
       "Bash(git config *)",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Read(//Users/soheil/Sous_DS/**)",
+      "Bash(sed -n '43,48p' TASTE_LOG.md)",
+      "Bash(git rm *)",
+      "Bash(node scripts/lint.mjs components/)",
+      "Bash(echo \"---exit:$?---\")",
+      "Bash(node scripts/lint.mjs components/ preview.html)"
     ]
   }
 }

@@ -871,6 +871,54 @@ These are valuable but deferred to Priority 2 and 3 plans:
 
 ---
 
+## Priority 2 – 5 outline (follow-on plans, for A+)
+
+Priority 1 is the truth-layer floor. The following plans separately to avoid scope thrash.
+
+### P2 — AI-native moat + reference app (next, ~2–3 weeks)
+The moat. Industry-defining primitives that nobody else ships well.
+- Ship on Radix primitives (focus trap, aria, keyboard) where applicable so a11y is battle-tested
+- `<AgentStream>` — token-by-token reveal, variable-rate easing, cursor glyph, interruptible
+- `<ToolCall>` — collapsed/expanded tool invocation with status line, duration, result summary
+- `<Citation>` — inline source chip with hover preview (extends Pill)
+- `<Transcript>` — role-keyed rows with mono timestamps; respects `prefers-reduced-motion` on long lists
+- `<TokenMeter>` — context-window usage; mono tabular-nums; accent in final 10%
+- `<DiffBlock>` — before/after code with accent marking changes only
+- `<ConfidenceBar>` — low/mid/high probability by length (dot motif extension)
+- `<Thinking>` — pulsing dot row during tool call / latency phases
+- **Reference app** — Next.js App Router at `sous-ds.dev` that IS the docs (dogfood forcing function, per Geist model)
+- **shadcn-registry distribution** — `npx shadcn add https://sous-ds.dev/r/agent-stream.json` installs one primitive into a consumer repo
+
+### P3 — Derivability + latency + gravitas (~2 weeks)
+The 3 non-obvious A+ separators.
+- **Derivable tokens** — color ramp from HCT hue+chroma seed; space from base+ratio; motion from base+curve. Agent can `sous theme --hue 12 --chroma 60` and get a valid theme.
+- **Latency tokens** — `--ds-latency-optimistic: 60ms`, `--ds-latency-ack: 140ms`, `--ds-latency-settled: 220ms`. Components adopt these for state transitions (optimistic commit → server ack → settled). Linear-grade snap.
+- **Motion recipes** — `motion-recipes.json`: named intent recipes (`hero`, `receipt`, `confirm`, `destruct`, `empty`, `error`, `ambient`, `gravitas`). Components pick a recipe; the recipe resolves to tokens.
+- **Gravitas tier** — `data-gravitas="high"` on destructive/financial/irreversible actions. Slower motion (280ms), confirm flow, different copy tone.
+- **Truth-layer lint** — `scripts/verify-paths.mjs`: every file path referenced in any `.md` file must exist on disk. Fails CI otherwise. Would have prevented this entire audit chain.
+
+### P4 — Figma + multi-framework (~3 weeks)
+- Code Connect `.figma.ts` for every shipped component (Button, Card, Pill, LiveDot, Toast, DottedChart + all P2 primitives)
+- Figma variables sync: export DTCG → Figma Variables via `plugin:figma:figma` MCP. Two-way diffable.
+- Figma library publish (components + variables + docs)
+- `components-swiftui/` (Arcade-parity, token passthrough via generated `Tokens.swift`)
+- `components-compose/` (Jetpack Compose)
+- Tailwind preset package: `@sous/tailwind` emitting theme extension from `design-tokens.json`
+
+### P5 — Enforcement + distribution polish (~2 weeks)
+- Visual regression via Playwright screenshots + Chromatic on PRs
+- `axe-core` run on rendered preview in CI; gate on violations
+- Keyboard grammar eval: a headless script walking every component's keyboard contract
+- Command-palette invocation contract: every component exposes a palette action + NL alias
+- `sous` CLI for multi-agent distribution:
+  - `sous install --agent claude` → drops SKILL.md into `~/.claude/skills/sous-ds/`
+  - `sous install --agent codex` → drops AGENTS.md into repo root
+  - `sous install --agent goose` → drops goose recipe
+- Bundle size budget via size-limit: < 8KB CSS, < 12KB per component JS
+- i18n pass: RTL mirror rules for every component, pluralization tokens
+
+---
+
 ## Rollback
 
 Every task commits independently. To roll back any single fix:

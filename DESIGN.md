@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: soheil-ds
+name: sous-ds
 description: A dark-first, data-dense, restraint-led interface system. Monospace for all data, single semantic accent, 1px borders over shadows, precise motion under 300ms.
 
 colors:
@@ -422,7 +422,7 @@ The system's signature data visualization. Bars are rendered as columns of dots 
 When a coding agent reads this file, it should use the following prompt scaffolds:
 
 **For a new page:**
-> "Build this using soheil-ds. Dark mode by default. Reference `DESIGN.md` tokens via `tokens.css`. Use `Geist` for all sans, `Geist Mono` for all data, labels, and code. No Inter. No shadows on cards. Body caps at 65ch. Use the bento pattern for multi-card layouts. One accent only, and only on temporal/status elements."
+> "Build this using sous-ds. Dark mode by default. Reference `DESIGN.md` tokens via `tokens.css`. Use `Geist` for all sans, `Geist Mono` for all data, labels, and code. No Inter. No shadows on cards. Body caps at 65ch. Use the bento pattern for multi-card layouts. One accent only, and only on temporal/status elements."
 
 **For a component:**
 > "Use the tokens defined in `DESIGN.md`. Button height 40px, radius `sm`. Active state `scale(0.97)`. Animation under 220ms with `ease-out`. `will-change: transform` if the component animates. Set `transform-origin` to trigger location if it's a popover."

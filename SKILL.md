@@ -1,51 +1,118 @@
 ---
-name: soheil-ds
-description: Use when building, styling, reviewing, or refining UI in projects that use the soheil-ds design system. Applies to components, pages, dashboards, data displays, previews, screenshots, and design audits that mention DESIGN.md, AGENTS.md, tokens.css, restrained dark UI, monospace data, semantic live accents, or the dot and dash motif.
+name: sous-ds
+description: Use when building, styling, auditing, or refining UI in any project using the sous-ds design system. Triggers on any UI task mentioning components, pages, dashboards, data displays, agent or chat interfaces, streaming responses, tool-call rows, citation chips, or the dot/dash data motif. Also triggers on dark mode, restrained aesthetic, monospace-for-data, sub-300ms motion, WCAG AA review, the `--ds-accent-live` semantic, and any task referencing DESIGN.md, AGENTS.md, tokens.css, or components/. Use to review or reject UI that uses gradients, shadow blur ≥ 25px, `transition: all`, scale(0) entries, Inter/system-ui as primary face, accent on CTAs, or glass morphism.
 ---
 
-# soheil-ds
+# sous-ds
 
-Use this skill whenever UI work should match the soheil-ds contract.
+A dark-first, data-dense, restraint-led design system for AI-native interfaces. Precision instrument, not marketing brochure. This skill transfers the contract so generated UI matches the system's taste without re-prompting.
+
+## When this skill applies
+
+Apply to any UI task in a repo where `DESIGN.md`, `tokens.css`, or `components/` exists. Also apply as a style critique anywhere — you can audit non-Sous codebases against the refusal corpus and explain the rule violated.
+
+Signal phrases that should trigger this skill:
+- "build a dashboard / component / agent UI / chat surface"
+- "review the design / UI / accessibility"
+- "why does this look AI-slop"
+- "make this match our system"
+- "streaming response / tool call / citation chip"
 
 ## Read in this order
 
-1. `DESIGN.md` for the visual and semantic contract.
-2. `AGENTS.md` for implementation rules.
-3. `ANIMATION_RULES.md` for motion.
-4. `components/` for the current reference implementation before creating anything new.
+1. `DESIGN.md` — the canonical contract (YAML tokens + prose rationale).
+2. `AGENTS.md` — code-generation rules and hard prohibitions.
+3. `ANIMATION_RULES.md` — motion contract.
+4. `TASTE_LOG.md` — append-only taste memory; each decision traces to a source.
+5. `quality-evaluator.md` — lint rule IDs and severities.
+6. `refusals.json` — **machine-readable refusal corpus. Load this first when evaluating or generating.**
+7. `components/` — reference implementations. Check before building new.
 
 ## Non-negotiables
 
-- Use `var(--ds-*)` tokens for colors, spacing, radii, durations, easing, and shared sizes.
-- Use `Geist` for sans and `Geist Mono` for data, labels, timestamps, and code.
-- Keep body text capped at `65ch`.
-- Use `--ds-accent-live` only for temporal or status meaning. Never for CTAs or decoration.
-- Keep dark cards border-led, not shadow-led.
-- Never use `transition: all`, `scale(0)`, or hover transitions on `color`.
-- Respect `prefers-reduced-motion`.
+- **Tokens only.** Every color, size, radius, duration, easing comes from `var(--ds-*)`. If a value needed is not a token, propose one in a PR — never improvise.
+- **Type.** Sans: `Geist`. Mono: `Geist Mono` for every datum, timestamp, label, code. `font-variant-numeric: tabular-nums` on numeric columns. Body max-width: `var(--ds-measure)` (65ch). Ellipsis `…`, not `...`.
+- **Elevation.** Dark cards: 1px `var(--ds-line)` border, no shadow. Shadows reserved for floating menus/toasts (`--ds-elev-1`) and modals (`--ds-elev-2`). Blur ≥ 25px is rejected (R-ELEV-001).
+- **Motion.** Duration ceiling 300ms. Default easing `var(--ds-ease-out)`. Enumerate transition properties — never `all`. Entries start from `scale(0.95)` minimum. Respect `prefers-reduced-motion`.
+- **Hit areas.** ≥ 44×44 enforced via `var(--ds-size-interactive-min)` pattern, even when visual size is smaller.
+- **Contrast.** WCAG AA (4.5:1 normal, 3:1 large) on every text/bg pair. The accessible pair is table-stakes.
 
-## Allowed accent carriers
+## Accent carriers (exhaustive)
 
-The accent is not a general branding color. It may appear only in sanctioned semantic carriers with a single meaning inside a viewport:
+`--ds-accent-live` (#E5533C) marks one semantic: live / now / active. It may appear ONLY as a foreground on:
+- `<LiveDot>` — the 6px dot
+- `<Pill live>` — pill with the live-state prefix
+- `<Toast tone="live">` — toast marking live state change
 
-- `LiveDot`
-- `Pill` when `live` is true
-- `Toast` when `tone="live"`
+**One accent per viewport. One meaning.** Any other use violates R-SEMANTIC-001.
 
-If two accent-bearing elements mean different things on the same screen, the design is wrong.
+Focus rings (`outline` / `box-shadow` on `:focus-visible`) are the documented exception — focus is a transient state carrier, not content.
 
 ## Refuse to generate
 
-- Gradient hero or card backgrounds
-- Accent-colored CTA buttons
-- Decorative purple, teal, green, or gold
-- Shadows with blur `>= 25px`
-- Full-width body copy
-- Inter, Roboto, Helvetica, Arial, or `system-ui` as the primary face
+Load `refusals.json` for the full machine-readable corpus with patterns. Summary:
+
+| # | Refuse | Why |
+|---|---|---|
+| R-COLOR-001 | Gradients on heroes/cards/buttons | Noise without semantics |
+| R-COLOR-002 | Decorative brand hues (purple/teal/gold) | One-accent rule |
+| R-COLOR-003 | Accent on CTA buttons | Semantic collision |
+| R-TYPE-001 | Inter/Roboto/system-ui as primary | AI-slop type signature |
+| R-ELEV-001 | Shadow blur ≥ 25px | AI-slop elevation |
+| R-ELEV-002 | Dark card radius > 16px | Too soft for instrument UI |
+| R-MOTION-001 | `transition: all` | Opaque, thrash-prone |
+| R-MOTION-002 | Duration > 300ms | Over the ceiling |
+| R-MOTION-003 | `scale(0)` entries | Cartoonish |
+| R-LAYOUT-001 | Spacing off 8pt scale (15/18/20/26px) | Off-grid signature |
+| R-SEMANTIC-001 | Accent outside LiveDot/Pill/Toast | The one-meaning rule |
+| R-SLOP-001 | Glass morphism | AI-slop marker |
+| R-SLOP-003 | Sparkle/magic-wand for AI features | AI-theatre |
+
+When refusing: cite the `R-*` id, quote the rationale, propose the canonical alternative.
+
+## Composition patterns
+
+- **Dashboard cell:** `<Card>` → header row with `<Pill>` status + `mono` timestamp → body with `<DottedChart>` or tabular-nums numbers → optional `<LiveDot>` in header when live-updating.
+- **Data row:** monospace for every data column; sans for labels only. Right-align numbers. Use `tabular-nums`.
+- **Empty state:** short sans body text, single ghost-variant action, no illustration.
+- **Error state:** `<Toast tone="error">` for transient, inline text + retry button for persistent. Never modal for an error unless destructive.
+
+## Prompt → action mapping
+
+| User says | Do this |
+|---|---|
+| "Make it pop" | Refuse. Propose stronger weight/luminance hierarchy instead. Cite R-COLOR-001/002 if they asked for gradient or decorative hue. |
+| "Add an accent color" | Clarify: semantic (live) or decoration? If decoration, refuse with R-COLOR-002. |
+| "Use a sparkle for the AI feature" | Refuse R-SLOP-003. Suggest geometric glyph or text label. |
+| "Streaming response / chat bubble / agent output" | Currently no shipped primitive. Compose: `<Card>` + mono body + `<LiveDot>` while streaming. Note the gap — these are P2 roadmap primitives. |
+| "Rounded-20 dark card" | Refuse R-ELEV-002. Offer `--ds-radius-md` (12) or `--ds-radius-lg` (16). |
+| "Loading spinner" | Ghost variant with `prefers-reduced-motion` fallback; duration ≤ standard; opacity pulse, not rotation. |
+| "Celebration / success moment" | Short (≤ 220ms) opacity+scale pulse on the affected element; no confetti, no sparkle. |
+
+## Roadmap primitives (not yet shipped)
+
+These are the signature AI-native components the system is growing toward. If a user needs one before it ships, compose from current primitives and flag the gap:
+
+- **`<AgentStream>`** — token-by-token reveal, variable-rate easing, cursor glyph
+- **`<ToolCall>`** — collapsed/expanded tool invocation, status line, duration
+- **`<Citation>`** — inline source chip with hover preview (extends `<Pill>`)
+- **`<Transcript>`** — role-keyed rows with mono timestamps
+- **`<TokenMeter>`** — context-window usage using mono + tabular-nums
+- **`<DiffBlock>`** — before/after with accent for changes only
+- **`<ConfidenceBar>`** — low/mid/high probability by length (extends dot motif)
 
 ## Verify before shipping
 
 ```bash
-npx @google/design.md lint DESIGN.md
-node scripts/lint.mjs components/ preview.html
+npx @google/design.md lint DESIGN.md     # contract shape
+node scripts/lint.mjs components/         # implementation rules including R-* refusals
+npm run lint                               # both, via package.json
 ```
+
+Errors block. Warnings are discretion.
+
+## Philosophy
+
+Restraint is the primary move — remove what does not inform or structure. Weight and luminance beat color. Data is the design; mono, tabular, display-sized, the number is the hero. Precision over softness — 1px, tight radii, snappy motion. The dot motif carries data encoding. One accent, one meaning.
+
+If you need playful, warm, or gradient — this is not your system.

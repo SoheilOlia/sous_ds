@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * soheil-ds · Quality Evaluator · lint.mjs
+ * sous-ds · Quality Evaluator · lint.mjs
  *
  * Scans CSS, TSX, JSX, and HTML files for violations of the rules defined
  * in quality-evaluator.md. Emits structured findings as JSON.
@@ -271,6 +271,42 @@ function ruleCL01_hardcodedHex(src, file) {
   return findings;
 }
 
+function ruleCL07_accentCarrier(src, file) {
+  // --ds-accent-live may only appear in sanctioned carriers + tokens.css
+  // + slop-vs-system example. Focus-ring rules (:focus-visible) are
+  // a documented exception because focus is a transient carrier, not content.
+  const allowed = [
+    "components/LiveDot.css",
+    "components/Pill.css",
+    "components/Toast.css",
+    "tokens.css",
+    "preview.html",
+    "examples/slop-vs-system.html",
+    "refusals.json",
+    "SKILL.md",
+  ];
+  const normalized = file.replace(/\\/g, "/");
+  if (allowed.some((p) => normalized.endsWith(p))) return [];
+  if (!SCANNABLE.includes(path.extname(file))) return [];
+
+  const findings = [];
+  const rx = /var\(\s*--ds-accent-live\b/g;
+  let m;
+  while ((m = rx.exec(src)) !== null) {
+    // Exempt focus-ring usage: scan back ~400 chars for :focus-visible selector
+    const window = src.slice(Math.max(0, m.index - 400), m.index);
+    if (/:focus-visible[^{]*\{[^}]*$/.test(window)) continue;
+    findings.push({
+      rule: "CL07",
+      severity: "error",
+      path: `${file}:${lineAt(src, m.index)}`,
+      message: "--ds-accent-live used outside sanctioned carriers (LiveDot, Pill, Toast).",
+      suggestion: "Carry 'live' semantics via <LiveDot>, <Pill live>, or <Toast tone=\"live\">. See DESIGN.md 'Accent carriers'.",
+    });
+  }
+  return findings;
+}
+
 const RULES = [
   ruleTY01_forbiddenFonts,
   ruleMO01_transitionAll,
@@ -280,6 +316,7 @@ const RULES = [
   ruleEL02_slopShadow,
   ruleLY01_offGridSpacing,
   ruleCL01_hardcodedHex,
+  ruleCL07_accentCarrier,
 ];
 
 // ---------------------------------------------------------------
@@ -371,7 +408,7 @@ async function main() {
 function printText(r) {
   const { findings, summary, verdict, filesScanned } = r;
   if (findings.length === 0) {
-    console.log(`\x1b[32m✓\x1b[0m soheil-ds lint · ${filesScanned} files · ${verdict}`);
+    console.log(`\x1b[32m✓\x1b[0m sous-ds lint · ${filesScanned} files · ${verdict}`);
     return;
   }
   for (const f of findings) {

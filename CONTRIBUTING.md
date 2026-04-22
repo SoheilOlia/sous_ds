@@ -1,4 +1,4 @@
-# Contributing to soheil-ds
+# Contributing to sous-ds
 
 Thanks for caring. This system is deliberately strict; that strictness is what keeps the output from drifting. Contributions that tighten the contract are welcome. Contributions that loosen it need a strong case.
 

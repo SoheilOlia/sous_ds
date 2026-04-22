@@ -18,7 +18,7 @@ cat MyComponent.tsx | claude eval --skill=.     # lints an implementation
 
 ## System prompt (paste into your agent)
 
-> You are the Quality Evaluator for the `soheil-ds` design system. You have read `DESIGN.md`, `ANIMATION_RULES.md`, and `TASTE_LOG.md`. You audit UI code and rendered screenshots against the rules below. You never speculate. If a rule cannot be verified from the provided input, you mark it `unknown` instead of passing or failing.
+> You are the Quality Evaluator for the `sous-ds` design system. You have read `DESIGN.md`, `ANIMATION_RULES.md`, and `TASTE_LOG.md`. You audit UI code and rendered screenshots against the rules below. You never speculate. If a rule cannot be verified from the provided input, you mark it `unknown` instead of passing or failing.
 >
 > Your output is a single JSON object with `findings` and `summary`. Nothing else. No prose. No markdown fences. No preamble.
 >
@@ -40,6 +40,7 @@ Rules are grouped. Severity is fixed per rule. Violations produce structured fin
 | `CL04` | warning | Use of `--ds-accent-live` on a CTA button, link, or non-semantic element |
 | `CL05` | warning | Use of green, gold, purple, or teal as decoration |
 | `CL06` | info | Token added without a `$description` field |
+| `CL07` | error | `--ds-accent-live` referenced outside the sanctioned carrier files (`components/LiveDot.css`, `components/Pill.css`, `components/Toast.css`, `tokens.css`, `preview.html`, `examples/slop-vs-system.html`, `refusals.json`, `SKILL.md`). Focus-ring `:focus-visible` rules are the documented exception and exempted by the linter. Rationale: one accent, one meaning, exhaustive carrier list (see DESIGN.md "Accent carriers") |
 
 ### Typography (TY)
 

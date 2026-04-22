@@ -1,13 +1,13 @@
-# soheil-ds
+# sous-ds
 
 A dark-first, data-dense, restraint-led design system for AI coding agents.
 Monospace for data. 1px borders over shadows. One semantic accent. Motion under 300ms.
 
 ```
-v0.1.0 · alpha · 2026-04-21
+v0.2.0 · alpha · 2026-04-22
 ```
 
-Geist + Geist Mono. WCAG AA on every foreground/background pair. Installable as a skill.
+Geist + Geist Mono. WCAG AA on every foreground/background pair. Structured as a skill-ready repo.
 
 ---
 
@@ -30,23 +30,21 @@ Plus: `tokens.css` (runtime CSS variables), `components/` (reference implementat
 
 ## Install
 
-### As a skill (Claude Code, Cursor, any agent with `npx skills`)
+### From a local checkout (works today)
+
+This repo contains a real root `SKILL.md` plus the rule files it points to. If your agent supports repo-backed skills, point it at the repo root and let `SKILL.md` serve as the entrypoint.
+
+### As a published skill (release target)
 
 ```bash
-npx skills add soheil/soheil-ds
+npx skills add soheil/sous-ds
 ```
 
-This repo now contains a real root `SKILL.md` plus the rule files it points to. Agents can load the skill and then follow the contract directly from source.
+Until that release exists, use the local workflow in [INSTALL.md](/Users/soheil/Sous_DS/INSTALL.md:1).
 
 ### As a direct dependency
 
-```bash
-# Copy the contract and token files into your project root
-curl -L https://github.com/soheil/soheil-ds/archive/v0.1.0.tar.gz | tar -xz
-cp soheil-ds-0.1.0/{DESIGN.md,AGENTS.md,ANIMATION_RULES.md,tokens.css,design-tokens.json} .
-```
-
-Then reference `tokens.css` from your app root:
+Copy the contract and token files into your project root, then reference `tokens.css` from your app root:
 
 ```html
 <link rel="stylesheet" href="./tokens.css">
@@ -74,6 +72,7 @@ A coding agent landing in a repo with this system should:
 3. Reference `tokens.css` and use `var(--ds-*)` for every value.
 4. Check `components/` for existing reference implementations before building new.
 5. Run the linter before committing: `node scripts/lint.mjs`.
+6. Run `npm run pack:check` before cutting a release.
 
 Never hardcode a color, size, or duration. Never use Inter. Never use a shadow with blur ≥ 25px.
 
@@ -88,6 +87,9 @@ npx @google/design.md lint DESIGN.md
 # Lint implementations against the rules
 node scripts/lint.mjs components/
 
+# Verify release tarball contents
+npm run pack:check
+
 # Check regression on a contract change
 npx @google/design.md diff DESIGN.md.before DESIGN.md.after
 
@@ -98,15 +100,15 @@ npx @google/design.md tailwind DESIGN.md > tailwind.theme.json
 npx @google/design.md export --format dtcg DESIGN.md > tokens.dtcg.json
 ```
 
-All three lint steps run in CI. See `.github/workflows/design.yml`.
+The contract lint, implementation lint, token parity check, and package integrity check run in CI. See `.github/workflows/design.yml`.
 
 ---
 
 ## File map
 
 ```
-soheil-ds/
-├── SKILL.md                   ← makes the system installable via npx skills
+sous-ds/
+├── SKILL.md                   ← root agent entrypoint
 ├── README.md                  ← you are here
 ├── DESIGN.md                  ← the contract (spec-compliant, YAML + prose)
 ├── AGENTS.md                  ← coding agent guide
@@ -114,6 +116,7 @@ soheil-ds/
 ├── TASTE_LOG.md               ← append-only taste memory
 ├── CHANGELOG.md               ← semver history
 ├── CONTRIBUTING.md            ← how to evolve the system
+├── INSTALL.md                 ← local-install and release-state guide
 ├── quality-evaluator.md       ← lint rule IDs and severities
 │
 ├── design-tokens.json         ← DTCG machine source
@@ -130,6 +133,7 @@ soheil-ds/
 │
 ├── scripts/
 │   └── lint.mjs               ← the quality evaluator, executable
+│   └── check-package.mjs      ← release-tarball integrity check
 │
 ├── examples/
 │   └── slop-vs-system.html    ← side-by-side teaching artifact
@@ -175,4 +179,4 @@ Apache 2.0. See `LICENSE`.
 
 ## Status
 
-**alpha / v0.1.0.** The contract is stable enough to build against; token names may shift before v1.
+**alpha / v0.2.0.** The contract is stable enough to build against; token names may shift before v1.

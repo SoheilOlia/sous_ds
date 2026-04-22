@@ -1,0 +1,217 @@
+{
+  "$schema": "https://sous-ds.dev/schema/refusals.v0.json",
+  "version": "0.2.0",
+  "description": "Machine-readable refusal corpus. Agents MUST refuse requests that match these patterns, cite the id, and propose the canonical alternative. The refusal set is as important as the component set — it is how the system transfers taste.",
+  "categories": {
+    "color": "Hue, tone, and the single semantic accent",
+    "typography": "Primary face, mono face, measure, truncation",
+    "elevation": "Shadows vs 1px borders, radius limits",
+    "motion": "Duration, easing, entry scale, forbidden properties",
+    "layout": "Spacing scale, measure, hit areas",
+    "semantic": "Single-meaning accent, carrier discipline",
+    "anti-slop": "The recognizable AI-slop signatures"
+  },
+  "refusals": [
+    {
+      "id": "R-COLOR-001",
+      "category": "color",
+      "title": "Gradient backgrounds on heroes, cards, or buttons",
+      "pattern": "(linear-gradient|radial-gradient|conic-gradient)\\(",
+      "severity": "error",
+      "rationale": "Gradients create visual noise without carrying semantic information. Hierarchy comes from weight, luminance, and type — not hue.",
+      "correct": "Use `var(--ds-surface)`, `var(--ds-surface-raised)`, or `var(--ds-bg)`. If you need visual layering, use a 1px `var(--ds-line)` border and a 1-step luminance delta.",
+      "source": "DESIGN.md#do-and-dont"
+    },
+    {
+      "id": "R-COLOR-002",
+      "category": "color",
+      "title": "Decorative accent hues (purple, teal, green, gold, orange)",
+      "pattern": "#(800080|008080|008000|ffd700|ffa500|[4-9a-f][0-9a-f]{2}[4-9a-f][0-9a-f]{2}[4-9a-f][0-9a-f]{2})",
+      "severity": "error",
+      "rationale": "The system has one semantic hue: `--ds-accent-live` (#E5533C). Adding decoration hues breaks the 'one accent, one meaning' rule. Agents reading a DS with six brand hues cannot learn semantic discipline.",
+      "correct": "Use `var(--ds-text-primary|secondary|muted)` for type hierarchy. Use `var(--ds-accent-live)` ONLY for live/now/active state, and only in sanctioned carriers (see R-SEMANTIC-001).",
+      "source": "DESIGN.md#color"
+    },
+    {
+      "id": "R-COLOR-003",
+      "category": "color",
+      "title": "`--ds-accent-live` on a CTA button",
+      "pattern": "\\.ds-btn\\[data-variant=\"primary\"\\][^}]*accent-live",
+      "severity": "error",
+      "rationale": "The accent encodes semantic 'now/live/active'. A primary CTA is directional, not temporal. Coloring it accent confuses what the hue means across the interface.",
+      "correct": "Primary button uses `var(--ds-text-primary)` fill on dark bg with `var(--ds-bg)` ink — a reversed-contrast chip. Accent stays reserved for live/status semantics.",
+      "source": "DESIGN.md#buttons"
+    },
+    {
+      "id": "R-TYPE-001",
+      "category": "typography",
+      "title": "Inter, Roboto, Helvetica, Arial, Open Sans, Lato, Poppins, Nunito, Space Grotesk, or `system-ui` as primary face",
+      "pattern": "font-family:[^;]*(Inter|Roboto|Helvetica|Arial|Open Sans|Lato|Poppins|Nunito|Space Grotesk|system-ui)",
+      "severity": "error",
+      "rationale": "These faces are the recognizable 'AI slop' type signature. Using them defeats the premise of the system. Sous ships with Geist + Geist Mono for a reason: precision, dense info, tabular data.",
+      "correct": "Primary: `var(--ds-font-sans)` (Geist). Mono: `var(--ds-font-mono)` (Geist Mono). Brand overrides belong in an override layer, never the default.",
+      "source": "AGENTS.md#typography"
+    },
+    {
+      "id": "R-TYPE-002",
+      "category": "typography",
+      "title": "Full-width body paragraph",
+      "pattern": "(?:width:\\s*100%|max-width:\\s*(?:none|unset))[^}]*font-family:\\s*var\\(--ds-font-sans",
+      "severity": "warning",
+      "rationale": "Body text past 65ch is hard to read. Eye has to jump too far on line wrap.",
+      "correct": "Cap body at `max-width: var(--ds-measure)` (65ch).",
+      "source": "DESIGN.md#typography"
+    },
+    {
+      "id": "R-TYPE-003",
+      "category": "typography",
+      "title": "Three-dot ellipsis literal (`...`) instead of `…`",
+      "pattern": "\\.{3}(?![\\w\\d.])",
+      "severity": "warning",
+      "rationale": "Three dots versus the ellipsis character typeset differently. Using the character is a small taste marker.",
+      "correct": "Use `…` (U+2026) in any user-facing truncation.",
+      "source": "ANIMATION_RULES.md"
+    },
+    {
+      "id": "R-ELEV-001",
+      "category": "elevation",
+      "title": "Shadow blur ≥ 25px",
+      "pattern": "box-shadow:[^;]*\\b([2-9][5-9]|[3-9]\\d|1\\d{2,})px\\s",
+      "severity": "error",
+      "rationale": "Soft large-radius shadows are the AI-slop elevation signature. Dark UI should separate surfaces with 1px borders and a luminance delta, not shadow theater.",
+      "correct": "Dark cards: 1px `var(--ds-line)` border, no shadow. Floating menus/toasts: `var(--ds-elev-1)`. Modals: `var(--ds-elev-2)`. Anything larger is out.",
+      "source": "DESIGN.md#elevation"
+    },
+    {
+      "id": "R-ELEV-002",
+      "category": "elevation",
+      "title": "Dark card with radius > 16px (lg)",
+      "pattern": "\\.ds-card[^}]*border-radius:\\s*(?:2[0-9]|[3-9]\\d|1\\d{2,})px",
+      "severity": "error",
+      "rationale": "Large radii on dark cards read as soft / marketing / blob. The system is precision-leaning.",
+      "correct": "Use `var(--ds-radius-md)` (12px) for cards. `lg` (16px) is the ceiling.",
+      "source": "DESIGN.md#radius"
+    },
+    {
+      "id": "R-MOTION-001",
+      "category": "motion",
+      "title": "`transition: all`",
+      "pattern": "transition:\\s*all",
+      "severity": "error",
+      "rationale": "`all` is opaque to intent. It animates properties you didn't mean to, creates layout thrash, and hides perf issues.",
+      "correct": "Enumerate: `transition: opacity var(--ds-dur-micro) var(--ds-ease-out), transform var(--ds-dur-standard) var(--ds-ease-out);`",
+      "source": "ANIMATION_RULES.md"
+    },
+    {
+      "id": "R-MOTION-002",
+      "category": "motion",
+      "title": "Duration > 300ms",
+      "pattern": "(?:transition|animation)(?:-duration)?:[^;]*\\b(3[1-9]\\d|[4-9]\\d{2}|\\d{4,})ms",
+      "severity": "error",
+      "rationale": "Sous motion ceiling is 300ms. Past that, the UI feels slow and agentic-y.",
+      "correct": "Use `var(--ds-dur-micro)` (140ms), `var(--ds-dur-standard)` (220ms), or `var(--ds-dur-deliberate)` (280ms). 300ms is the hard ceiling.",
+      "source": "ANIMATION_RULES.md#duration"
+    },
+    {
+      "id": "R-MOTION-003",
+      "category": "motion",
+      "title": "Entry animation from `scale(0)`",
+      "pattern": "scale\\(\\s*0(?:\\.0+)?\\s*\\)",
+      "severity": "error",
+      "rationale": "scale(0) entries feel cartoony and draw attention to the animation itself. Real UI enters from near its final size.",
+      "correct": "Start from `scale(0.95)` minimum. Exit can go lower, but entries never.",
+      "source": "ANIMATION_RULES.md#entries"
+    },
+    {
+      "id": "R-MOTION-004",
+      "category": "motion",
+      "title": "`color` transition on hover",
+      "pattern": "transition:[^;]*\\bcolor\\b",
+      "severity": "warning",
+      "rationale": "Color transitions on hover read as lazy and slow. Use opacity or background-color changes.",
+      "correct": "For hover affordance, change `background-color` or `opacity`, not `color`.",
+      "source": "ANIMATION_RULES.md"
+    },
+    {
+      "id": "R-LAYOUT-001",
+      "category": "layout",
+      "title": "Spacing literal off the 8pt scale",
+      "pattern": "(?:padding|margin|gap)(?:-[a-z]+)?:[^;]*\\b(1[3579]|2[13579]|3[13579]|5|7|9|11)px",
+      "severity": "error",
+      "rationale": "The system snaps to 8pt increments (plus 2/4 for micro). Values like 15, 18, 20, 26 are the off-grid signature of hand-placed UI.",
+      "correct": "Use tokens: `var(--ds-space-0..11)` matching 0, 2, 4, 8, 12, 16, 24, 32, 48, 64, 96, 128.",
+      "source": "DESIGN.md#spacing"
+    },
+    {
+      "id": "R-LAYOUT-002",
+      "category": "layout",
+      "title": "Interactive target below 44×44 (without invisible hit padding)",
+      "pattern": "",
+      "severity": "error",
+      "rationale": "Touch hit areas under 44×44 fail WCAG 2.5.5. Visual size can be smaller — hit area cannot.",
+      "correct": "Visible size as designed; hit area enforced via `min-height/min-width: var(--ds-size-interactive-min)` or `width: max(100%, var(--ds-size-interactive-min))` pattern.",
+      "source": "AGENTS.md#accessibility",
+      "manualCheck": true
+    },
+    {
+      "id": "R-SEMANTIC-001",
+      "category": "semantic",
+      "title": "`--ds-accent-live` used outside sanctioned carriers",
+      "pattern": "var\\(--ds-accent-live\\)",
+      "allowedFiles": [
+        "components/LiveDot.css",
+        "components/Pill.css",
+        "components/Toast.css",
+        "tokens.css",
+        "examples/slop-vs-system.html"
+      ],
+      "severity": "error",
+      "rationale": "The accent has one semantic meaning: live/now/active. Carriers are an exhaustive list, not a theme color. Agents generating UI that paints accent onto arbitrary elements break the most important rule in the system.",
+      "correct": "Carry accent via `<LiveDot>`, `<Pill live>`, or `<Toast tone=\"live\">`. If a new semantic genuinely needs the accent, the PR must update DESIGN.md 'Accent carriers' and this refusal entry.",
+      "source": "DESIGN.md#accent-carriers"
+    },
+    {
+      "id": "R-SEMANTIC-002",
+      "category": "semantic",
+      "title": "Two live dots in one viewport with different meanings",
+      "pattern": "",
+      "severity": "error",
+      "rationale": "Two accents meaning two different things destroys the 'one accent, one meaning' contract. Users learn the hue is noise, not information.",
+      "correct": "Pick the dominant live state for the viewport. Express secondary statuses with text or non-accent chrome.",
+      "source": "DESIGN.md#accent",
+      "manualCheck": true
+    },
+    {
+      "id": "R-SLOP-001",
+      "category": "anti-slop",
+      "title": "Glass morphism (blur + translucent background)",
+      "pattern": "backdrop-filter:[^;]*blur",
+      "severity": "warning",
+      "rationale": "The 2023–2025 AI-slop signature. Over-used in generated marketing pages. Not wrong in every context, but a red flag in a dense instrument system.",
+      "correct": "Use solid surfaces. If overlay context genuinely requires backdrop treatment, document the exception.",
+      "source": "DESIGN.md#what-this-is-not"
+    },
+    {
+      "id": "R-SLOP-002",
+      "category": "anti-slop",
+      "title": "Emoji icons in instrument UI",
+      "pattern": "",
+      "severity": "warning",
+      "rationale": "Emoji in dashboard/data/agent UI is the 'AI-assistant personality theater' signature. Instrument UIs use geometric icons or text.",
+      "correct": "Use simple glyph text (● ▲ ■ → ↗), monospace labels, or SVG icons matching stroke and size tokens.",
+      "source": "DESIGN.md#voice",
+      "manualCheck": true
+    },
+    {
+      "id": "R-SLOP-003",
+      "category": "anti-slop",
+      "title": "'Sparkle' or 'magic wand' affordances for AI features",
+      "pattern": "",
+      "severity": "warning",
+      "rationale": "Sparkles are the 2023 AI-slop convention. Sous treats AI as an instrument, not magic.",
+      "correct": "Name the action (`Summarize`, `Regenerate`, `Cite`). Use geometric or text-only affordance. Reserve the accent-live dot for active processing, not for 'AI present'.",
+      "source": "DESIGN.md#voice",
+      "manualCheck": true
+    }
+  ]
+}

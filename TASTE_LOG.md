@@ -11,6 +11,8 @@ Each entry records what was learned, from what source, and what it means for the
 Conflicts between entries are flagged explicitly, never silently resolved.
 The Quality Evaluator uses this file as ground truth for taste signals.
 
+**Editorial note (2026-04-22):** references below to `/Users/soheil/Desktop/Inspiration` and "8 images" describe the initial subset review, preserved for history. The current working corpus lives in `Inspiration/` at repo root and contains 18 files; see ENTRY 005.
+
 ---
 
 ## ENTRY 001 — Emil Kowalski Skill
@@ -43,6 +45,7 @@ See `ANIMATION_RULES.md` for full encoding.
 ## ENTRY 002 — Inspiration Image Analysis
 **Date:** 2026-04-21
 **Source:** `/Users/soheil/Desktop/Inspiration` (8 images)
+> _Superseded — actual source is `Inspiration/` at repo root; 18 files (17 JPEG + 1 GIF). See ENTRY 005 §5._
 **Type:** Visual reference
 
 *Content unchanged from v1.0. Full per-image analysis retained as is. Summary of cross-image synthesis below.*
