@@ -1,0 +1,58 @@
+/* ============================================================
+   Card.css — reference implementation
+   No shadows. 1px border. Radius md. Tokens only.
+   ============================================================ */
+
+.ds-card {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-text-primary);
+}
+
+.ds-card[data-surface="raised"] {
+  background: var(--ds-surface-raised);
+}
+
+.ds-card[data-padding="none"] { padding: 0; }
+.ds-card[data-padding="sm"]   { padding: var(--ds-space-5); }
+.ds-card[data-padding="md"]   { padding: var(--ds-space-6); }
+.ds-card[data-padding="lg"]   { padding: var(--ds-space-8); }
+
+.ds-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--ds-space-6);
+}
+
+.ds-card__num {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--ds-text-muted);
+  text-transform: uppercase;
+}
+.ds-card__num b {
+  color: var(--ds-text-primary);
+  font-weight: 500;
+  margin-left: 10px;
+}
+
+.ds-card__meta {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  color: var(--ds-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ds-card__title {
+  margin: 0 0 var(--ds-space-4) 0;
+  font-size: var(--ds-type-h3-size);
+  line-height: var(--ds-type-h3-lh);
+  letter-spacing: -0.01em;
+  font-weight: 600;
+  color: var(--ds-text-primary);
+}

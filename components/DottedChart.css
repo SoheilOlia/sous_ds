@@ -1,0 +1,65 @@
+/* ============================================================
+   DottedChart.css — the signature data motif
+   Density = magnitude. No color hierarchy.
+   ============================================================ */
+
+.ds-chart {
+  margin: 0;
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+}
+
+.ds-chart__bars {
+  display: grid;
+  align-items: end;
+}
+
+.ds-chart__bar {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--ds-space-2);
+  align-items: center;
+}
+
+.ds-chart__dot {
+  width: var(--ds-size-dot);
+  height: var(--ds-size-dot);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-text-muted);
+  opacity: 0;
+  animation: ds-chart-dot-in var(--ds-dur-micro) var(--ds-ease-out) forwards;
+}
+
+.ds-chart__bar.is-active .ds-chart__dot {
+  background: var(--ds-text-primary);
+}
+
+@keyframes ds-chart-dot-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.ds-chart__labels {
+  display: grid;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  font-weight: 500;
+  color: var(--ds-text-muted);
+  text-align: center;
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+}
+
+.ds-chart__label.is-active {
+  color: var(--ds-text-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-chart__dot {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "soheil-ds",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A dark-first, data-dense, restraint-led design system for AI coding agents.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./tokens.css": "./tokens.css",
+    "./design-tokens.json": "./design-tokens.json",
+    "./components": "./components/index.ts"
+  },
+  "scripts": {
+    "lint:contract": "npx --yes @google/design.md lint DESIGN.md",
+    "lint:ui": "node scripts/lint.mjs components/ preview.html",
+    "lint": "npm run lint:contract && npm run lint:ui"
+  }
+}

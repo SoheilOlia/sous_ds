@@ -1,0 +1,131 @@
+/* ============================================================
+   Button.css — reference implementation
+   Every value is a token. Zero hardcoded colors, sizes, or durations.
+   ============================================================ */
+
+.ds-btn {
+  /* layout */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-3);
+  padding: 0 var(--ds-space-5);
+  border-radius: var(--ds-radius-sm);
+  border: 1px solid transparent;
+
+  /* type */
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-type-body-sm-size);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 0;
+  white-space: nowrap;
+
+  /* interaction */
+  cursor: pointer;
+  user-select: none;
+  appearance: none;
+
+  /* motion : only opacity, transform, and background-color */
+  transition:
+    opacity          var(--ds-dur-micro) var(--ds-ease-out),
+    transform        var(--ds-dur-press)  ease,
+    background-color var(--ds-dur-micro) var(--ds-ease-out),
+    border-color     var(--ds-dur-micro) var(--ds-ease-out);
+
+  will-change: transform;
+}
+
+/* 44px minimum hit area via pseudo-element (Emil rule) */
+.ds-btn::before {
+  content: "";
+  position: absolute;
+  inset: 50% 0 0 50%;
+  width: max(100%, var(--ds-size-interactive-min));
+  height: max(100%, var(--ds-size-interactive-min));
+  transform: translate(-50%, -50%);
+}
+
+/* ---- Sizes ------------------------------------------------- */
+.ds-btn[data-size="md"] { height: var(--ds-size-control-md); }
+.ds-btn[data-size="sm"] { height: var(--ds-size-control-sm); padding: 0 var(--ds-space-4); }
+
+/* ---- Variants ---------------------------------------------- */
+.ds-btn[data-variant="primary"] {
+  background: var(--ds-text-primary);
+  color: var(--ds-text-on-primary);
+}
+.ds-btn[data-variant="primary"]:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.ds-btn[data-variant="secondary"] {
+  background: transparent;
+  color: var(--ds-text-primary);
+  border-color: var(--ds-line-strong);
+}
+.ds-btn[data-variant="secondary"]:hover:not(:disabled) {
+  background: var(--ds-surface);
+}
+
+.ds-btn[data-variant="ghost"] {
+  background: transparent;
+  color: var(--ds-text-secondary);
+}
+.ds-btn[data-variant="ghost"]:hover:not(:disabled) {
+  color: var(--ds-text-primary);
+  background: var(--ds-surface);
+}
+
+/* ---- Press feedback (scale rule) --------------------------- */
+.ds-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* ---- Focus ring -------------------------------------------- */
+.ds-btn:focus-visible {
+  outline: 2px solid var(--ds-line-strong);
+  outline-offset: 2px;
+}
+
+/* ---- Disabled ---------------------------------------------- */
+.ds-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---- Loading ----------------------------------------------- */
+.ds-btn[data-loading] .ds-btn__label {
+  /* keep button width stable while spinning */
+  opacity: 0.6;
+}
+
+.ds-btn__spinner {
+  width: var(--ds-size-icon-sm);
+  height: var(--ds-size-icon-sm);
+  border-radius: var(--ds-radius-pill);
+  border: 1px solid currentColor;
+  border-top-color: transparent;
+  animation: ds-btn-spin var(--ds-dur-spinner) linear infinite;
+}
+
+@keyframes ds-btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Icon slot --------------------------------------------- */
+.ds-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ds-size-icon-sm);
+  height: var(--ds-size-icon-sm);
+  flex: none;
+}
+
+/* ---- Label ------------------------------------------------- */
+.ds-btn__label {
+  display: inline-flex;
+  align-items: center;
+}

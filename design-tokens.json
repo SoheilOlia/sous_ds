@@ -1,0 +1,191 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "$name": "soheil-ds",
+  "$version": "0.1.0",
+  "$description": "Canonical tokens for the system. Dark is default. Every token passes WCAG AA at minimum. Format inspired by the W3C DTCG spec.",
+
+  "color": {
+    "bg": {
+      "default":  { "$value": "#0A0A0A", "$type": "color", "$description": "Page background, dark mode default" },
+      "light":    { "$value": "#F4F4F4", "$type": "color", "$description": "Page background, light mode" }
+    },
+    "surface": {
+      "default":       { "$value": "#141414", "$type": "color", "$description": "Card, panel, sheet. Dark mode" },
+      "raised":        { "$value": "#1C1C1C", "$type": "color", "$description": "Popover, menu, elevated dark surface" },
+      "light":         { "$value": "#FFFFFF", "$type": "color", "$description": "Card, panel, sheet. Light mode" },
+      "light-sunken":  { "$value": "#EBEBEB", "$type": "color", "$description": "Recessed surface on light" }
+    },
+    "line": {
+      "default": { "$value": "rgba(255,255,255,0.08)", "$type": "color", "$description": "Card border on dark. 1px only, never shadow" },
+      "strong":  { "$value": "rgba(255,255,255,0.14)", "$type": "color", "$description": "Higher contrast border for inputs" },
+      "light":   { "$value": "rgba(0,0,0,0.08)",       "$type": "color", "$description": "Light mode line" }
+    },
+    "text": {
+      "primary":       { "$value": "#F0F0F0", "$type": "color", "$description": "Dark mode primary text. 18.9:1 on bg.default. AAA" },
+      "secondary":     { "$value": "#A0A0A0", "$type": "color", "$description": "Dark mode secondary. 7.58:1 on bg.default. AAA" },
+      "muted":         { "$value": "#888888", "$type": "color", "$description": "Dark mode labels, captions. 5.58:1 on bg.default. AA" },
+      "primary-light":   { "$value": "#1A1A1A", "$type": "color", "$description": "Light mode primary. 15.8:1 on bg.light. AAA" },
+      "secondary-light": { "$value": "#6B6B6B", "$type": "color", "$description": "Light mode secondary. 5.33:1 on bg.light. AA. Replaces prior #999 which failed AA" },
+      "muted-light":     { "$value": "#767676", "$type": "color", "$description": "Light mode muted. 4.55:1 on white. AA minimum" },
+      "on-accent":     { "$value": "#FFFFFF", "$type": "color", "$description": "Text on accent-live. 5.31:1. AA" },
+      "on-primary":    { "$value": "#0A0A0A", "$type": "color", "$description": "Text on filled primary button" }
+    },
+    "accent": {
+      "live": { "$value": "#E5533C", "$type": "color", "$description": "Temporal/status only. Live, active, now, alerting. Never decorative, never a CTA color" }
+    }
+  },
+
+  "type": {
+    "family": {
+      "sans": { "$value": "\"Geist\", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif", "$type": "fontFamily", "$description": "Primary face. Geometric, neutral, characterful. Self-host or Google Fonts" },
+      "mono": { "$value": "\"Geist Mono\", ui-monospace, \"SF Mono\", \"JetBrains Mono\", monospace", "$type": "fontFamily", "$description": "All data, labels, timestamps, code. tabular-nums always on" }
+    },
+    "scale": {
+      "display":  { "$value": { "family": "{type.family.sans}", "size": "64px", "lineHeight": "72px", "weight": 600, "tracking": "-0.03em" }, "$type": "typography" },
+      "h1":       { "$value": { "family": "{type.family.sans}", "size": "40px", "lineHeight": "48px", "weight": 600, "tracking": "-0.02em" },  "$type": "typography" },
+      "h2":       { "$value": { "family": "{type.family.sans}", "size": "28px", "lineHeight": "36px", "weight": 600, "tracking": "-0.015em" }, "$type": "typography" },
+      "h3":       { "$value": { "family": "{type.family.sans}", "size": "20px", "lineHeight": "28px", "weight": 600, "tracking": "-0.01em" },  "$type": "typography" },
+      "body-lg":  { "$value": { "family": "{type.family.sans}", "size": "17px", "lineHeight": "26px", "weight": 400, "tracking": "0" },       "$type": "typography" },
+      "body":     { "$value": { "family": "{type.family.sans}", "size": "15px", "lineHeight": "24px", "weight": 400, "tracking": "0" },       "$type": "typography" },
+      "body-sm":  { "$value": { "family": "{type.family.sans}", "size": "13px", "lineHeight": "20px", "weight": 400, "tracking": "0" },       "$type": "typography" },
+      "label":    { "$value": { "family": "{type.family.mono}", "size": "11px", "lineHeight": "16px", "weight": 500, "tracking": "0.08em", "transform": "uppercase" }, "$type": "typography" },
+      "mono-xl":  { "$value": { "family": "{type.family.mono}", "size": "48px", "lineHeight": "56px", "weight": 500, "tracking": "-0.02em", "features": "tnum" }, "$type": "typography" },
+      "mono":     { "$value": { "family": "{type.family.mono}", "size": "13px", "lineHeight": "20px", "weight": 400, "features": "tnum" }, "$type": "typography" }
+    },
+    "measure": {
+      "default": { "$value": "65ch", "$type": "dimension", "$description": "Max body line length per Emil" }
+    }
+  },
+
+  "space": {
+    "0":  { "$value": "0",     "$type": "dimension" },
+    "1":  { "$value": "2px",   "$type": "dimension" },
+    "2":  { "$value": "4px",   "$type": "dimension" },
+    "3":  { "$value": "8px",   "$type": "dimension" },
+    "4":  { "$value": "12px",  "$type": "dimension" },
+    "5":  { "$value": "16px",  "$type": "dimension" },
+    "6":  { "$value": "24px",  "$type": "dimension" },
+    "7":  { "$value": "32px",  "$type": "dimension" },
+    "8":  { "$value": "48px",  "$type": "dimension" },
+    "9":  { "$value": "64px",  "$type": "dimension" },
+    "10": { "$value": "96px",  "$type": "dimension" },
+    "11": { "$value": "128px", "$type": "dimension" }
+  },
+
+  "size": {
+    "control-sm": { "$value": "32px", "$type": "dimension", "$description": "Dense control height. Use sparingly in compact toolbars and tables." },
+    "control-md": { "$value": "40px", "$type": "dimension", "$description": "Default control height for buttons and inputs." },
+    "interactive-min": { "$value": "44px", "$type": "dimension", "$description": "Minimum touch hit area for interactive elements." },
+    "dot": { "$value": "6px", "$type": "dimension", "$description": "Live/status marker size." },
+    "icon-sm": { "$value": "14px", "$type": "dimension", "$description": "Small inline icon and spinner size." },
+    "toast-min-width": { "$value": "280px", "$type": "dimension", "$description": "Minimum toast width on desktop before wrapping." }
+  },
+
+  "radius": {
+    "none": { "$value": "0",     "$type": "dimension" },
+    "xs":   { "$value": "4px",   "$type": "dimension" },
+    "sm":   { "$value": "8px",   "$type": "dimension" },
+    "md":   { "$value": "12px",  "$type": "dimension", "$description": "Card default. Tighter than the 20px seen in light references. Precision over softness" },
+    "lg":   { "$value": "16px",  "$type": "dimension" },
+    "pill": { "$value": "9999px","$type": "dimension" }
+  },
+
+  "elevation": {
+    "0": { "$value": "none", "$type": "shadow", "$description": "Default. Cards use 1px border, never shadow, in dark mode" },
+    "1": { "$value": "0 1px 2px rgba(0,0,0,0.3)", "$type": "shadow", "$description": "Floating menu, toast. Use sparingly. Never on cards" },
+    "2": { "$value": "0 8px 24px rgba(0,0,0,0.5)", "$type": "shadow", "$description": "Modal, drawer only" }
+  },
+
+  "motion": {
+    "duration": {
+      "instant":    { "$value": "0ms",   "$type": "duration" },
+      "press":      { "$value": "100ms", "$type": "duration", "$description": "Press feedback for buttons and small action controls." },
+      "micro":      { "$value": "140ms", "$type": "duration", "$description": "Button press, tooltip, icon swap" },
+      "standard":   { "$value": "220ms", "$type": "duration", "$description": "Dropdown, popover, card entry" },
+      "deliberate": { "$value": "280ms", "$type": "duration", "$description": "Modal, drawer. Still under 300ms ceiling" },
+      "exit-standard": { "$value": "180ms", "$type": "duration", "$description": "Exit for standard UI surfaces. Roughly 20 percent faster than entry." },
+      "spinner":    { "$value": "700ms", "$type": "duration", "$description": "Continuous spinner rotation period." },
+      "live-pulse": { "$value": "2000ms", "$type": "duration", "$description": "Semantic live pulse cadence." },
+      "stagger-column": { "$value": "60ms", "$type": "duration", "$description": "Column reveal stagger for dotted charts and dense data groups." },
+      "stagger-item": { "$value": "20ms", "$type": "duration", "$description": "Item reveal stagger inside a single data column." }
+    },
+    "easing": {
+      "out":    { "$value": "cubic-bezier(0.16, 1, 0.3, 1)",   "$type": "cubicBezier", "$description": "Default. Snappy out, gentle settle" },
+      "in-out": { "$value": "cubic-bezier(0.65, 0, 0.35, 1)",  "$type": "cubicBezier", "$description": "On-screen morph only" },
+      "in":     { "$value": "cubic-bezier(0.7, 0, 1, 0.5)",    "$type": "cubicBezier", "$description": "Exits only. Rarely used" },
+      "linear": { "$value": "linear",                           "$type": "cubicBezier", "$description": "Constant motion only (spinners, marquees)" }
+    },
+    "scale-enter": { "$value": "0.95", "$type": "number", "$description": "Minimum entry scale. Never start from 0" },
+    "scale-press": { "$value": "0.97", "$type": "number", "$description": "Button :active feedback" }
+  },
+
+  "breakpoint": {
+    "sm": { "$value": "640px",  "$type": "dimension" },
+    "md": { "$value": "768px",  "$type": "dimension" },
+    "lg": { "$value": "1024px", "$type": "dimension" },
+    "xl": { "$value": "1280px", "$type": "dimension" }
+  },
+
+  "component": {
+    "button": {
+      "size-sm": {
+        "height": { "$value": "{size.control-sm}", "$type": "dimension" },
+        "paddingX": { "$value": "{space.4}", "$type": "dimension" },
+        "$description": "Dense button size for compact toolbars and secondary utility actions."
+      },
+      "primary": {
+        "bg":       { "$value": "{color.text.primary}",    "$type": "color" },
+        "fg":       { "$value": "{color.text.on-primary}", "$type": "color" },
+        "radius":   { "$value": "{radius.sm}",             "$type": "dimension" },
+        "paddingY": { "$value": "{space.4}",               "$type": "dimension" },
+        "paddingX": { "$value": "{space.5}",               "$type": "dimension" },
+        "height":   { "$value": "{size.control-md}",       "$type": "dimension" },
+        "type":     { "$value": "{type.scale.body-sm}",    "$type": "typography" }
+      },
+      "secondary": {
+        "bg":     { "$value": "transparent", "$type": "color" },
+        "fg":     { "$value": "{color.text.primary}", "$type": "color" },
+        "border": { "$value": "{color.line.strong}", "$type": "color" }
+      },
+      "ghost": {
+        "bg":     { "$value": "transparent", "$type": "color" },
+        "fg":     { "$value": "{color.text.secondary}", "$type": "color" }
+      }
+    },
+    "card": {
+      "bg":     { "$value": "{color.surface.default}", "$type": "color" },
+      "border": { "$value": "1px solid {color.line.default}", "$type": "border" },
+      "radius": { "$value": "{radius.md}", "$type": "dimension" },
+      "shadow": { "$value": "{elevation.0}", "$type": "shadow", "$description": "No shadow on cards. Ever. Border does the work" },
+      "padY":   { "$value": "{space.6}", "$type": "dimension" },
+      "padX":   { "$value": "{space.6}", "$type": "dimension" }
+    },
+    "pill": {
+      "filled": {
+        "bg":     { "$value": "{color.text.primary}", "$type": "color" },
+        "fg":     { "$value": "{color.text.on-primary}", "$type": "color" },
+        "radius": { "$value": "{radius.pill}", "$type": "dimension" },
+        "$description": "Primary status. Urgent, current, selected"
+      },
+      "outline": {
+        "bg":     { "$value": "transparent", "$type": "color" },
+        "fg":     { "$value": "{color.text.secondary}", "$type": "color" },
+        "border": { "$value": "1px dashed {color.line.strong}", "$type": "border" },
+        "radius": { "$value": "{radius.pill}", "$type": "dimension" },
+        "$description": "Secondary status. Draft, future, in-progress. Dashed signals impermanence"
+      }
+    },
+    "dot-live": {
+      "size":  { "$value": "{size.dot}",            "$type": "dimension" },
+      "color": { "$value": "{color.accent.live}",   "$type": "color" },
+      "pulse": { "$value": "opacity {motion.duration.live-pulse} linear infinite", "$type": "transition", "$description": "Opacity pulse only. Never color change" }
+    },
+    "input": {
+      "bg":     { "$value": "{color.surface.default}", "$type": "color" },
+      "border": { "$value": "1px solid {color.line.strong}", "$type": "border" },
+      "radius": { "$value": "{radius.sm}", "$type": "dimension" },
+      "height": { "$value": "{size.control-md}", "$type": "dimension" },
+      "type":   { "$value": "{type.scale.body-sm}", "$type": "typography" }
+    }
+  }
+}

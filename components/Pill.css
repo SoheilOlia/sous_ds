@@ -1,0 +1,53 @@
+/* ============================================================
+   Pill.css — reference implementation
+   Two variants, mapped to status hierarchy.
+   ============================================================ */
+
+.ds-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  height: var(--ds-space-6);
+  padding: 0 var(--ds-space-4);
+  border: 1px solid transparent;
+  border-radius: var(--ds-radius-pill);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Filled : primary status, active, current */
+.ds-pill[data-variant="filled"] {
+  background: var(--ds-text-primary);
+  color: var(--ds-text-on-primary);
+}
+
+/* Outline : secondary, impermanent, in-progress.
+   Dashed border is deliberate semantic signal. */
+.ds-pill[data-variant="outline"] {
+  background: transparent;
+  color: var(--ds-text-secondary);
+  border: 1px dashed var(--ds-line-strong);
+}
+
+/* Embedded live dot (filled variant only by convention) */
+.ds-pill__dot {
+  width: var(--ds-size-dot);
+  height: var(--ds-size-dot);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-accent-live);
+  animation: ds-pill-pulse var(--ds-dur-live-pulse) linear infinite;
+}
+
+@keyframes ds-pill-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-pill__dot { animation: none; opacity: 1; }
+}

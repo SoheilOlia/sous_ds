@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>soheil-ds · slop vs system</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Teaching artifact.
+   Left column = AI slop (rejected by the system).
+   Right column = system-compliant.
+   Each pair exposes ONE rule at a time.
+   ============================================================ */
+
+:root {
+  --ds-bg: #0A0A0A;
+  --ds-surface: #141414;
+  --ds-surface-raised: #1C1C1C;
+  --ds-line: rgba(255,255,255,0.08);
+  --ds-line-strong: rgba(255,255,255,0.14);
+  --ds-text-primary: #F0F0F0;
+  --ds-text-secondary: #A0A0A0;
+  --ds-text-muted: #888888;
+  --ds-text-on-primary: #0A0A0A;
+  --ds-accent-live: #E5533C;
+  --ds-font-sans: "Geist", ui-sans-serif, sans-serif;
+  --ds-font-mono: "Geist Mono", ui-monospace, monospace;
+  --ds-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Bad-example-only tokens. NEVER in tokens.css. */
+  --slop-purple-start: #7C3AED;
+  --slop-purple-end: #EC4899;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  background: var(--ds-bg);
+  color: var(--ds-text-primary);
+  font-family: var(--ds-font-sans);
+  font-size: 15px;
+  line-height: 24px;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.app { max-width: 1240px; margin: 0 auto; padding: 48px 32px; }
+
+/* ---- Header ---- */
+.hdr { padding-bottom: 32px; border-bottom: 1px solid var(--ds-line); margin-bottom: 48px; }
+.hdr h1 {
+  margin: 0 0 12px 0;
+  font-size: 40px;
+  line-height: 48px;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+.hdr p {
+  margin: 0;
+  max-width: 65ch;
+  color: var(--ds-text-secondary);
+}
+
+.hdr .label {
+  display: inline-block;
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-text-muted);
+  margin-bottom: 16px;
+}
+
+/* ---- Pair ---- */
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 24px;
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+@media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
+
+.side {
+  padding: 32px;
+  min-height: 280px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.side--bad  { background: #141414; }
+.side--good { background: #141414; border-left: 1px solid var(--ds-line); }
+@media (max-width: 760px) {
+  .side--good { border-left: 0; border-top: 1px solid var(--ds-line); }
+}
+
+.side__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+.side__tag--bad  { background: rgba(229,83,60,0.12); color: var(--ds-accent-live); }
+.side__tag--good { background: rgba(240,240,240,0.06); color: var(--ds-text-primary); }
+
+.side__rule {
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  color: var(--ds-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.side__rule b { color: var(--ds-text-secondary); font-weight: 500; margin-left: 8px; }
+
+.side__demo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.side__note {
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  color: var(--ds-text-muted);
+  line-height: 18px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px dashed var(--ds-line);
+}
+
+/* ==============================================================
+   Each demo uses scoped classes so bad-example styles can't leak.
+   ============================================================== */
+
+/* ---- 01 · TY01 forbidden font ---- */
+.demo-ty01-bad  { font-family: "Inter", sans-serif; font-weight: 600; font-size: 28px; }
+.demo-ty01-good { font-family: var(--ds-font-sans); font-weight: 600; font-size: 28px; letter-spacing: -0.015em; }
+
+/* ---- 02 · EL02 AI-slop shadow ---- */
+.demo-el02-bad {
+  background: #141414;
+  border-radius: 16px;
+  padding: 24px 32px;
+  color: #F0F0F0;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.45);
+  font-family: var(--ds-font-sans);
+}
+.demo-el02-good {
+  background: #141414;
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  padding: 24px 32px;
+  color: #F0F0F0;
+  font-family: var(--ds-font-sans);
+}
+.demo-el02-bad h4, .demo-el02-good h4 { margin: 0 0 4px 0; font-weight: 600; font-size: 16px; }
+.demo-el02-bad p,  .demo-el02-good p  { margin: 0; font-size: 13px; color: var(--ds-text-secondary); }
+
+/* ---- 03 · CL02/CL04 accent as CTA ---- */
+.demo-cl04-bad {
+  background: var(--ds-accent-live);
+  color: #FFFFFF;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 20px;
+  height: 40px;
+  font-family: var(--ds-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.demo-cl04-good {
+  background: #F0F0F0;
+  color: #0A0A0A;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 20px;
+  height: 40px;
+  font-family: var(--ds-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ---- 04 · MO01/MO03 transition-all + scale(0) ---- */
+.demo-mo03-bad, .demo-mo03-good {
+  width: 96px; height: 96px;
+  border-radius: 12px;
+  background: var(--ds-surface-raised);
+  border: 1px solid var(--ds-line);
+  cursor: pointer;
+}
+.demo-mo03-bad  { animation: mo03-bad 2200ms infinite; }
+.demo-mo03-good { animation: mo03-good 2200ms infinite; }
+
+@keyframes mo03-bad {
+  0%   { transform: scale(0); opacity: 0; }
+  40%  { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes mo03-good {
+  0%   { transform: scale(0.95); opacity: 0; }
+  30%  { transform: scale(1);    opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+/* ---- 05 · LY01 off-grid spacing ---- */
+.demo-ly01-bad, .demo-ly01-good {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.demo-ly01-bad .box, .demo-ly01-good .box {
+  background: var(--ds-surface-raised);
+  border: 1px solid var(--ds-line);
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  color: var(--ds-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  min-width: 60px;
+}
+.demo-ly01-bad .box { padding: 15px 18px; }     /* off-grid */
+.demo-ly01-good .box { padding: 16px 16px; }    /* on 8pt grid */
+
+/* ---- 06 · RE01 gradient fill ---- */
+.demo-re01-bad {
+  background: linear-gradient(135deg, var(--slop-purple-start), var(--slop-purple-end));
+  border-radius: 12px;
+  padding: 48px 32px;
+  color: white;
+  font-family: var(--ds-font-sans);
+  min-width: 280px;
+}
+.demo-re01-good {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  padding: 48px 32px;
+  color: var(--ds-text-primary);
+  font-family: var(--ds-font-sans);
+  min-width: 280px;
+}
+.demo-re01-bad h4, .demo-re01-good h4 { margin: 0 0 6px 0; font-size: 24px; font-weight: 600; letter-spacing: -0.015em; }
+.demo-re01-bad p, .demo-re01-good p   { margin: 0; font-size: 13px; }
+.demo-re01-bad p  { color: rgba(255,255,255,0.85); }
+.demo-re01-good p { color: var(--ds-text-secondary); }
+
+/* ---- 07 · TY02 non-tabular numeric column ---- */
+.demo-ty02-bad, .demo-ty02-good {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 8px 24px;
+  min-width: 240px;
+}
+.demo-ty02-bad { font-family: var(--ds-font-sans); }
+.demo-ty02-good { font-family: var(--ds-font-mono); font-variant-numeric: tabular-nums; }
+.demo-ty02-bad .k, .demo-ty02-good .k { color: var(--ds-text-muted); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; align-self: center; }
+.demo-ty02-bad .v, .demo-ty02-good .v { color: var(--ds-text-primary); font-size: 18px; font-weight: 500; text-align: right; }
+
+/* ---- 08 · RE04 SaaS signals (stars, green dots) ---- */
+.demo-re04-bad {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  padding: 24px;
+  min-width: 300px;
+  font-family: var(--ds-font-sans);
+}
+.demo-re04-good {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: 12px;
+  padding: 24px;
+  min-width: 300px;
+  font-family: var(--ds-font-sans);
+}
+.demo-re04-bad .stars { color: #FFC107; font-size: 18px; margin-bottom: 8px; }
+.demo-re04-bad .rating { color: var(--ds-text-primary); font-weight: 600; font-size: 20px; }
+.demo-re04-bad .avail { color: #22C55E; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 12px; display: inline-flex; align-items: center; gap: 6px; }
+.demo-re04-bad .avail::before { content: ""; width: 6px; height: 6px; border-radius: 999px; background: #22C55E; }
+
+.demo-re04-good .metric { font-family: var(--ds-font-mono); font-variant-numeric: tabular-nums; font-size: 40px; font-weight: 500; letter-spacing: -0.02em; }
+.demo-re04-good .metric .sup { font-size: 0.35em; color: var(--ds-text-muted); margin-left: 4px; vertical-align: top; }
+.demo-re04-good .label { font-family: var(--ds-font-mono); font-size: 11px; color: var(--ds-text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 12px; }
+.demo-re04-good .delta { font-family: var(--ds-font-mono); font-size: 11px; color: var(--ds-text-secondary); letter-spacing: 0.04em; margin-top: 4px; }
+
+/* ---- 09 · MO02 color transition on hover ---- */
+.demo-mo02-bad, .demo-mo02-good {
+  background: transparent;
+  border: 1px solid var(--ds-line-strong);
+  color: var(--ds-text-primary);
+  padding: 0 20px; height: 40px;
+  font-family: var(--ds-font-sans); font-size: 13px; font-weight: 500;
+  border-radius: 8px; cursor: pointer;
+}
+.demo-mo02-bad { transition: color 200ms ease; }
+.demo-mo02-bad:hover { color: #EC4899; }
+.demo-mo02-good { transition: background-color var(--dur-micro, 140ms) var(--ds-ease-out); }
+.demo-mo02-good:hover { background: var(--ds-surface-raised); }
+
+/* ---- 10 · SH02 oversize radius ---- */
+.demo-sh02-bad, .demo-sh02-good {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  padding: 24px 32px;
+  color: var(--ds-text-primary);
+  font-family: var(--ds-font-sans);
+  min-width: 260px;
+}
+.demo-sh02-bad  { border-radius: 24px; }
+.demo-sh02-good { border-radius: 12px; }
+
+/* ---- Footer ---- */
+.foot { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--ds-line); font-family: var(--ds-font-mono); font-size: 11px; color: var(--ds-text-muted); letter-spacing: 0.04em; display: flex; justify-content: space-between; }
+.foot a { color: var(--ds-text-secondary); }
+</style>
+</head>
+<body>
+
+<main class="app">
+
+  <header class="hdr">
+    <span class="label">soheil-ds · Teaching artifact</span>
+    <h1>Slop vs System</h1>
+    <p>Every pair below exposes one rule. The left side is a common AI-slop default. The right side is the system-compliant rendering. Read the rule ID, feel the difference, recognize the pattern next time an agent tries to ship the left.</p>
+  </header>
+
+  <!-- 01 · TY01 forbidden font -->
+  <section class="pair">
+    <div class="side side--bad">
+      <span class="side__tag side--bad side__tag--bad">✗  Slop</span>
+      <div class="side__rule">TY01<b>Primary face is Inter</b></div>
+      <div class="side__demo"><span class="demo-ty01-bad">Elite, industry-defining craft</span></div>
+      <div class="side__note">Inter is the default AI-generation fingerprint. It reads as "generic product UI" because it <i>is</i> the generic product UI. Reject on sight.</div>
+    </div>
+    <div class="side side--good">
+      <span class="side__tag side--good side__tag--good">✓  System</span>
+      <div class="side__rule">TY01<b>Primary face is Geist</b></div>
+      <div class="side__demo"><span class="demo-ty01-good">Elite, industry-defining craft</span></div>
+      <div class="side__note">Geist is geometric, neutral, and characterful without tipping into personality. Free. Self-hostable. Fallback stack has matching x-height to prevent FOUT shift.</div>
+    </div>
+  </section>
+
+  <!-- 02 · EL02 slop shadow -->
+  <section class="pair">
+    <div class="side side--bad">
+      <span class="side__tag side--bad side__tag--bad">✗  Slop</span>
+      <div class="side__rule">EL02<b>box-shadow blur ≥ 25px</b></div>
+      <div class="side__demo">
+        <div class="demo-el02-bad">
+          <h4>Card</h4>
+          <p>Drops a giant soft shadow onto a dark canvas. This is the AI-slop signature.</p>
+        </div>
+      </div>
+      <div class="side__note">On dark canvas, a large soft drop shadow reads as "floating UI theater." Large blur = amateur signal. The linter flags any shadow with blur ≥ 25px.</div>
+    </div>
+    <div class="side side--good">
+      <span class="side__tag side--good side__tag--good">✓  System</span>
+      <div class="side__rule">EL02<b>1px border, no shadow</b></div>
+      <div class="side__demo">
+        <div class="demo-el02-good">
+          <h4>Card</h4>
+          <p>Same message, separated by a 1px border. Edge is crisp. No glow.</p>
+        </div>
+      </div>
+      <div class="side__note">Surface hierarchy via 6-point luminance steps + 1px border. No elevation theater. Shadows reserved for menus, toasts, and modals only.</div>
+    </div>
+  </section>
+
+  <!-- 03 · CL04 accent as CTA -->
+  <section class="pair">
+    <div class="side side--bad">
+      <span class="side__tag side--bad side__tag--bad">✗  Slop</span>
+      <div class="side__rule">CL04<b>accent-live used as CTA color</b></div>
+      <div class="side__demo"><button class="demo-cl04-bad">Get started</button></div>
+      <div class="side__note">The red-orange accent now means "buy this." It <b>also</b> means "live, now, active" elsewhere in the UI. Two meanings, one color = meaning collapses.</div>
+    </div>
+    <div class="side side--good">
+      <span class="side__tag side--good side__tag--good">✓  System</span>
+      <div class="side__rule">CL04<b>primary text color as button bg</b></div>
+      <div class="side__demo"><button class="demo-cl04-good">Get started</button></div>
+      <div class="side__note">The CTA uses luminance contrast, not hue. Accent stays reserved for temporal semantics. One accent, one meaning.</div>
+    </div>
+  </section>
+
+  <!-- 04 · MO03 scale(0) entry -->
+  <section class="pair">
+    <div class="side side--bad">
+      <span class="side__tag side--bad side__tag--bad">✗  Slop</span>
+      <div class="side__rule">MO03<b>Entry starts at scale(0)</b></div>
+      <div class="side__demo"><div class="demo-mo03-bad"></div></div>
+      <div class="side__note">Element materializes from nothing. Feels teleported, not grounded. Even a deflated balloon has visible shape.</div>
+    </div>
+    <div class="side side--good">
+      <span class="side__tag side--good side__tag--good">✓  System</span>
+      <div class="side__rule">MO03<b>Entry starts at scale(0.95)</b></div>
+      <div class="side__demo"><div class="demo-mo03-good"></div></div>
+      <div class="side__note">Starting from scale(0.95) makes the motion feel gentle, natural, grounded. Source: Emil Kowalski.</div>
+    </div>
+  </section>
+
+  <!-- 05 · LY01 off-grid spacing -->
+  <section class="pair">
+    <div class="side side--bad">
+      <span class="side__tag side--bad side__tag--bad">✗  Slop</span>
+      <div class="side__rule">LY01<b>padding: 15px 18px (off-grid)</b></div>
+      <div class="side__demo"><div class="demo-ly01-bad"><span class="box">15 · 18</span><span class="box">15 · 18</span><span class="box">15 · 18</span></div></div>
+      <div class="side__note">Values chosen by eye, not by system. Creates visual inconsistency across components that should feel aligned.</div>
+    </div>
+    <div class="side side--good">
+      <span class="side__tag side--good side__tag--good">✓  System</span>
+      <div class="side__rule">LY01<b>padding: 16px 16px (space-5)</b></div>
+      <div class="side__demo"><div class="demo-ly01-good"><span class="box">16 · 16</span><span class="box">16 · 16</span><span class="box">16 · 16</span></div></div>
+      <div class="side__note">Every spacing value snaps to the 8pt scale. Components compose predictably. Rhythm across the UI is consistent.</div>
+    </div>
+  </section>
+
+  <!-- 06 · RE01 gradient fill -->
+  <section class="pair">
+    <div class="side side--bad">
+      <span class="side__tag side--bad side__tag--bad">✗  Slop</span>
+      <div class="side__rule">RE01<b>Purple-to-pink gradient fill</b></div>
+      <div class="side__demo">
+        <div class="demo-re01-bad">
+          <h4>Unlock your potential</h4>
+          <p>The classic AI-SaaS hero treatment</p>
+        </div>
+      </div>
+      <div class="side__note">The "purple gradient" is the most overused AI aesthetic. Reads as cliché, not craft. No information is being encoded by the gradient.</div>
+    </div>
+    <div class="side side--good">
+      <span class="side__tag side--good side__tag--good">✓  System</span>
+      <div class="side__rule">RE01<b>Flat surface, weight-driven hierarchy</b></div>
+      <div class="side__demo">
+        <div class="demo-re01-good">
+          <h4>Precision is a feature</h4>
+          <p>Weight and luminance carry the hierarchy</p>
+        </div>
+      </div>
+      <div class="side__note">Same message, higher confidence. No decoration. Weight and contrast do the work a gradient was pretending to do.</div>
+    </div>
+  </section>
+
+  <!-- 07 · TY02 non-tabular -->
+  <section class="pair">
+    <div class="side side--bad">
+      <span class="side__tag side--bad side__tag--bad">✗  Slop</span>
+      <div class="side__rule">TY02<b>Sans numerals, no tabular-nums</b></div>
+      <div class="side__demo">
+        <div class="demo-ty02-bad">
+          <span class="k">Revenue</span><span class="v">$11,248</span>
+          <span class="k">MRR</span><span class="v">$3,914</span>
+          <span class="k">Churn</span><span class="v">$627</span>
+        </div>
+      </div>
+      <div class="side__note">Proportional digits slosh from row to row. Eye has to re-scan for each line. Data is harder to read than it needs to be.</div>
+    </div>
+    <div class="side side--good">
+      <span class="side__tag side--good side__tag--good">✓  System</span>
+      <div class="side__rule">TY02<b>Mono + font-variant-numeric: tabular-nums</b></div>
+      <div class="side__demo">
+        <div class="demo-ty02-good">
+          <span class="k">Revenue</span><span class="v">$11,248</span>
+          <span class="k">MRR</span><span class="v">$3,914</span>
+          <span class="k">Churn</span><span class="v">$627</span>
+        </div>
+      </div>
+      <div class="side__note">Digits align by column. Eye reads down, not around. Data is the design element, and it earns its weight.</div>
+    </div>
+  </section>
+
+  <!-- 08 · RE04 SaaS signals -->
+  <section class="pair">
+    <div class="side side--bad">
+      <span class="side__tag side--bad side__tag--bad">✗  Slop</span>
+      <div class="side__rule">RE04<b>Stars, green dots, "4.8/5"</b></div>
+      <div class="side__demo">
+        <div class="demo-re04-bad">
+          <div class="stars">★ ★ ★ ★ ★</div>
+          <div class="rating">4.8 / 5.0</div>
+          <div class="avail">AVAILABLE NOW</div>
+        </div>
+      </div>
+      <div class="side__note">Gold stars + green dot = marketplace aesthetic. Not measurement, not information. Decoration masquerading as data.</div>
+    </div>
+    <div class="side side--good">
+      <span class="side__tag side--good side__tag--good">✓  System</span>
+      <div class="side__rule">RE04<b>Number-as-hero, mono, semantic accent</b></div>
+      <div class="side__demo">
+        <div class="demo-re04-good">
+          <div class="metric">+326<span class="sup">%</span></div>
+          <div class="label">Revenue growth</div>
+          <div class="delta">VS PRIOR YEAR · DEC 2026</div>
+        </div>
+      </div>
+      <div class="side__note">The number <i>is</i> the content. Mono, tabular, display-size. Unit in lighter weight. No decoration. The data speaks.</div>
+    </div>
+  </section>
+
+  <!-- 09 · MO02 color transition -->
+  <section class="pair">
+    <div class="side side--bad">
+      <span class="side__tag side--bad side__tag--bad">✗  Slop</span>
+      <div class="side__rule">MO02<b>transition on color</b></div>
+      <div class="side__demo"><button class="demo-mo02-bad">Hover me (color)</button></div>
+      <div class="side__note">Hover flashes to magenta via a color transition. Color transitions read as cheap. Browser paint work is also more expensive than transform.</div>
+    </div>
+    <div class="side side--good">
+      <span class="side__tag side--good side__tag--good">✓  System</span>
+      <div class="side__rule">MO02<b>transition on background-color / opacity</b></div>
+      <div class="side__demo"><button class="demo-mo02-good">Hover me (bg)</button></div>
+      <div class="side__note">Hover adjusts the background luminance. Same semantic ("I am interactive") without a color announcement. Quieter, more precise.</div>
+    </div>
+  </section>
+
+  <!-- 10 · SH02 oversize radius -->
+  <section class="pair">
+    <div class="side side--bad">
+      <span class="side__tag side--bad side__tag--bad">✗  Slop</span>
+      <div class="side__rule">SH02<b>border-radius: 24px on dark card</b></div>
+      <div class="side__demo"><div class="demo-sh02-bad">Dashboard panel</div></div>
+      <div class="side__note">Soft. Friendly. Consumer. Conflicts with the "precision instrument" stance. Radii above lg (16px) on dark cards undermine the aesthetic.</div>
+    </div>
+    <div class="side side--good">
+      <span class="side__tag side--good side__tag--good">✓  System</span>
+      <div class="side__rule">SH02<b>border-radius: 12px (md)</b></div>
+      <div class="side__demo"><div class="demo-sh02-good">Dashboard panel</div></div>
+      <div class="side__note">Tight. Precise. The card reads as an instrument panel, not a pillow.</div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>soheil-ds · v0.1 · teaching artifact</span>
+    <span><a href="./DESIGN.md">DESIGN.md</a> · <a href="./quality-evaluator.md">quality-evaluator.md</a> · <a href="./preview.html">preview.html</a></span>
+  </footer>
+
+</main>
+
+<noscript></noscript>
+
+</body>
+</html>

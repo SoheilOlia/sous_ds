@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -n '40,50p' TASTE_LOG.md)",
+      "Bash(sed -n '124,130p' TASTE_LOG.md)",
+      "Bash(sed -n '146,152p' TASTE_LOG.md)",
+      "Bash(git init *)",
+      "Bash(git config *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}
