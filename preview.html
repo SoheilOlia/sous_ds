@@ -360,8 +360,8 @@ body {
 .palette-showcase {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-auto-rows: minmax(180px, auto);
-  gap: var(--ds-space-5);
+  grid-template-rows: repeat(3, minmax(140px, auto));
+  gap: var(--ds-space-3);
   align-items: stretch;
 }
 
@@ -369,7 +369,6 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 180px;
   padding: var(--ds-space-5);
   border: 1px solid var(--swatch-border, var(--ds-line));
   border-radius: var(--ds-radius-md);
@@ -385,11 +384,27 @@ body {
 }
 
 /*
-  Palette is a uniform 4×2 grid of 8 swatches:
-  Row 1 (surfaces + anchor ink): bg · surface · surface-raised · text-primary
-  Row 2 (ink hierarchy + accents): text-secondary · text-muted · accent-success · accent-live
-  Class modifiers name the token they carry, not the visible hue.
+  Bento grid — monochromatic as hero (big cells), accents as small corner pops.
+  4 cols × 3 rows, 8 cards:
+
+     C1          C2          C3          C4
+  R1 [SURFACE 2×2          ] [TEXT-PRIMARY 2×1           ]
+  R2 [                     ] [TEXT-SEC  ] [TEXT-MUTED    ]
+  R3 [BG       ] [RAISED  ] [SUCCESS   ] [LIVE           ]
+
+  Grid positions declare hierarchy: surface and text-primary are the anchors
+  (interface mass + anchor ink). Accents are 1×1 cells in the bottom row,
+  deliberately small — they are semantic pops, not brand decoration.
 */
+
+.palette-card--surface       { grid-column: 1 / span 2; grid-row: 1 / span 2; }
+.palette-card--text-primary  { grid-column: 3 / span 2; grid-row: 1; }
+.palette-card--text-secondary{ grid-column: 3; grid-row: 2; }
+.palette-card--text-muted    { grid-column: 4; grid-row: 2; }
+.palette-card--bg            { grid-column: 1; grid-row: 3; }
+.palette-card--raised        { grid-column: 2; grid-row: 3; }
+.palette-card--success       { grid-column: 3; grid-row: 3; }
+.palette-card--live          { grid-column: 4; grid-row: 3; }
 
 .palette-card__head {
   display: flex;
@@ -526,15 +541,102 @@ body {
 }
 
 .palette-note {
-  max-width: 38ch;
-  margin-top: var(--ds-space-6);
+  max-width: 48ch;
+  margin-top: var(--ds-space-7);             /* 32px — minimum breathing room under the bento */
+  color: var(--ds-text-muted);                /* matches the #666-intent body-copy color; dark-safe AA at 5.58:1 */
+}
+
+/*
+  Text specimens — each ink rendered in its own color, with role.
+  These are components, not swatches: they demonstrate the type
+  as it would actually appear in UI.
+*/
+.text-specimens {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-7);
+}
+
+.text-specimen {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--ds-space-5);
+  padding: var(--ds-space-5);
+  min-height: 180px;
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+  transition: border-color var(--ds-dur-micro) var(--ds-ease-out);
+}
+
+.text-specimen:hover,
+.text-specimen:focus-within {
+  border-color: var(--ds-line-strong);
+}
+
+.text-specimen__sample {
+  font-family: var(--ds-font-display);
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: -0.0075em;
+  font-weight: 400;
+}
+
+.text-specimen--primary   .text-specimen__sample { color: var(--ds-text-primary); }
+.text-specimen--secondary .text-specimen__sample { color: var(--ds-text-secondary); }
+.text-specimen--muted     .text-specimen__sample { color: var(--ds-text-muted); }
+
+.text-specimen__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ds-space-4);
+  padding-top: var(--ds-space-4);
+  border-top: 1px solid var(--ds-line);
+}
+
+.text-specimen__label {
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-text-muted);
+}
+
+.text-specimen__value {
+  margin-top: var(--ds-space-1);
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--ds-text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 980px) {
   .palette-showcase {
+    /* Drop the bento at narrow widths — stack into a single column so every swatch keeps its proportions */
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: minmax(172px, auto);
-    gap: var(--ds-space-4);
+    grid-template-rows: none;
+    grid-auto-rows: minmax(160px, auto);
+    gap: var(--ds-space-3);
+  }
+
+  .palette-card--surface,
+  .palette-card--text-primary,
+  .palette-card--text-secondary,
+  .palette-card--text-muted,
+  .palette-card--bg,
+  .palette-card--raised,
+  .palette-card--success,
+  .palette-card--live {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .text-specimens {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1527,6 +1629,50 @@ body {
       <p class="palette-note site-copy">
         Three surfaces, three inks, two semantic accents. Neutrals do the visual work; hue is reserved for meaning. <span class="mono">accent-success</span> marks committed / goal-met state, <span class="mono">accent-live</span> stays on the attention rail (alert, anomaly, live-now). Never decorative, never a CTA.
       </p>
+
+      <div class="text-specimens" role="list" aria-label="Text color specimens in use">
+        <div class="text-specimen text-specimen--primary" role="listitem">
+          <div class="text-specimen__sample">Anchor ink. The heading you read first.</div>
+          <div class="text-specimen__meta">
+            <div>
+              <div class="text-specimen__label">text-primary</div>
+              <div class="text-specimen__value">#F0F0F0 · 18.9:1 · AAA</div>
+            </div>
+            <div>
+              <div class="text-specimen__label">use</div>
+              <div class="text-specimen__value">Display · h1 – h3 · core body</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-specimen text-specimen--secondary" role="listitem">
+          <div class="text-specimen__sample">Supporting body. Descriptive copy under a heading.</div>
+          <div class="text-specimen__meta">
+            <div>
+              <div class="text-specimen__label">text-secondary</div>
+              <div class="text-specimen__value">#A0A0A0 · 7.58:1 · AAA</div>
+            </div>
+            <div>
+              <div class="text-specimen__label">use</div>
+              <div class="text-specimen__value">Body · captions · paragraph prose</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-specimen text-specimen--muted" role="listitem">
+          <div class="text-specimen__sample">Meta. Timestamps, counts, least emphasis.</div>
+          <div class="text-specimen__meta">
+            <div>
+              <div class="text-specimen__label">text-muted</div>
+              <div class="text-specimen__value">#888888 · 5.58:1 · AA</div>
+            </div>
+            <div>
+              <div class="text-specimen__label">use</div>
+              <div class="text-specimen__value">Labels · timestamps · metadata</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ==== 04 — Typography ========================================= -->
