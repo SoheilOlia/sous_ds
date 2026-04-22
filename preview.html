@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>sous-ds / v0.2</title>
+<title>sous-ds / v0.2.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
    Tokens (mirror of tokens.css, inlined for portability)
@@ -22,27 +22,69 @@
   --ds-text-muted: #888888;
   --ds-text-on-primary: #0A0A0A;
   --ds-text-on-accent: #FFFFFF;
+  --ds-text-on-success: #0A0A0A;
   --ds-accent-live: #E5533C;
+  --ds-accent-success: #00E013;
 
+  --ds-font-display: "Cash Sans", "Geist", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
   --ds-font-sans: "Geist", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
   --ds-font-mono: "Geist Mono", ui-monospace, "SF Mono", "JetBrains Mono", monospace;
   --ds-measure: 65ch;
 
+  --ds-type-display-family: var(--ds-font-display);
+  --ds-type-h1-family: var(--ds-font-display);
+  --ds-type-h2-family: var(--ds-font-mono);
+  --ds-type-h3-family: var(--ds-font-mono);
+  --ds-type-display-size: 90px;
+  --ds-type-display-lh: 86px;
+  --ds-type-display-weight: 400;
+  --ds-type-display-track: -0.04em;
+  --ds-type-h1-size: 64px;
+  --ds-type-h1-lh: 61px;
+  --ds-type-h1-weight: 400;
+  --ds-type-h1-track: -0.035em;
+  --ds-type-h2-size: 40px;
+  --ds-type-h2-lh: 38px;
+  --ds-type-h2-weight: 400;
+  --ds-type-h2-track: -0.03em;
+  --ds-type-h3-size: 28px;
+  --ds-type-h3-lh: 30px;
+  --ds-type-h3-weight: 400;
+  --ds-type-h3-track: -0.02em;
+
   --ds-space-1: 2px;  --ds-space-2: 4px;  --ds-space-3: 8px;  --ds-space-4: 12px;
   --ds-space-5: 16px; --ds-space-6: 24px; --ds-space-7: 32px; --ds-space-8: 48px;
   --ds-space-9: 64px; --ds-space-10: 96px; --ds-space-11: 128px;
+  --ds-space-tight: var(--ds-space-3);
+  --ds-space-group: var(--ds-space-5);
+  --ds-space-section: var(--ds-space-7);
+  --ds-space-context: var(--ds-space-9);
+
+  --ds-type-body-sm-size: 13px;
+  --ds-type-body-sm-lh: 20px;
 
   --ds-radius-xs: 4px; --ds-radius-sm: 8px; --ds-radius-md: 12px;
   --ds-radius-lg: 16px; --ds-radius-pill: 9999px;
+
+  --ds-size-control-sm: 32px;
+  --ds-size-control-md: 40px;
+  --ds-size-interactive-min: 44px;
+  --ds-size-dot: 6px;
+  --ds-size-icon-sm: 14px;
 
   --ds-elev-0: none;
   --ds-elev-1: 0 1px 2px rgba(0,0,0,0.3);
   --ds-elev-2: 0 8px 24px rgba(0,0,0,0.5);
 
+  --ds-dur-instant: 0ms;
+  --ds-dur-press: 100ms;
   --ds-dur-micro: 140ms;
   --ds-dur-standard: 220ms;
   --ds-dur-deliberate: 280ms;
+  --ds-dur-stagger-column: 60ms;
+  --ds-dur-stagger-item: 20ms;
   --ds-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ds-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 /* ============================================================
@@ -241,10 +283,12 @@ body {
 
 .section h2 {
   margin: 0 0 var(--ds-space-3) 0;
-  font-size: 28px;
-  line-height: 36px;
-  letter-spacing: -0.015em;
-  font-weight: 600;
+  font-family: var(--ds-type-h2-family);
+  font-size: var(--ds-type-h2-size);
+  line-height: var(--ds-type-h2-lh);
+  letter-spacing: var(--ds-type-h2-track);
+  font-weight: var(--ds-type-h2-weight);
+  font-variant-numeric: tabular-nums;
 }
 
 .section p {
@@ -255,44 +299,265 @@ body {
   line-height: 24px;
 }
 
+.site-copy {
+  margin: 0;
+  max-width: 38ch;
+  color: var(--ds-text-secondary);
+  font-family: var(--ds-font-display);
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: -0.0075em;
+}
+
 /* ============================================================
    01 — Identity
    ============================================================ */
 .identity .big {
-  font-size: 64px;
-  line-height: 70px;
-  letter-spacing: -0.03em;
-  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--ds-type-display-family);
+  font-size: var(--ds-type-display-size);
+  line-height: var(--ds-type-display-lh);
+  letter-spacing: var(--ds-type-display-track);
+  font-weight: var(--ds-type-display-weight);
   color: var(--ds-text-primary);
   margin: 0 0 var(--ds-space-6) 0;
-  max-width: 14ch;
+  max-width: 11ch;
+}
+.identity .hero-line {
+  display: block;
+  opacity: 0;
+  transform: translateY(var(--ds-space-4));
+  filter: blur(6px);
+  animation: hero-line-in var(--ds-dur-deliberate) var(--ds-ease-out) forwards;
+}
+.identity .hero-line:nth-child(2) {
+  animation-delay: var(--ds-dur-stagger-column);
 }
 .identity .big em {
   font-style: normal;
-  color: var(--ds-text-muted);
+  color: var(--ds-text-secondary);
+  font-weight: 400;
+}
+
+@keyframes hero-line-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--ds-space-4));
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
 }
 
 /* ============================================================
    02 — Palette
    ============================================================ */
-.palette {
+.palette-showcase {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(180px, auto);
   gap: var(--ds-space-5);
+  align-items: stretch;
 }
-@media (max-width: 900px) { .palette { grid-template-columns: repeat(2, 1fr); } }
 
-.swatch {
+.palette-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 180px;
+  padding: var(--ds-space-5);
+  border: 1px solid var(--swatch-border, var(--ds-line));
+  border-radius: var(--ds-radius-md);
+  background: var(--swatch-fill);
+  color: var(--swatch-ink, var(--ds-text-primary));
+  overflow: hidden;
+  transition: border-color var(--ds-dur-micro) var(--ds-ease-out);
+}
+
+.palette-card:hover,
+.palette-card:focus-within {
+  border-color: var(--ds-line-strong);
+}
+
+/*
+  Palette is a uniform 4×2 grid of 8 swatches:
+  Row 1 (surfaces + anchor ink): bg · surface · surface-raised · text-primary
+  Row 2 (ink hierarchy + accents): text-secondary · text-muted · accent-success · accent-live
+  Class modifiers name the token they carry, not the visible hue.
+*/
+
+.palette-card__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+}
+
+.palette-card__name {
+  font-family: var(--ds-font-sans);
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  opacity: 0.66;
+  transition: opacity var(--ds-dur-micro) var(--ds-ease-out),
+    transform var(--ds-dur-micro) var(--ds-ease-out);
+}
+
+.palette-card__role {
+  font-family: var(--ds-font-mono);
+  font-size: 8px;
+  line-height: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.34;
+  transition: opacity var(--ds-dur-micro) var(--ds-ease-out),
+    transform var(--ds-dur-micro) var(--ds-ease-out);
+}
+
+.palette-card__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ds-space-4);
+}
+
+.palette-card__meta-label {
+  font-family: var(--ds-font-mono);
+  font-size: 8px;
+  line-height: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.3;
+  transition: opacity var(--ds-dur-micro) var(--ds-ease-out);
+}
+
+.palette-card__meta-value {
+  margin-top: var(--ds-space-1);
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  line-height: 15px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.46;
+  transition: opacity var(--ds-dur-micro) var(--ds-ease-out),
+    transform var(--ds-dur-micro) var(--ds-ease-out);
+}
+
+.palette-card:hover .palette-card__name,
+.palette-card:focus-within .palette-card__name {
+  opacity: 0.98;
+  transform: translateY(-2px);
+}
+
+.palette-card:hover .palette-card__role,
+.palette-card:focus-within .palette-card__role {
+  opacity: 0.72;
+  transform: translateY(-2px);
+}
+
+.palette-card:hover .palette-card__meta-label,
+.palette-card:focus-within .palette-card__meta-label {
+  opacity: 0.62;
+}
+
+.palette-card:hover .palette-card__meta-value,
+.palette-card:focus-within .palette-card__meta-value {
+  opacity: 0.96;
+  transform: translateY(-2px);
+}
+
+.palette-utilities {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-3);
+  margin-bottom: var(--ds-space-7);
+}
+
+.palette-utility {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3);
   border: 1px solid var(--ds-line);
   border-radius: var(--ds-radius-sm);
-  overflow: hidden;
+  background: var(--ds-surface);
+  transition: border-color var(--ds-dur-micro) var(--ds-ease-out);
 }
-.swatch .chip { height: 80px; }
-.swatch .info { padding: var(--ds-space-4); border-top: 1px solid var(--ds-line); background: var(--ds-surface-raised); }
-.swatch .name { font-size: 13px; font-weight: 500; color: var(--ds-text-primary); margin-bottom: 2px; }
-.swatch .hex { font-family: var(--ds-font-mono); font-size: 11px; color: var(--ds-text-muted); }
-.swatch .ratio { font-family: var(--ds-font-mono); font-size: 10px; color: var(--ds-text-secondary); margin-top: 6px; letter-spacing: 0.04em; }
-.swatch .ratio b { color: var(--ds-text-primary); font-weight: 500; }
+
+.palette-utility:hover,
+.palette-utility:focus-within {
+  border-color: var(--ds-line-strong);
+}
+
+.palette-utility__token {
+  font-family: var(--ds-font-sans);
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 500;
+  color: var(--ds-text-primary);
+  opacity: 0.68;
+  transition: opacity var(--ds-dur-micro) var(--ds-ease-out);
+}
+
+.palette-utility__value {
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--ds-text-secondary);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.46;
+  transition: opacity var(--ds-dur-micro) var(--ds-ease-out);
+}
+
+.palette-utility:hover .palette-utility__token,
+.palette-utility:focus-within .palette-utility__token {
+  opacity: 0.96;
+}
+
+.palette-utility:hover .palette-utility__value,
+.palette-utility:focus-within .palette-utility__value {
+  opacity: 0.92;
+}
+
+.palette-note {
+  max-width: 38ch;
+  margin-top: var(--ds-space-6);
+}
+
+@media (max-width: 980px) {
+  .palette-showcase {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(172px, auto);
+    gap: var(--ds-space-4);
+  }
+}
+
+@media (max-width: 720px) {
+  .palette-showcase,
+  .palette-utilities {
+    grid-template-columns: 1fr;
+  }
+
+  .palette-card__meta,
+  .palette-utilities {
+    grid-template-columns: 1fr;
+  }
+
+  .palette-utility {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .palette-utility__value {
+    text-align: left;
+  }
+}
 
 /* ============================================================
    03 — Typography
@@ -317,10 +582,22 @@ body {
 .typelist .specimen { color: var(--ds-text-primary); }
 .typelist .meta { font-family: var(--ds-font-mono); font-size: 11px; color: var(--ds-text-muted); text-align: right; }
 
-.t-display { font-size: 48px; line-height: 56px; letter-spacing: -0.03em; font-weight: 600; }
-.t-h1 { font-size: 32px; line-height: 40px; letter-spacing: -0.02em; font-weight: 600; }
-.t-h2 { font-size: 24px; line-height: 32px; letter-spacing: -0.015em; font-weight: 600; }
-.t-h3 { font-size: 20px; line-height: 28px; letter-spacing: -0.01em; font-weight: 600; }
+.t-display { font-family: var(--ds-type-display-family); font-size: var(--ds-type-display-size); line-height: var(--ds-type-display-lh); letter-spacing: var(--ds-type-display-track); font-weight: var(--ds-type-display-weight); }
+.t-h1 { font-family: var(--ds-type-h1-family); font-size: var(--ds-type-h1-size); line-height: var(--ds-type-h1-lh); letter-spacing: var(--ds-type-h1-track); font-weight: var(--ds-type-h1-weight); }
+.t-h2 { font-family: var(--ds-type-h2-family); font-size: var(--ds-type-h2-size); line-height: var(--ds-type-h2-lh); letter-spacing: var(--ds-type-h2-track); font-weight: var(--ds-type-h2-weight); font-variant-numeric: tabular-nums; }
+.t-h3 { font-family: var(--ds-type-h3-family); font-size: var(--ds-type-h3-size); line-height: var(--ds-type-h3-lh); letter-spacing: var(--ds-type-h3-track); font-weight: var(--ds-type-h3-weight); font-variant-numeric: tabular-nums; }
+.specimen-mix {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.18em;
+}
+.specimen-mix__num {
+  font-family: var(--ds-font-mono);
+  font-size: 0.96em;
+  font-weight: inherit;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+}
 .t-body { font-size: 15px; line-height: 24px; }
 .t-body-sm { font-size: 13px; line-height: 20px; }
 .t-label { font-family: var(--ds-font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ds-text-secondary); }
@@ -342,15 +619,20 @@ body {
 .space-list { display: flex; flex-direction: column; gap: 6px; }
 .space-row {
   display: grid;
-  grid-template-columns: 40px 60px 1fr;
+  grid-template-columns: 92px 56px 1fr;
   align-items: center;
   gap: var(--ds-space-4);
   font-family: var(--ds-font-mono);
   font-size: 11px;
   color: var(--ds-text-muted);
 }
-.space-row b { color: var(--ds-text-secondary); font-weight: 500; }
+.space-row b {
+  color: var(--ds-text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+}
 .space-row .bar { height: 2px; background: var(--ds-text-primary); border-radius: 1px; }
+.space-subhead { margin: var(--ds-space-6) 0 var(--ds-space-4); }
 
 .radius-list { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--ds-space-4); }
 @media (max-width: 760px) { .radius-list { grid-template-columns: repeat(3, 1fr); } }
@@ -370,6 +652,8 @@ body {
    ============================================================ */
 .elev-stack { display: flex; gap: var(--ds-space-5); flex-wrap: wrap; }
 .elev-card {
+  display: flex;
+  flex-direction: column;
   flex: 1 1 150px;
   background: var(--ds-surface-raised);
   border: 1px solid var(--ds-line);
@@ -384,9 +668,11 @@ body {
 .elev-card .level {
   font-family: var(--ds-font-mono);
   font-size: 28px;
+  line-height: 1;
   font-weight: 500;
   color: var(--ds-text-primary);
   font-variant-numeric: tabular-nums;
+  margin-top: var(--ds-space-4);
 }
 .elev-card .use {
   font-family: var(--ds-font-mono);
@@ -394,7 +680,8 @@ body {
   color: var(--ds-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-top: var(--ds-space-5);
+  margin-top: auto;
+  padding-top: var(--ds-space-7);
 }
 
 /* ============================================================
@@ -475,6 +762,18 @@ body {
 
 .component-row .label { min-width: 120px; }
 
+.component-row--block {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .component-row--block {
+    grid-template-columns: 1fr;
+  }
+}
+
 .pill {
   display: inline-flex;
   align-items: center;
@@ -485,9 +784,15 @@ body {
   font-family: var(--ds-font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
+  transition:
+    opacity var(--ds-dur-standard) var(--ds-ease-out),
+    background-color var(--ds-dur-micro) var(--ds-ease-out),
+    transform var(--ds-dur-press) var(--ds-ease-out);
 }
 .pill--filled { background: var(--ds-text-primary); color: var(--ds-text-on-primary); }
 .pill--outline { background: transparent; color: var(--ds-text-secondary); border: 1px dashed var(--ds-line-strong); }
+.pill--draft { color: var(--ds-text-muted); border-color: var(--ds-line); opacity: 0.82; }
+.pill--progress { background: var(--ds-surface-raised); color: var(--ds-text-primary); border-color: var(--ds-line-strong); }
 
 .pill .dot-live {
   width: 6px; height: 6px; border-radius: 999px;
@@ -513,6 +818,339 @@ body {
 }
 .input.mono-input { font-family: var(--ds-font-mono); font-variant-numeric: tabular-nums; }
 
+.seg-control {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-2);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-surface);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.seg-control__thumb {
+  position: absolute;
+  inset: var(--ds-space-2) auto var(--ds-space-2) 0;
+  width: 0;
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-text-primary);
+  transform: translateX(0);
+  transition:
+    width var(--ds-dur-standard) var(--ds-ease-out),
+    transform var(--ds-dur-standard) var(--ds-ease-out),
+    opacity var(--ds-dur-micro) var(--ds-ease-out);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.seg-control button {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--ds-size-control-sm);
+  padding: 0 var(--ds-space-5);
+  border: 0;
+  border-radius: var(--ds-radius-pill);
+  background: transparent;
+  color: var(--ds-text-secondary);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-type-body-sm-size);
+  line-height: var(--ds-type-body-sm-lh);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    opacity var(--ds-dur-micro) var(--ds-ease-out),
+    transform var(--ds-dur-press) var(--ds-ease-out);
+}
+
+.seg-control button::before {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: max(100%, var(--ds-size-interactive-min));
+  height: max(100%, var(--ds-size-interactive-min));
+  transform: translate(-50%, -50%);
+}
+
+.seg-control button:hover {
+  color: var(--ds-text-primary);
+}
+
+.seg-control button.is-selected {
+  color: var(--ds-text-on-primary);
+}
+
+.seg-control button:active { transform: scale(0.97); }
+.seg-control button:focus-visible { outline: 2px solid var(--ds-line-strong); outline-offset: 2px; }
+
+.seg-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+}
+
+.demo-control {
+  padding: 0;
+  border: 0;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  text-align: left;
+}
+
+.demo-control:focus-visible {
+  outline: 2px solid var(--ds-line-strong);
+  outline-offset: 4px;
+  border-radius: var(--ds-radius-sm);
+}
+
+.seg-progress--interactive {
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.status-demo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-4);
+  padding: var(--ds-space-2) var(--ds-space-4);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-surface);
+  cursor: pointer;
+}
+
+.seg-bar {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--ds-space-2);
+  gap: var(--ds-space-2);
+  align-items: end;
+  min-height: var(--ds-space-5);
+}
+
+.seg-bar__segment {
+  width: var(--ds-space-2);
+  height: var(--ds-space-5);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-line-strong);
+  opacity: 0;
+  transform: scaleY(0.72);
+  transform-origin: center bottom;
+  transition:
+    opacity var(--ds-dur-micro) var(--ds-ease-out),
+    background-color var(--ds-dur-micro) var(--ds-ease-out),
+    transform var(--ds-dur-micro) var(--ds-ease-out);
+  animation: seg-rise var(--ds-dur-standard) var(--ds-ease-out) forwards;
+  animation-delay: calc(var(--ds-dur-stagger-item) * var(--segment-index, 0));
+}
+
+.seg-bar__segment.is-active {
+  background: var(--ds-text-primary);
+  opacity: 1;
+}
+
+.seg-bar.is-complete .seg-bar__segment.is-active {
+  background: var(--ds-accent-success);
+}
+
+.seg-bar__segment.is-activating {
+  animation: seg-fill var(--ds-dur-standard) var(--ds-ease-out);
+}
+
+.seg-meta {
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ds-text-secondary);
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transform: translateY(var(--ds-space-1));
+  animation: status-copy-in var(--ds-dur-standard) var(--ds-ease-out) 120ms forwards;
+}
+
+@keyframes seg-rise {
+  from {
+    opacity: 0;
+    transform: scaleY(0.72);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes seg-fill {
+  0% {
+    opacity: 0.45;
+    transform: scaleY(0.78);
+  }
+  60% {
+    opacity: 1;
+    transform: scaleY(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes status-copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--ds-space-1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.inline-status-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(var(--ds-space-1)) scale(0.98);
+  transition:
+    opacity var(--ds-dur-standard) var(--ds-ease-out),
+    transform var(--ds-dur-micro) var(--ds-ease-out);
+  animation: inline-status-in var(--ds-dur-micro) var(--ds-ease-out) forwards;
+}
+
+.inline-status-preview[data-tone="active"],
+.inline-status-preview.is-live {
+  color: var(--ds-text-primary);
+}
+
+.inline-status-preview__label {
+  transition: opacity var(--ds-dur-standard) var(--ds-ease-out);
+}
+
+.inline-status-preview[data-tone="default"] .inline-status-preview__label {
+  opacity: 0.72;
+}
+
+.inline-status-preview[data-tone="active"] .inline-status-preview__label,
+.inline-status-preview.is-live .inline-status-preview__label {
+  opacity: 1;
+}
+
+.inline-status-preview.is-bumping {
+  animation: inline-status-bump var(--ds-dur-standard) var(--ds-ease-out);
+}
+
+.inline-status-preview__bracket {
+  color: var(--ds-text-muted);
+}
+
+.inline-status-preview__dot {
+  width: var(--ds-size-dot);
+  height: var(--ds-size-dot);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-accent-live);
+  animation: live-pulse var(--ds-dur-live-pulse) linear infinite;
+}
+
+@keyframes inline-status-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--ds-space-1)) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes inline-status-bump {
+  0% {
+    transform: translateY(0) scale(0.98);
+  }
+  60% {
+    transform: translateY(-1px) scale(1.01);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.toolcall-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-4);
+  padding: var(--ds-space-4) var(--ds-space-5);
+  background: var(--ds-surface-raised);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  opacity: 0;
+  transform: translateY(var(--ds-space-3)) scale(0.98);
+  animation: toolcall-in var(--ds-dur-standard) var(--ds-ease-out) 80ms forwards;
+}
+
+.toolcall-preview__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-group);
+  flex-wrap: wrap;
+}
+
+.toolcall-preview__name {
+  font-size: var(--ds-type-body-sm-size);
+  line-height: var(--ds-type-body-sm-lh);
+  font-weight: 500;
+  color: var(--ds-text-primary);
+}
+
+.toolcall-preview__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  flex-wrap: wrap;
+}
+
+.toolcall-preview__duration {
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ds-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.toolcall-preview__detail {
+  margin: 0;
+  color: var(--ds-text-secondary);
+  font-size: var(--ds-type-body-sm-size);
+  line-height: var(--ds-type-body-sm-lh);
+  max-width: 68ch;
+}
+
+@keyframes toolcall-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--ds-space-3)) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* ============================================================
    07 — Data motif: dotted bar chart
    ============================================================ */
@@ -525,6 +1163,27 @@ body {
 @media (max-width: 760px) { .chart { grid-template-columns: 1fr; } }
 
 .chart .stat .label { display: block; margin-bottom: var(--ds-space-3); }
+.chart .stat {
+  opacity: 0;
+  transform: translateY(var(--ds-space-4)) scale(0.98);
+  animation: chart-stat-in var(--ds-dur-standard) var(--ds-ease-out) 180ms forwards;
+}
+.chart-stat-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chart-stat-trigger:focus-visible {
+  outline: 2px solid var(--ds-line-strong);
+  outline-offset: 6px;
+  border-radius: var(--ds-radius-sm);
+}
 .chart .stat .value {
   font-family: var(--ds-font-mono);
   font-variant-numeric: tabular-nums;
@@ -533,6 +1192,10 @@ body {
   font-weight: 500;
   letter-spacing: -0.03em;
   color: var(--ds-text-primary);
+}
+
+.chart-stat-trigger[data-tone="success"] .value {
+  color: var(--ds-accent-success);
 }
 .chart .stat .value .sup { font-size: 0.32em; color: var(--ds-text-muted); vertical-align: top; margin-left: 4px; }
 .chart .stat .delta {
@@ -565,6 +1228,8 @@ body {
   animation: dot-in var(--ds-dur-micro) var(--ds-ease-out) forwards;
 }
 .bar.active .d { background: var(--ds-text-primary); }
+.bar.success .d { background: var(--ds-accent-success); }
+.bar.attention .d { background: var(--ds-accent-live); }
 
 @keyframes dot-in {
   from { opacity: 0; transform: scale(0.85); }
@@ -582,6 +1247,36 @@ body {
   text-align: center;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  opacity: 0;
+  animation: chart-labels-in var(--ds-dur-standard) linear 220ms forwards;
+}
+
+.bar-labels span.is-success {
+  color: var(--ds-accent-success);
+}
+
+.bar-labels span.is-attention {
+  color: var(--ds-accent-live);
+}
+
+@keyframes chart-stat-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--ds-space-4)) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes chart-labels-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ============================================================
@@ -646,7 +1341,7 @@ body {
         <i class="dim"></i><i></i><i></i><i class="dim"></i>
         <i></i><i></i><i class="dim"></i><i></i>
       </div>
-      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.2</span></h1>
+      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.2.0</span></h1>
     </div>
     <div class="status">
       <span class="clock" id="clock">00:00:00</span>
@@ -662,11 +1357,15 @@ body {
         <span class="section-num">01<b>/ Identity</b></span>
         <span class="section-aside">Manifesto</span>
       </div>
-      <h2 class="big">Restraint <em>is</em> the primary move.</h2>
-      <p>
+      <h2 class="big">
+        <span class="hero-line">Restraint <em>is</em> the</span>
+        <span class="hero-line">primary move.</span>
+      </h2>
+      <p class="site-copy">
         Terminal gravity meets editorial restraint. Dark by default,
         near-black rather than charcoal. Monospace carries all data.
-        One accent, used only where it means now. Cards float on contrast,
+        The palette is monochrome first. Green carries positive emphasis and completion;
+        red is reserved for attention, anomaly, or urgent live-now state. Cards float on contrast,
         not shadow. Every element justifies its presence.
       </p>
     </section>
@@ -685,31 +1384,162 @@ body {
     <section class="section" data-col="12" style="animation-delay:80ms">
       <div class="section-head">
         <span class="section-num">03<b>/ Palette</b></span>
-        <span class="section-aside">WCAG AA verified · Dark mode default</span>
+        <span class="section-aside">Eight swatches · three surfaces · three inks · two accents</span>
       </div>
-      <div class="palette">
-        <div class="swatch"><div class="chip" style="background:#0A0A0A"></div><div class="info"><div class="name">bg</div><div class="hex">#0A0A0A</div><div class="ratio">Page canvas</div></div></div>
-        <div class="swatch"><div class="chip" style="background:#141414"></div><div class="info"><div class="name">surface</div><div class="hex">#141414</div><div class="ratio">Card, panel</div></div></div>
-        <div class="swatch"><div class="chip" style="background:#1C1C1C"></div><div class="info"><div class="name">surface-raised</div><div class="hex">#1C1C1C</div><div class="ratio">Menu, modal</div></div></div>
-        <div class="swatch"><div class="chip" style="background:#F0F0F0"></div><div class="info"><div class="name">text-primary</div><div class="hex">#F0F0F0</div><div class="ratio"><b>18.9:1</b> on bg · AAA</div></div></div>
-        <div class="swatch"><div class="chip" style="background:#A0A0A0"></div><div class="info"><div class="name">text-secondary</div><div class="hex">#A0A0A0</div><div class="ratio"><b>7.58:1</b> on bg · AAA</div></div></div>
-        <div class="swatch"><div class="chip" style="background:#888888"></div><div class="info"><div class="name">text-muted</div><div class="hex">#888888</div><div class="ratio"><b>5.58:1</b> on bg · AA</div></div></div>
-        <div class="swatch"><div class="chip" style="background:rgba(255,255,255,0.08); background-image:linear-gradient(45deg,transparent 49%, rgba(255,255,255,0.12) 50%, transparent 51%); "></div><div class="info"><div class="name">line</div><div class="hex">rgba(255,255,255,.08)</div><div class="ratio">1px border only</div></div></div>
-        <div class="swatch"><div class="chip" style="background:#E5533C"></div><div class="info"><div class="name">accent-live</div><div class="hex">#E5533C</div><div class="ratio"><b>5.31:1</b> on bg · AA · semantic only</div></div></div>
+      <div class="palette-showcase">
+        <div class="palette-card palette-card--bg" style="--swatch-fill: var(--ds-bg); --swatch-ink: var(--ds-text-primary); --swatch-border: var(--ds-line-strong);">
+          <div class="palette-card__head">
+            <div class="palette-card__name">bg</div>
+            <div class="palette-card__role">page canvas · zero ornament</div>
+          </div>
+          <div class="palette-card__meta">
+            <div>
+              <div class="palette-card__meta-label">HEX</div>
+              <div class="palette-card__meta-value">#0A0A0A</div>
+            </div>
+            <div>
+              <div class="palette-card__meta-label">RGB</div>
+              <div class="palette-card__meta-value">10, 10, 10</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="palette-card palette-card--surface" style="--swatch-fill: var(--ds-surface); --swatch-ink: var(--ds-text-primary);">
+          <div class="palette-card__head">
+            <div class="palette-card__name">surface</div>
+            <div class="palette-card__role">base neutral · card · panel · interface mass</div>
+          </div>
+          <div class="palette-card__meta">
+            <div>
+              <div class="palette-card__meta-label">HEX</div>
+              <div class="palette-card__meta-value">#141414</div>
+            </div>
+            <div>
+              <div class="palette-card__meta-label">RGB</div>
+              <div class="palette-card__meta-value">20, 20, 20</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="palette-card palette-card--raised" style="--swatch-fill: var(--ds-surface-raised); --swatch-ink: var(--ds-text-primary);">
+          <div class="palette-card__head">
+            <div class="palette-card__name">surface-raised</div>
+            <div class="palette-card__role">menu · modal · overlay</div>
+          </div>
+          <div class="palette-card__meta">
+            <div>
+              <div class="palette-card__meta-label">HEX</div>
+              <div class="palette-card__meta-value">#1C1C1C</div>
+            </div>
+            <div>
+              <div class="palette-card__meta-label">RGB</div>
+              <div class="palette-card__meta-value">28, 28, 28</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="palette-card palette-card--text-primary" style="--swatch-fill: var(--ds-text-primary); --swatch-ink: var(--ds-text-on-primary); --swatch-border: rgba(0, 0, 0, 0.08);">
+          <div class="palette-card__head">
+            <div class="palette-card__name">text-primary</div>
+            <div class="palette-card__role">anchor ink · highest contrast · core type</div>
+          </div>
+          <div class="palette-card__meta">
+            <div>
+              <div class="palette-card__meta-label">HEX</div>
+              <div class="palette-card__meta-value">#F0F0F0</div>
+            </div>
+            <div>
+              <div class="palette-card__meta-label">RGB</div>
+              <div class="palette-card__meta-value">240, 240, 240</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="palette-card palette-card--text-secondary" style="--swatch-fill: var(--ds-text-secondary); --swatch-ink: var(--ds-text-on-primary); --swatch-border: rgba(0, 0, 0, 0.08);">
+          <div class="palette-card__head">
+            <div class="palette-card__name">text-secondary</div>
+            <div class="palette-card__role">neutral bridge · supporting hierarchy</div>
+          </div>
+          <div class="palette-card__meta">
+            <div>
+              <div class="palette-card__meta-label">HEX</div>
+              <div class="palette-card__meta-value">#A0A0A0</div>
+            </div>
+            <div>
+              <div class="palette-card__meta-label">RGB</div>
+              <div class="palette-card__meta-value">160, 160, 160</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="palette-card palette-card--text-muted" style="--swatch-fill: var(--ds-text-muted); --swatch-ink: var(--ds-text-on-primary); --swatch-border: rgba(0, 0, 0, 0.08);">
+          <div class="palette-card__head">
+            <div class="palette-card__name">text-muted</div>
+            <div class="palette-card__role">meta · timestamp · least emphasis</div>
+          </div>
+          <div class="palette-card__meta">
+            <div>
+              <div class="palette-card__meta-label">HEX</div>
+              <div class="palette-card__meta-value">#888888</div>
+            </div>
+            <div>
+              <div class="palette-card__meta-label">RGB</div>
+              <div class="palette-card__meta-value">136, 136, 136</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="palette-card palette-card--success" style="--swatch-fill: var(--ds-accent-success); --swatch-ink: var(--ds-text-on-success); --swatch-border: rgba(0, 0, 0, 0.08);">
+          <div class="palette-card__head">
+            <div class="palette-card__name">accent-success</div>
+            <div class="palette-card__role">primary accent · success · committed · goal-met</div>
+          </div>
+          <div class="palette-card__meta">
+            <div>
+              <div class="palette-card__meta-label">HEX</div>
+              <div class="palette-card__meta-value">#00E013</div>
+            </div>
+            <div>
+              <div class="palette-card__meta-label">RGB</div>
+              <div class="palette-card__meta-value">0, 224, 19</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="palette-card palette-card--live" style="--swatch-fill: var(--ds-accent-live); --swatch-ink: var(--ds-text-on-accent); --swatch-border: rgba(0, 0, 0, 0.08);">
+          <div class="palette-card__head">
+            <div class="palette-card__name">accent-live</div>
+            <div class="palette-card__role">attention rail · alert · anomaly · live-now</div>
+          </div>
+          <div class="palette-card__meta">
+            <div>
+              <div class="palette-card__meta-label">HEX</div>
+              <div class="palette-card__meta-value">#E5533C</div>
+            </div>
+            <div>
+              <div class="palette-card__meta-label">RGB</div>
+              <div class="palette-card__meta-value">229, 83, 60</div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <p class="palette-note site-copy">
+        Three surfaces, three inks, two semantic accents. Neutrals do the visual work; hue is reserved for meaning. <span class="mono">accent-success</span> marks committed / goal-met state, <span class="mono">accent-live</span> stays on the attention rail (alert, anomaly, live-now). Never decorative, never a CTA.
+      </p>
     </section>
 
     <!-- ==== 04 — Typography ========================================= -->
     <section class="section" data-col="12" style="animation-delay:120ms">
       <div class="section-head">
         <span class="section-num">04<b>/ Typography</b></span>
-        <span class="section-aside">Geist · Geist Mono</span>
+        <span class="section-aside">Cash Sans · Geist · Geist Mono</span>
       </div>
       <div class="typelist">
-        <div class="row"><span class="role">display</span><span class="specimen t-display">Aa 0123</span><span class="meta">64 / 72 · 600 · −0.03em</span></div>
-        <div class="row"><span class="role">h1</span><span class="specimen t-h1">Aa 0123</span><span class="meta">40 / 48 · 600 · −0.02em</span></div>
-        <div class="row"><span class="role">h2</span><span class="specimen t-h2">Aa 0123</span><span class="meta">28 / 36 · 600 · −0.015em</span></div>
-        <div class="row"><span class="role">h3</span><span class="specimen t-h3">Aa 0123</span><span class="meta">20 / 28 · 600</span></div>
+        <div class="row"><span class="role">display</span><span class="specimen t-display specimen-mix"><span>Aa</span><span class="specimen-mix__num">0123</span></span><span class="meta">90 / 86 · 400 · −0.04em</span></div>
+        <div class="row"><span class="role">h1</span><span class="specimen t-h1 specimen-mix"><span>Aa</span><span class="specimen-mix__num">0123</span></span><span class="meta">64 / 61 · 400 · −0.035em</span></div>
+        <div class="row"><span class="role">h2</span><span class="specimen t-h2">AA 0123</span><span class="meta">40 / 38 · mono · −0.03em</span></div>
+        <div class="row"><span class="role">h3</span><span class="specimen t-h3">Card 0123</span><span class="meta">28 / 30 · mono · −0.02em</span></div>
         <div class="row"><span class="role">body</span><span class="specimen t-body">The quick brown fox jumps over the lazy dog.</span><span class="meta">15 / 24 · 400</span></div>
         <div class="row"><span class="role">body-sm</span><span class="specimen t-body-sm">The quick brown fox jumps over the lazy dog.</span><span class="meta">13 / 20 · 400</span></div>
         <div class="row"><span class="role">label</span><span class="specimen t-label">SECTION · METADATA</span><span class="meta">11 · mono · 0.08em</span></div>
@@ -739,6 +1569,13 @@ body {
             <div class="space-row"><b>space-9</b><span>64px</span><div class="bar" style="width:64px"></div></div>
             <div class="space-row"><b>space-10</b><span>96px</span><div class="bar" style="width:96px"></div></div>
             <div class="space-row"><b>space-11</b><span>128px</span><div class="bar" style="width:128px"></div></div>
+          </div>
+          <div class="label space-subhead">Semantic aliases</div>
+          <div class="space-list">
+            <div class="space-row"><b>tight</b><span>8px</span><div class="bar" style="width:8px"></div></div>
+            <div class="space-row"><b>group</b><span>16px</span><div class="bar" style="width:16px"></div></div>
+            <div class="space-row"><b>section</b><span>32px</span><div class="bar" style="width:32px"></div></div>
+            <div class="space-row"><b>context</b><span>64px</span><div class="bar" style="width:64px"></div></div>
           </div>
         </div>
 
@@ -830,8 +1667,8 @@ body {
       <div class="component-row">
         <span class="label">Pills</span>
         <span class="pill pill--filled">Active</span>
-        <span class="pill pill--outline">Draft</span>
-        <span class="pill pill--outline" style="border-style:dashed">In progress</span>
+        <span class="pill pill--outline pill--draft">Draft</span>
+        <span class="pill pill--outline pill--progress">In progress</span>
         <span class="pill pill--filled"><span class="dot-live"></span>Live</span>
       </div>
 
@@ -842,10 +1679,64 @@ body {
       </div>
 
       <div class="component-row">
+        <span class="label">Segmented</span>
+        <div class="seg-control" id="segmented-demo" role="group" aria-label="Data scope">
+          <span class="seg-control__thumb" aria-hidden="true"></span>
+          <button type="button">Overview</button>
+          <button type="button" class="is-selected">Signals</button>
+          <button type="button">Logs</button>
+        </div>
+      </div>
+
+      <div class="component-row">
+        <span class="label">Progress</span>
+        <button type="button" class="seg-progress seg-progress--interactive demo-control" id="progress-demo" aria-label="Replay segmented progress">
+          <span class="seg-bar" id="progress-bar" role="meter" aria-label="Context usage" aria-valuemin="0" aria-valuemax="12" aria-valuenow="7">
+            <span class="seg-bar__segment is-active" style="--segment-index:0"></span>
+            <span class="seg-bar__segment is-active" style="--segment-index:1"></span>
+            <span class="seg-bar__segment is-active" style="--segment-index:2"></span>
+            <span class="seg-bar__segment is-active" style="--segment-index:3"></span>
+            <span class="seg-bar__segment is-active" style="--segment-index:4"></span>
+            <span class="seg-bar__segment is-active" style="--segment-index:5"></span>
+            <span class="seg-bar__segment is-active" style="--segment-index:6"></span>
+            <span class="seg-bar__segment" style="--segment-index:7"></span>
+            <span class="seg-bar__segment" style="--segment-index:8"></span>
+            <span class="seg-bar__segment" style="--segment-index:9"></span>
+            <span class="seg-bar__segment" style="--segment-index:10"></span>
+            <span class="seg-bar__segment" style="--segment-index:11"></span>
+          </span>
+          <span class="seg-meta" id="progress-meta">Context window · 7 / 12 blocks committed</span>
+        </button>
+      </div>
+
+      <div class="component-row">
+        <span class="label">Status</span>
+        <button type="button" class="status-demo demo-control" id="status-demo" aria-label="Replay status transition">
+          <span class="inline-status-preview" id="queued-status" data-tone="default"><span class="inline-status-preview__bracket" aria-hidden="true">[</span><span class="inline-status-preview__label" id="queued-status-label">Queued</span><span class="inline-status-preview__bracket" aria-hidden="true">]</span></span>
+          <span class="inline-status-preview" id="loading-status" data-tone="active"><span class="inline-status-preview__bracket" aria-hidden="true">[</span><span class="inline-status-preview__label" id="loading-status-label">Loading 00:00</span><span class="inline-status-preview__bracket" aria-hidden="true">]</span></span>
+          <span class="inline-status-preview is-live"><span class="inline-status-preview__bracket" aria-hidden="true">[</span><span class="inline-status-preview__dot" aria-hidden="true"></span><span class="inline-status-preview__label">Live</span><span class="inline-status-preview__bracket" aria-hidden="true">]</span></span>
+        </button>
+      </div>
+
+      <div class="component-row component-row--block">
+        <span class="label">Tool call</span>
+        <div class="toolcall-preview">
+          <div class="toolcall-preview__head">
+            <span class="toolcall-preview__name">web.search</span>
+            <div class="toolcall-preview__meta">
+              <span class="toolcall-preview__duration">842ms</span>
+              <span class="inline-status-preview is-live"><span class="inline-status-preview__bracket" aria-hidden="true">[</span><span class="inline-status-preview__dot" aria-hidden="true"></span><span>Running</span><span class="inline-status-preview__bracket" aria-hidden="true">]</span></span>
+            </div>
+          </div>
+          <p class="toolcall-preview__detail">Searching primary sources for release notes, current install paths, and contract integrity without blocking the interface.</p>
+        </div>
+      </div>
+
+      <div class="component-row">
         <span class="label">Live dot</span>
         <span style="display:inline-flex; align-items:center; gap:8px; color:var(--ds-text-secondary); font-family:var(--ds-font-mono); font-size:12px">
           <span class="dot-live" style="display:inline-block; width:6px; height:6px; border-radius:999px; background:var(--ds-accent-live); animation:live-pulse 2000ms linear infinite"></span>
-          STREAMING · 02:41:17
+          STREAMING · <span id="streaming-duration">02:41:17</span>
         </span>
       </div>
 
@@ -855,7 +1746,7 @@ body {
     <section class="section" data-col="12" style="animation-delay:320ms">
       <div class="section-head">
         <span class="section-num">09<b>/ Data Motif</b></span>
-        <span class="section-aside">Dotted bar · Density = value · No color needed</span>
+        <span class="section-aside">Dotted bar · Green = positive outcome · Red = anomaly</span>
       </div>
 
       <div class="chart">
@@ -863,15 +1754,17 @@ body {
           <div class="bars" id="bars"></div>
           <div class="bar-labels">
             <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span>
-            <span>May</span><span>Jun</span><span>Jul</span><span>Aug</span>
-            <span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+            <span>May</span><span class="is-attention">Jun</span><span>Jul</span><span>Aug</span>
+            <span>Sep</span><span>Oct</span><span>Nov</span><span class="is-success">Dec</span>
           </div>
         </div>
 
         <div class="stat">
-          <span class="label">Revenue growth</span>
-          <div class="value">+326<span class="sup">%</span></div>
-          <div class="delta">VS PRIOR YEAR · DEC CURRENT</div>
+          <button type="button" class="chart-stat-trigger demo-control" id="revenue-trigger" aria-label="Replay revenue growth count up">
+            <span class="label">Revenue growth</span>
+            <div class="value"><span class="prefix">+</span><span id="revenue-value">326</span><span class="sup">%</span></div>
+            <div class="delta">VS PRIOR YEAR · DEC CURRENT</div>
+          </button>
         </div>
       </div>
     </section>
@@ -896,6 +1789,7 @@ body {
             <li>Set <code>transform-origin</code> explicitly on popovers</li>
             <li>Use <code>…</code> for truncation, not <code>...</code></li>
             <li>Cap body at <code>65ch</code></li>
+            <li>Show loading with <b>mono status text</b> or segmented progress when total is known</li>
           </ul>
         </div>
         <div class="col dont">
@@ -905,11 +1799,12 @@ body {
             <li>Use a shadow with blur <b>≥ 25px</b> (the AI-slop shadow)</li>
             <li>Transition <code>color</code> on hover (opacity instead)</li>
             <li>Use <b>Inter, Roboto, system-ui</b> as the primary face</li>
-            <li>Color a CTA button with <b>accent-live</b></li>
-            <li>Put <b>two live dots</b> with different meanings in one viewport</li>
+            <li>Color a CTA button with <b>accent-live</b> or <b>accent-success</b></li>
+            <li>Scatter <b>green</b> and <b>red</b> through one cluster without a clear positive/attention mapping</li>
             <li>Apply gradient fills to buttons, cards, or backgrounds</li>
             <li>Use radius above <code>lg</code> on a dark card</li>
             <li>Stretch body text full viewport width</li>
+            <li>Use <b>layout-mimic placeholder chrome</b> for loading instead of explicit status</li>
           </ul>
         </div>
       </div>
@@ -918,7 +1813,7 @@ body {
   </div>
 
   <footer class="foot">
-    <span>sous-ds · v0.2 · 2026-04-22</span>
+    <span>sous-ds · v0.2.0 · 2026-04-22</span>
     <span><a href="./DESIGN.md">DESIGN.md</a> · <a href="./AGENTS.md">AGENTS.md</a> · <a href="./TASTE_LOG.md">TASTE_LOG.md</a></span>
   </footer>
 
@@ -963,14 +1858,20 @@ body {
   // Count of dots per column (0-14). Roughly an upward trend ending at peak.
   const values  = [4, 5, 5, 6, 7, 6, 8, 9, 10, 11, 12, 14];
   const current = values.length - 1;
+  const success = values.length - 1;
+  const attention = 5;
 
   values.forEach((v, i) => {
     const col = document.createElement('div');
-    col.className = 'bar' + (i === current ? ' active' : '');
+    col.className =
+      'bar' +
+      (i === current ? ' active' : '') +
+      (i === success ? ' success' : '') +
+      (i === attention ? ' attention' : '');
     for (let n = 0; n < v; n++) {
       const d = document.createElement('span');
       d.className = 'd';
-      d.style.animationDelay = (i * 55 + n * 18) + 'ms';
+      d.style.animationDelay = `calc((var(--ds-dur-stagger-column) * ${i}) + (var(--ds-dur-stagger-item) * ${n}))`;
       col.appendChild(d);
     }
     root.appendChild(col);
@@ -994,6 +1895,301 @@ body {
       s.style.animationDelay = (i * 40) + 'ms';
     });
   });
+})();
+
+/* ============================================================
+   Segmented control demo — moving thumb follows the selected mode
+   ============================================================ */
+(function segmentedDemo () {
+  const root = document.getElementById('segmented-demo');
+  if (!root) return;
+
+  const thumb = root.querySelector('.seg-control__thumb');
+  const buttons = Array.from(root.querySelectorAll('button'));
+  if (!thumb || buttons.length === 0) return;
+
+  function setSelected(nextButton) {
+    buttons.forEach((button) => {
+      button.classList.toggle('is-selected', button === nextButton);
+    });
+
+    thumb.style.width = `${nextButton.offsetWidth}px`;
+    thumb.style.transform = `translateX(${nextButton.offsetLeft}px)`;
+  }
+
+  const initial = root.querySelector('button.is-selected') || buttons[0];
+  setSelected(initial);
+
+  buttons.forEach((button) => {
+    button.addEventListener('click', () => setSelected(button));
+  });
+
+  window.addEventListener('resize', () => {
+    const selected = root.querySelector('button.is-selected') || buttons[0];
+    setSelected(selected);
+  });
+})();
+
+/* ============================================================
+   Progress demo — click to replay the segmented fill only
+   ============================================================ */
+(function progressDemo () {
+  const initialCommitted = 7;
+  const totalSegments = 12;
+  const fillDelay = 140;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const progressTrigger = document.getElementById('progress-demo');
+  const progressBar = document.getElementById('progress-bar');
+  const progressMeta = document.getElementById('progress-meta');
+  const segments = progressBar ? Array.from(progressBar.querySelectorAll('.seg-bar__segment')) : [];
+
+  if (!progressTrigger || !progressBar || !progressMeta || segments.length === 0) {
+    return;
+  }
+
+  let fillTimer = null;
+  let committed = initialCommitted;
+
+  function clearFillTimer() {
+    if (fillTimer) {
+      window.clearTimeout(fillTimer);
+      fillTimer = null;
+    }
+  }
+
+  function setCommitted(value) {
+    committed = value;
+    segments.forEach((segment, index) => {
+      if (index < value) {
+        segment.classList.add('is-active');
+      } else {
+        segment.classList.remove('is-active');
+      }
+    });
+
+    progressBar.setAttribute('aria-valuenow', String(value));
+    progressMeta.textContent = 'Context window · ' + value + ' / ' + totalSegments + ' blocks committed';
+    progressBar.classList.toggle('is-complete', value === totalSegments);
+  }
+
+  function resetProgressDemo() {
+    clearFillTimer();
+    segments.forEach((segment) => {
+      segment.classList.remove('is-activating');
+    });
+    progressBar.classList.remove('is-complete');
+    setCommitted(initialCommitted);
+  }
+
+  function fillFrom(index) {
+    if (index >= totalSegments) {
+      return;
+    }
+
+    const segment = segments[index];
+    if (!segment) {
+      return;
+    }
+
+    segment.classList.add('is-active');
+    segment.classList.add('is-activating');
+    segment.addEventListener('animationend', () => {
+      segment.classList.remove('is-activating');
+    }, { once: true });
+    setCommitted(index + 1);
+
+    fillTimer = window.setTimeout(() => {
+      fillFrom(index + 1);
+    }, fillDelay);
+  }
+
+  function queueFill() {
+    clearFillTimer();
+    if (reducedMotion) {
+      setCommitted(totalSegments);
+      return;
+    }
+    if (committed >= totalSegments) {
+      return;
+    }
+
+    fillTimer = window.setTimeout(() => {
+      fillFrom(committed);
+    }, 80);
+  }
+
+  function runProgressDemo() {
+    resetProgressDemo();
+    queueFill();
+  }
+
+  progressTrigger.addEventListener('click', runProgressDemo);
+})();
+
+/* ============================================================
+   Status demo — click to toggle queued / playing / paused only
+   ============================================================ */
+(function statusDemo () {
+  const statusTrigger = document.getElementById('status-demo');
+  const queuedStatus = document.getElementById('queued-status');
+  const queuedLabel = document.getElementById('queued-status-label');
+  const loadingStatus = document.getElementById('loading-status');
+  const loadingLabel = document.getElementById('loading-status-label');
+
+  if (!statusTrigger || !queuedStatus || !queuedLabel || !loadingStatus || !loadingLabel) {
+    return;
+  }
+
+  let loadingTimer = null;
+  let elapsedLoading = 0;
+  let state = 'queued';
+
+  function formatClock(seconds) {
+    const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const secs = String(seconds % 60).padStart(2, '0');
+    return mins + ':' + secs;
+  }
+
+  function clearLoadingTimer() {
+    if (loadingTimer) {
+      window.clearInterval(loadingTimer);
+      loadingTimer = null;
+    }
+  }
+
+  function bumpStatus(node) {
+    node.classList.remove('is-bumping');
+    void node.offsetWidth;
+    node.classList.add('is-bumping');
+    window.setTimeout(() => {
+      node.classList.remove('is-bumping');
+    }, 240);
+  }
+
+  function startLoadingClock() {
+    clearLoadingTimer();
+    loadingLabel.textContent = 'Loading ' + formatClock(elapsedLoading);
+    loadingTimer = window.setInterval(() => {
+      elapsedLoading += 1;
+      loadingLabel.textContent = 'Loading ' + formatClock(elapsedLoading);
+    }, 1000);
+  }
+
+  function setPlayback(nextState) {
+    state = nextState;
+
+    if (nextState === 'playing') {
+      queuedStatus.dataset.tone = 'active';
+      queuedLabel.textContent = 'Playing';
+      loadingStatus.dataset.tone = 'active';
+      startLoadingClock();
+      return;
+    }
+
+    clearLoadingTimer();
+
+    if (nextState === 'paused') {
+      queuedStatus.dataset.tone = 'default';
+      queuedLabel.textContent = 'Paused';
+      loadingStatus.dataset.tone = 'default';
+      return;
+    }
+
+    elapsedLoading = 0;
+    queuedStatus.dataset.tone = 'default';
+    queuedLabel.textContent = 'Queued';
+    loadingStatus.dataset.tone = 'active';
+    loadingLabel.textContent = 'Loading 00:00';
+  }
+
+  function toggleStatusDemo() {
+    if (state === 'queued') {
+      setPlayback('playing');
+    } else if (state === 'playing') {
+      setPlayback('paused');
+    } else {
+      setPlayback('playing');
+    }
+
+    bumpStatus(queuedStatus);
+    bumpStatus(loadingStatus);
+  }
+
+  statusTrigger.addEventListener('click', toggleStatusDemo);
+})();
+
+/* ============================================================
+   Revenue growth — click to replay the count-up
+   ============================================================ */
+(function revenueDemo () {
+  const trigger = document.getElementById('revenue-trigger');
+  const valueEl = document.getElementById('revenue-value');
+  if (!trigger || !valueEl) return;
+
+  const target = 326;
+  const duration = 680;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let frame = 0;
+
+  function render(value) {
+    valueEl.textContent = String(value);
+  }
+
+  trigger.addEventListener('click', () => {
+    if (reducedMotion) {
+      trigger.dataset.tone = 'success';
+      render(target);
+      return;
+    }
+
+    if (frame) {
+      window.cancelAnimationFrame(frame);
+    }
+
+    const start = performance.now();
+    trigger.dataset.tone = 'default';
+
+    function tick(now) {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      render(Math.round(target * eased));
+
+      if (progress < 1) {
+        frame = window.requestAnimationFrame(tick);
+      } else {
+        trigger.dataset.tone = 'success';
+        render(target);
+      }
+    }
+
+    render(0);
+    frame = window.requestAnimationFrame(tick);
+  });
+})();
+
+/* ============================================================
+   Streaming timer — always advancing while the preview is open
+   ============================================================ */
+(function streamingTimer () {
+  const el = document.getElementById('streaming-duration');
+  if (!el) return;
+
+  let elapsed = (2 * 60 * 60) + (41 * 60) + 17;
+
+  function formatDuration(totalSeconds) {
+    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+    const seconds = String(totalSeconds % 60).padStart(2, '0');
+    return hours + ':' + minutes + ':' + seconds;
+  }
+
+  function tick() {
+    el.textContent = formatDuration(elapsed);
+    elapsed += 1;
+  }
+
+  tick();
+  window.setInterval(tick, 1000);
 })();
 </script>
 
