@@ -4,6 +4,35 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.2.6] — 2026-04-23
+
+Polish pass on the v0.2.5 Data Motif surfaces via the emil-design-eng
+lens. No API changes — only motion quality, alignment, and microcopy
+scale.
+
+### Changed
+- **DottedChart scrubber head** animates via `transform: translateX()`
+  driven by a `--x` CSS variable instead of `transition: left`. GPU-
+  accelerated, interruptible, and honors Emil's 300ms UI ceiling
+  (duration 320ms → 200ms). The head now also fades in with
+  `opacity: 0 → .is-ready` once JS has positioned it, so it no longer
+  sits parked at the left edge during the startup window. Startup
+  delay shortened (900ms → 450ms) so the first sweep is visible almost
+  immediately after entry animations settle.
+- **Axis microcopy** on `<DotTimeline>` and `<PulseTrail>` (`60s ago`/
+  `now`) dropped from 11px to 9px — matches the existing
+  `.bar-labels` microcopy in §09. 11px was reading at the `.label`
+  voice; 9px whispers, which is right for axis text.
+- **`<PulseTrail>` dots bottom-align to the canvas baseline.** Dots
+  were centered at `top: 50%` which, in the 48px canvas bottom-aligned
+  inside a 96px chart slot, placed them at slot y≈72 — "passing" over
+  `<DotTimeline>`'s bottom dots at y≈86–92. Now positioned with
+  `bottom: 4px` (trail) / `bottom: 3px` (head) so both data-motif
+  components share the same visual baseline. Hover-pulse keyframes
+  updated to drop the obsolete `translateY` component.
+
+---
+
 ## [0.2.5] — 2026-04-23
 
 Preview polish + first AI-native interaction on `<DottedChart>`. The
