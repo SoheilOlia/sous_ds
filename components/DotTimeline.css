@@ -87,6 +87,23 @@
   50%      { opacity: 0.55; }
 }
 
+/*
+ * Hover pulse — hovering a column pulses all its dots together at the
+ * LiveDot cadence ("inspect this bucket"). Uses the same opacity
+ * rhythm as the live-state pulse so the system vocabulary stays
+ * consistent; scoped to hover-capable pointers so touch users don't
+ * see a dead state.
+ */
+
+@media (hover: hover) and (pointer: fine) {
+  .ds-dot-timeline__col:hover {
+    cursor: pointer;
+  }
+  .ds-dot-timeline__col:hover .ds-dot-timeline__d {
+    animation: ds-dot-timeline-pulse var(--ds-dur-live-pulse) linear infinite;
+  }
+}
+
 .ds-dot-timeline__axis {
   display: flex;
   justify-content: space-between;
@@ -108,5 +125,9 @@
     animation: none;
     outline: 1px solid var(--ds-accent-live);
     outline-offset: 0;
+  }
+  .ds-dot-timeline__col:hover .ds-dot-timeline__d {
+    animation: none;
+    opacity: 1 !important;
   }
 }

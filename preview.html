@@ -1479,11 +1479,10 @@ body {
 }
 .variant__name {
   font-family: var(--ds-font-mono);
-  font-size: 11px;
-  line-height: 16px;
+  font-size: 13px;
+  line-height: 20px;
   font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: -0.01em;
   color: var(--ds-text-primary);
   margin-bottom: var(--ds-space-3);
 }
@@ -1494,11 +1493,26 @@ body {
   color: var(--ds-text-secondary);
   max-width: 60ch;
 }
+
+/* Chart slot — fixed height so DotTimeline and PulseTrail baselines
+   align at the same Y across both variants, regardless of their own
+   internal track heights. */
+.variant__chart {
+  display: flex;
+  align-items: flex-end;
+  min-height: var(--ds-space-10);
+}
+.variant__chart > * {
+  width: 100%;
+}
+
 .variant__axis {
   display: flex;
   justify-content: space-between;
   font-family: var(--ds-font-mono);
   font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  font-weight: 500;
   letter-spacing: var(--ds-type-label-track);
   text-transform: uppercase;
   color: var(--ds-text-muted);
@@ -1550,6 +1564,14 @@ body {
 @keyframes ds-dot-timeline-pulse {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.55; }
+}
+
+/* Hover pulse — hover a column to pulse all its dots together at LiveDot cadence. */
+@media (hover: hover) and (pointer: fine) {
+  .ds-dot-timeline__col:hover { cursor: pointer; }
+  .ds-dot-timeline__col:hover .ds-dot-timeline__d {
+    animation: ds-dot-timeline-pulse var(--ds-dur-live-pulse) linear infinite;
+  }
 }
 
 /* ---- <PulseTrail> (inline mirror of components/PulseTrail.css) ---- */
@@ -1611,6 +1633,10 @@ body {
   .ds-pulse-trail__head {
     left: 100%;
     box-shadow: 0 0 0 3px rgba(255, 46, 22, 0.28);
+  }
+  .ds-dot-timeline__col:hover .ds-dot-timeline__d {
+    animation: none;
+    opacity: 1 !important;
   }
   .ds-pulse-trail__dot[data-role="trail"]:hover {
     animation: none;
@@ -2128,24 +2154,24 @@ body {
           <div class="variant__head">
             <span class="variant__letter">A</span>
             <div>
-              <div class="variant__name">&lt;DotTimeline&gt;</div>
-              <div class="variant__note">Quantitative. 24 time buckets over 60s, each a vertical stack of up to 10 dots. Dot count = event density. Column color = bucket state. Direct sibling of DottedChart with a time axis.</div>
+              <div class="variant__name">DotTimeline</div>
+              <div class="variant__note">Quantitative. 24 time buckets over 60s, each a vertical stack of up to 10 dots. Dot count = event density. Column color = bucket state. Hover a column to pulse it; direct sibling of DottedChart with a time axis.</div>
             </div>
           </div>
-          <div id="demo-dot-timeline"></div>
-          <div class="variant__axis"><span>60S AGO</span><span>NOW</span></div>
+          <div class="variant__chart"><div id="demo-dot-timeline"></div></div>
+          <div class="variant__axis"><span>60s ago</span><span>now</span></div>
         </div>
 
         <div class="variant">
           <div class="variant__head">
             <span class="variant__letter">B</span>
             <div>
-              <div class="variant__name">&lt;PulseTrail&gt;</div>
+              <div class="variant__name">PulseTrail</div>
               <div class="variant__note">Qualitative — Emil-style signature motion. A larger <code>accent-live</code> head dot (8px, with a soft halo) sweeps left→right on a 4s loop while pulsing on the LiveDot cadence; smaller trail dots mark prior events at decaying opacity, and pulse on their own when hovered. Motion IS the data.</div>
             </div>
           </div>
-          <div id="demo-pulse-trail"></div>
-          <div class="variant__axis"><span>60S AGO</span><span>NOW</span></div>
+          <div class="variant__chart"><div id="demo-pulse-trail"></div></div>
+          <div class="variant__axis"><span>60s ago</span><span>now</span></div>
         </div>
       </div>
     </section>
@@ -2268,12 +2294,17 @@ body {
   const BUCKET_COUNT = 24;
   const MAX_DOTS = 10;
 
-  // Pattern: ramp up, peak, 3-bucket live cluster at position 13-15, tail into queued.
-  const counts = [1, 2, 3, 4, 5, 4, 6, 7, 6, 8, 9, 7, 9, 10, 8, 6, 4, 3, 2, 1, 0, 0, 0, 0];
+  // Pattern: gentle bell curve peaking mid-window, one small 1-dot cluster
+  // near the right ("now") running live, rest default / queued. Matches the
+  // <DottedChart> read: mostly muted neutrals, a single success peak, a
+  // single attention marker.
+  const counts = [2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 2, 1, 1, 0, 0, 0, 0];
+  const PEAK_INDEX = 8;    // highest column → done (green)
+  const LIVE_INDEX = 19;   // 1-dot column near "now" → live (red)
   const states = Array.from({ length: BUCKET_COUNT }, (_, i) => {
-    if (i >= 20) return 'queued';
-    if (i >= 13 && i <= 15) return 'live';
-    return 'done';
+    if (i === PEAK_INDEX) return 'done';
+    if (i === LIVE_INDEX) return 'live';
+    return 'queued';
   });
   const maxCount = Math.max(...counts, 1);
 
