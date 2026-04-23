@@ -4,6 +4,64 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.2.3] — 2026-04-22
+
+Polish pass on the v0.2.2 Data Motif siblings based on first-read
+feedback. Density now reads as a direct sibling of `<DottedChart>`,
+motion is legible from a still frame, and `<LiveDot>` picks up the
+AI-native rotating-agent-state pattern.
+
+### Added
+- `<DotTimeline density="compact">` — new prop. Same component, same
+  data, same state colors, same live-pulse cadence, but each bucket
+  collapses from a vertical dot stack to a single thin bar whose height
+  encodes count. Preferred read at full container width or for
+  high-rate streams where dot stacks would overlap. Standard dot-stack
+  mode remains the default.
+- `<LiveDot labels={[...]} />` — rotating typewriter agent-state
+  indicator. New props `labels: string[]`, `labelStep` (per-char
+  interval, default 50ms), and `labelHold` (hold at full, default
+  2000ms). Cycles through each label with type → hold → erase →
+  advance; a 1px caret renders after the visible text and blinks on a
+  1s cycle so the "something is happening" signal reads even between
+  rotations. Accessibility: visible label is `aria-hidden` during
+  rotation; a separate `aria-live="polite"` sr-only span updates with
+  the full current label so assistive tech hears "AGENTING" not
+  "A, AG, AGE...". Reduced motion collapses to instant swaps at the
+  hold cadence. Preview demo shows `[AGENTING, WORKING, THINKING,
+  REASONING]`.
+- `Section 10 / Data Motif — Two New Siblings` in `preview.html`. The
+  `<DotTimeline>` + `<PulseTrail>` block was a subsection inside §09
+  with its own larger heading typography that fought the page voice;
+  promoted to its own section using the canonical `.section-head`
+  pattern so the hierarchy reads as siblings to every other section.
+
+### Changed
+- `<DotTimeline>` column layout switched from `flex: 1 1 0` (stretch to
+  fill) to CSS grid with fixed `var(--ds-size-dot)` (6px) column widths
+  and `var(--ds-space-3)` (8px) gap — direct match for the
+  `<DottedChart>` rhythm. Inter-dot vertical gap bumped from 2px to
+  `var(--ds-space-2)` (4px) to match DottedChart's stack rhythm.
+  Preview shows the two siblings side-by-side at half-width (stacks
+  below 880px) so 24 buckets sit tight.
+- `<PulseTrail>` head is now visually distinct from trail dots so the
+  "this one is moving" signal reads from a still frame, not just from
+  seeing the animation: 6px → 8px diameter, soft accent-live halo ring
+  via `box-shadow` at 18% opacity, and default `loopDuration` tightened
+  from 6000ms → 4000ms so in-flight motion is obvious on first glance.
+  Reduced-motion fallback keeps the halo (bumped to 28% opacity) and
+  pins the head at "now".
+- Renumbered `§10 Do & Don't` → `§11`; animation-delay bumped from
+  360ms → 400ms to stay ordered after the new §10.
+
+### Removed
+- `.variant-head` CSS class in `preview.html` (the now-unused subsection
+  header that lived between the bento wrap and the variants grid).
+- Static "STREAMING · 02:41:17" duration counter in the Live-dot
+  preview row, superseded by the rotating typewriter demo.
+
+---
+
 ## [0.2.2] — 2026-04-22
 
 Data-motif expansion. Two new in-family siblings to `<DottedChart>` —
