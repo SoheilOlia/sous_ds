@@ -4,6 +4,51 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.2.5] — 2026-04-23
+
+Preview polish + first AI-native interaction on `<DottedChart>`. The
+data-motif surfaces (`<DottedChart>`, `<DotTimeline>`, `<PulseTrail>`)
+now share a consistent interaction vocabulary — inspect any element on
+hover; the system reads itself aloud.
+
+### Added
+- **DottedChart Agent Scrubber** (preview §09). An `accent-live` read-
+  head sweeps left→right across the 12 month columns on ~1.2s per
+  month, pausing on each. As it passes a column, the column lights up
+  (gray dots → primary text color; accent columns keep their accents)
+  and a typewriter caption below reports `MONTH · VALUE`. Reuses the
+  PulseTrail head (8px, 3px halo, LiveDot-cadence pulse) and the
+  `<LiveDot labels={...}>` typewriter from v0.2.3. A faint linear-
+  gradient scrub line descends from the head through the chart so the
+  column being read is visually crosshaired. Hover any column pauses
+  auto-scrub and snaps the head there; mouseleave resumes from the
+  current position. `prefers-reduced-motion` pins the head at Dec with
+  its caption shown statically.
+- `<DotTimeline>` columns pulse on hover at the LiveDot cadence, so
+  every past bucket is individually inspectable — matches the
+  `<PulseTrail>` trail-dot affordance shipped in v0.2.4. Reduced
+  motion: hovered columns lift to full opacity statically.
+- `.variant__chart` slot with `min-height: var(--ds-space-10)` so the
+  baseline of `<DotTimeline>` (96px track) and `<PulseTrail>` (48px
+  canvas) line up at the same Y even though their internal chart
+  heights differ.
+
+### Changed
+- Preview §10 variant names dropped the `<angle brackets>` and the
+  all-caps treatment in favor of plain CamelCase `DotTimeline` /
+  `PulseTrail`, bumped to 13px/20px mono with −0.01em tracking so the
+  CamelCase sits right.
+- Preview §10 axis microcopy (`60s ago` / `now`) picked up the canonical
+  `.label` line-height and weight, and moved the uppercase to CSS so
+  HTML source is single-case.
+- `<DotTimeline>` preview demo data rebalanced: was 13 `done` (green)
+  buckets out of 24 reading as a green wall; now one peak bucket
+  (count 10) is green, one 1-dot bucket near "now" is red live, rest
+  are muted queued. Matches the `<DottedChart>` grammar of mostly-
+  neutral with single success + attention markers.
+
+---
+
 ## [0.2.4] — 2026-04-22
 
 Second-look pass on v0.2.3. The compact bar variant shipped one day
