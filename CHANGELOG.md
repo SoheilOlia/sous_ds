@@ -4,6 +4,38 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.2.10] — 2026-04-23
+
+§10 redesigned as a live activity feed coupled to the §09 scrubber.
+
+### Changed
+- `<DotTimeline>` retired from the preview showcase. Next to
+  `<DottedChart>` above it read as the same grammar twice (dot-stack
+  columns); `<PulseTrail>` is the more distinctive motif and carries
+  §10 alone. Component files + exports are untouched — direct
+  consumers can still import `<DotTimeline>`.
+- §10 is now a single coupled demo, not an A/B variant showcase. The
+  `.variants` subgrid container, the `.variant__letter` A/B markers,
+  and the dual-chart baseline alignment were all removed.
+
+### Added
+- **§09 scrubber emits `scrubber:month` CustomEvents on window** every
+  time it lands on a column (auto-advance or hover). Detail carries
+  `{ label, value, index }`.
+- **§10 `<PulseTrail>` listens for those events and streams in trail
+  dots** — each scrubber land adds a new event at the right edge with
+  a bloom, older events fade leftward, oldest drops off once the
+  10-slot FIFO fills. Real data, not hardcoded positions.
+- **`.ds-pulse-trail__dot.is-arriving` bloom keyframe**: scale 1.6 → 1.0
+  with an accent-success halo flash over `var(--ds-dur-standard)` as
+  each event lands. One-shot; removed when the animation ends.
+  `prefers-reduced-motion` skips the bloom.
+- **`.variant__caption`** row echoes the scrubber caption vocabulary
+  (live-pulse dot + mono uppercase label) and shows the latest event
+  label (`DEC · 14`). `aria-live="polite"`.
+
+---
+
 ## [0.2.9] — 2026-04-23
 
 Tighter body-voice match + slower animation cadence.
