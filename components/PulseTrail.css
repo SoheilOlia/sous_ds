@@ -48,14 +48,26 @@
 .ds-pulse-trail__dot[data-role="trail"][data-state="queued"] { background: var(--ds-text-muted); }
 
 /* ---------- Head (sweeps left → right + pulses on LiveDot cadence) ---------- */
+/*
+ * The head is visually distinct from the trail by:
+ *   1. larger diameter (8px vs 6px trail)
+ *   2. a soft accent-live halo ring via box-shadow
+ *   3. a tighter sweep cycle (default 4000ms) so motion is obvious on
+ *      first glance — trail dots without a moving head read as static
+ * These three together make "is it alive?" answerable from a still
+ * screenshot, not only from seeing the animation in flight.
+ */
 
 .ds-pulse-trail__head {
   background: var(--ds-accent-live);
+  width: 8px;
+  height: 8px;
   z-index: 2;
   left: 0%;
+  box-shadow: 0 0 0 3px rgba(255, 46, 22, 0.18);
   will-change: transform, opacity, left;
   animation:
-    ds-pulse-trail-sweep var(--ds-pulse-trail-loop, 6000ms) linear infinite,
+    ds-pulse-trail-sweep var(--ds-pulse-trail-loop, 4000ms) linear infinite,
     ds-pulse-trail-pulse var(--ds-dur-live-pulse) linear infinite;
 }
 
@@ -84,12 +96,17 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- Reduced motion ---------- */
+/* ---------- Reduced motion ----------
+ * No sweep, no pulse — but keep the head clearly distinct from trail
+ * dots via size + halo, so "something is live here" still reads
+ * without motion. The head pins at the right edge ("now").
+ */
 
 @media (prefers-reduced-motion: reduce) {
   .ds-pulse-trail__head {
     animation: none;
     left: 100%;
+    box-shadow: 0 0 0 3px rgba(255, 46, 22, 0.28);
   }
   .ds-pulse-trail__dot[data-role="trail"] {
     transition: none;

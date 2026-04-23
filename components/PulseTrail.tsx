@@ -38,7 +38,7 @@ export type PulseTrailProps = {
   trailLength?: number;
   /** Visible time window in ms. Default 60_000. */
   window?: number;
-  /** Head sweep cycle duration in ms. Default 6_000. */
+  /** Head sweep cycle duration in ms. Default 4_000 (tight enough that motion is obvious on first glance). */
   loopDuration?: number;
   /** aria-label prefix. Default "Agent activity". */
   label?: string;
@@ -56,7 +56,7 @@ export function PulseTrail(props: PulseTrailProps) {
     events = [],
     trailLength = 10,
     window: windowMs = 60_000,
-    loopDuration = 6_000,
+    loopDuration = 4_000,
     label = "Agent activity",
     showAxis = true,
     className,

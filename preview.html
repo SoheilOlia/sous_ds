@@ -1549,11 +1549,14 @@ body {
 .ds-pulse-trail__dot[data-role="trail"][data-state="queued"] { background: var(--ds-text-muted); }
 .ds-pulse-trail__head {
   background: var(--ds-accent-live);
+  width: 8px;
+  height: 8px;
   z-index: 2;
   left: 0%;
+  box-shadow: 0 0 0 3px rgba(255, 46, 22, 0.18);
   will-change: transform, opacity, left;
   animation:
-    ds-pulse-trail-sweep 6000ms linear infinite,
+    ds-pulse-trail-sweep 4000ms linear infinite,
     ds-pulse-trail-pulse var(--ds-dur-live-pulse) linear infinite;
 }
 @keyframes ds-pulse-trail-sweep {
@@ -1569,7 +1572,10 @@ body {
   .ds-dot-timeline__col[data-state="live"] .ds-dot-timeline__d,
   .ds-dot-timeline[data-density="compact"] .ds-dot-timeline__col[data-state="live"] .ds-dot-timeline__b,
   .ds-pulse-trail__head { animation: none; }
-  .ds-pulse-trail__head { left: 100%; }
+  .ds-pulse-trail__head {
+    left: 100%;
+    box-shadow: 0 0 0 3px rgba(255, 46, 22, 0.28);
+  }
 }
 
 
@@ -2093,7 +2099,7 @@ body {
             <span class="variant__letter">B</span>
             <div>
               <div class="variant__name">&lt;PulseTrail&gt;</div>
-              <div class="variant__note">Qualitative — Emil-style signature motion. Single <code>accent-live</code> dot sweeps left→right on a 6s loop while pulsing on the LiveDot cadence; trail dots mark prior events at decaying opacity. Motion IS the data.</div>
+              <div class="variant__note">Qualitative — Emil-style signature motion. A larger <code>accent-live</code> head dot (8px, with a soft halo) sweeps left→right on a 4s loop while pulsing on the LiveDot cadence; smaller trail dots mark prior events at decaying opacity. Motion IS the data.</div>
             </div>
           </div>
           <div id="demo-pulse-trail"></div>
