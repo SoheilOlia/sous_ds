@@ -1,3 +1,14 @@
+> **⚠️ SUPERSEDED** — this spec described the solid-bar DensityStrip, which
+> broke the Data Motif family grammar (DottedChart uses dots; this used
+> rectangles). The review that followed produced **R-FAMILY-001** (see
+> SKILL.md "Extending a component family"), a three-variant dot-based
+> re-exploration, and the decision to ship A + B as `<DotTimeline>` and
+> `<PulseTrail>`. This document is preserved for history.
+>
+> **Current spec:** [2026-04-22-dot-motif-variants-design.md](./2026-04-22-dot-motif-variants-design.md)
+
+---
+
 # DensityStrip — Design Spec
 
 **Status:** Approved (4-question brainstorm, user confirmed each section)
