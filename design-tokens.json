@@ -1,7 +1,7 @@
 {
   "$schema": "https://tr.designtokens.org/format/",
   "$name": "sous-ds",
-  "$version": "0.2.6",
+  "$version": "0.2.7",
   "$description": "Canonical tokens for the system. Dark is default. Every token passes WCAG AA at minimum. Semantic accents are reserved: live and success only. Format inspired by the W3C DTCG spec.",
 
   "color": {

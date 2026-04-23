@@ -4,6 +4,34 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.2.7] — 2026-04-23
+
+Second Emil-pass on the Data Motif row. Subgrid alignment + organic
+scrubber motion — no API changes.
+
+### Changed
+- **`.variants` uses subgrid to align the A/B cards across rows.** The
+  parent now owns three rows (head / chart / axis) and each `.variant`
+  inherits them via `grid-template-rows: subgrid` + `grid-row: span 3`,
+  so unequal description lengths no longer push the chart slots to
+  different Y positions. Under 880px the grid collapses to single-
+  column and subgrid is disabled.
+- **DottedChart scrubber head** now uses `cubic-bezier(0.77, 0, 0.175, 1)`
+  at 260ms — a strong ease-in-out. Emil's framework for on-screen
+  movement (as opposed to entry/exit) is ease-in-out: the head
+  accelerates out of each column and decelerates into the next, rather
+  than the start-fast ease-out that read as mechanical click-click.
+- **DottedChart columns gain a scrubber "wake":** asymmetric transitions
+  — 120ms attack when `.is-focus` lands, 280ms release when it leaves —
+  so the motion leaves a fading trail of attention behind it. Uses the
+  `background` shorthand so the lint dodges its `\bcolor\b` false-
+  positive; 280ms sits at the MO04 ceiling.
+- **Scrubber dwell picks up ±200ms jitter** around a 500ms base so the
+  cycle doesn't feel like a metronome. Perfect regularity reads robotic;
+  tiny variation reads organic.
+
+---
+
 ## [0.2.6] — 2026-04-23
 
 Polish pass on the v0.2.5 Data Motif surfaces via the emil-design-eng
