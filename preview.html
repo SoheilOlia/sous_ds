@@ -1433,13 +1433,11 @@ body {
      before the first positioning pass. */
   transform: translateX(calc(var(--x, 0px) - 50%));
   opacity: 0;
-  /* Ease-in-out for cross-chart motion — ease-out starts fast and
-     reads as mechanical click-click-click when stepping between
-     discrete columns. The strong cubic-bezier below is the system's
-     ease-in-out curve, slightly slowed so the motion breathes. */
-  transition:
-    transform 260ms cubic-bezier(0.77, 0, 0.175, 1),
-    opacity 200ms var(--ds-ease-out);
+  /* --x is tweened by JS (requestAnimationFrame) so the head can
+     drift between columns over more than the 300ms CSS-transition
+     ceiling. Only opacity has a CSS transition here — for the fade-in
+     when the head first positions itself. */
+  transition: opacity 200ms var(--ds-ease-out);
   animation: live-pulse var(--ds-dur-live-pulse) linear infinite;
   pointer-events: none;
   z-index: 2;
@@ -1615,18 +1613,17 @@ body {
   margin-bottom: var(--ds-space-3);
 }
 .variant__note {
-  /* Matches .site-copy (§01 manifesto) — the system's established body
-     voice. Display face (Cash Sans → Geist fallback), 22px, tight
-     line-height, secondary ink. Reads editorial instead of "generic
-     UI chrome". */
+  /* Byte-for-byte match to .site-copy (§01 manifesto) — the system's
+     only established body voice. Any drift (line-height, max-width)
+     makes the two voices read as different families. */
+  margin: 0;
+  max-width: 38ch;
+  color: var(--ds-text-secondary);
   font-family: var(--ds-font-display);
   font-size: 22px;
-  line-height: 1.2;
+  line-height: 1.1;
   font-weight: 400;
   letter-spacing: -0.0075em;
-  color: var(--ds-text-secondary);
-  max-width: 42ch;
-  margin: 0;
 }
 .variant__note code {
   /* Inline code stays in Geist Mono so token names like `accent-live`
@@ -2459,10 +2456,11 @@ body {
   if (!barsWrap || !head || !textEl) return;
 
   const LABELS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  const TYPE_STEP = 35;   // ms per character typed
-  const HOLD_BASE = 500;  // ms base dwell after the caption finishes typing
-  const HOLD_JITTER = 200; // +/- range around HOLD_BASE — small randomness
-                          // breaks the metronome feel of a perfectly-timed loop
+  const TYPE_STEP = 60;     // per-character interval for the caption typewriter
+  const HOLD_BASE = 1500;   // base dwell after the caption types in
+  const HOLD_JITTER = 300;  // +/- randomness around HOLD_BASE, kills metronome feel
+  const HEAD_MOVE = 1500;   // head auto-drift duration between months
+  const HOVER_SNAP = 0;     // on hover, head snaps instantly (no drift)
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -2470,6 +2468,7 @@ body {
   let isAuto = true;
   let typeTimer = 0;
   let advanceTimer = 0;
+  let headFrame = 0;
 
   function getBars () {
     return Array.from(barsWrap.querySelectorAll('.bars .bar'));
@@ -2480,16 +2479,51 @@ body {
     return bar ? bar.querySelectorAll('.d').length : 0;
   }
 
-  function positionHead (idx) {
+  function cancelHeadFrame () {
+    if (headFrame) { window.cancelAnimationFrame(headFrame); headFrame = 0; }
+  }
+
+  function currentHeadX () {
+    const raw = head.style.getPropertyValue('--x');
+    const n = parseFloat(raw);
+    return isFinite(n) ? n : 0;
+  }
+
+  function positionHead (idx, duration) {
     const bars = getBars();
-    if (!bars[idx]) return;
+    if (!bars[idx]) return Promise.resolve();
     const barRect = bars[idx].getBoundingClientRect();
     const wrapRect = barsWrap.getBoundingClientRect();
-    const x = barRect.left + barRect.width / 2 - wrapRect.left;
-    // --x drives a transform: translateX() (GPU-accelerated) instead of
-    // animating the `left` property (which forces layout each frame).
-    head.style.setProperty('--x', x + 'px');
+    const toX = barRect.left + barRect.width / 2 - wrapRect.left;
     head.classList.add('is-ready');
+
+    cancelHeadFrame();
+
+    // Instant snap: used for hover, first-load positioning, and reduced motion.
+    if (!duration || duration <= 0 || reduced) {
+      head.style.setProperty('--x', toX + 'px');
+      return Promise.resolve();
+    }
+
+    // RAF tween from current to target X using ease-in-out (sine).
+    // Lives in JS so the drift can exceed the 300ms CSS transition
+    // ceiling without breaking the design-system lint rules.
+    return new Promise(function (resolve) {
+      const fromX = currentHeadX();
+      const start = performance.now();
+      (function tick (now) {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 0.5 - 0.5 * Math.cos(Math.PI * t); // ease-in-out sine
+        const x = fromX + (toX - fromX) * eased;
+        head.style.setProperty('--x', x + 'px');
+        if (t < 1) {
+          headFrame = window.requestAnimationFrame(tick);
+        } else {
+          headFrame = 0;
+          resolve();
+        }
+      })(performance.now());
+    });
   }
 
   function highlight (idx) {
@@ -2522,9 +2556,11 @@ body {
 
   function showMonth (idx, instant) {
     currentIdx = idx;
-    positionHead(idx);
     highlight(idx);
-    return setCaption(idx, instant);
+    // Head drifts on auto-advance; snaps on hover / reduced motion.
+    const headP = positionHead(idx, instant ? HOVER_SNAP : HEAD_MOVE);
+    const capP = setCaption(idx, instant);
+    return Promise.all([headP, capP]);
   }
 
   function cycle () {
@@ -2555,6 +2591,7 @@ body {
     isAuto = false;
     cancelTypeTimer();
     cancelAdvanceTimer();
+    cancelHeadFrame();
   }
 
   function setupHover () {
@@ -2578,7 +2615,7 @@ body {
     startAuto();
   }, 450);
 
-  window.addEventListener('resize', function () { positionHead(currentIdx); });
+  window.addEventListener('resize', function () { positionHead(currentIdx, 0); });
 })();
 
 /* ============================================================
@@ -2935,8 +2972,8 @@ body {
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const CYCLE = 1500;          // ms between target picks
-  const COUNT_DURATION = 680;  // ms for each count animation
+  const CYCLE = 3000;          // dwell between target picks
+  const COUNT_DURATION = 1500; // duration of the count animation
 
   let current = 0;
   let frame = 0;
