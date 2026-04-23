@@ -1,7 +1,7 @@
 {
   "$schema": "https://tr.designtokens.org/format/",
   "$name": "sous-ds",
-  "$version": "0.2.0",
+  "$version": "0.2.2",
   "$description": "Canonical tokens for the system. Dark is default. Every token passes WCAG AA at minimum. Semantic accents are reserved: live and success only. Format inspired by the W3C DTCG spec.",
 
   "color": {
@@ -85,9 +85,7 @@
     "interactive-min": { "$value": "44px", "$type": "dimension", "$description": "Minimum touch hit area for interactive elements." },
     "dot": { "$value": "6px", "$type": "dimension", "$description": "Live/status marker size." },
     "icon-sm": { "$value": "14px", "$type": "dimension", "$description": "Small inline icon and spinner size." },
-    "toast-min-width": { "$value": "280px", "$type": "dimension", "$description": "Minimum toast width on desktop before wrapping." },
-    "strip-h": { "$value": "48px", "$type": "dimension", "$description": "DensityStrip row height. Snaps to 8pt scale; matches Button md visual footprint." },
-    "strip-bar-min": { "$value": "4px", "$type": "dimension", "$description": "DensityStrip: minimum bar height when a bucket has any events, so a 'count of 1' bucket is still visible." }
+    "toast-min-width": { "$value": "280px", "$type": "dimension", "$description": "Minimum toast width on desktop before wrapping." }
   },
 
   "radius": {

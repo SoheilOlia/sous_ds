@@ -1,6 +1,6 @@
 /* ============================================================
    sous-ds / tokens.css
-   Generated from design-tokens.json v0.2.0
+   Generated from design-tokens.json v0.2.2
    Every value here is the single source of truth for the system.
    Do not override in component CSS. Change the token instead.
    ============================================================ */
@@ -71,8 +71,6 @@
   --ds-size-dot:           6px;
   --ds-size-icon-sm:       14px;
   --ds-size-toast-min-width: 280px;
-  --ds-size-strip-h:       48px;  /* DensityStrip row height; snaps to 8pt */
-  --ds-size-strip-bar-min: 4px;   /* DensityStrip: min bar height when count > 0 */
 
   /* ---- Radius --------------------------------------------- */
   --ds-radius-none: 0;

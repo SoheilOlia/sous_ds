@@ -1,0 +1,109 @@
+/*
+ * DotTimeline.css · sous-ds
+ *
+ * Motion rules (Emil-aligned):
+ * - Transitions on state changes (interruptible as data updates)
+ * - Keyframes only for infinite live pulse (continuous, same cadence as LiveDot)
+ * - Transform/opacity only; never layout properties
+ * - prefers-reduced-motion: reduce collapses motion; live state becomes static outline
+ *
+ * Accent carriers used: --ds-accent-live AND --ds-accent-success. One of
+ * two components permitted to carry both (the other is PulseTrail).
+ * See DESIGN.md #accent-carriers and CL07 in scripts/lint.mjs.
+ */
+
+.ds-dot-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+  width: 100%;
+  font-family: var(--ds-font-mono);
+}
+
+.ds-dot-timeline__track {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ds-space-2);
+  /* 10 dots × 6 + 9 × 2 gaps + padding = 86 (fits comfortably in 96 = space-10) */
+  height: var(--ds-space-10);
+  padding: var(--ds-space-2) 0;
+  border-bottom: 1px solid var(--ds-line);
+  isolation: isolate;
+}
+
+.ds-dot-timeline__col {
+  position: relative;
+  flex: 1 1 0;
+  min-width: var(--ds-space-2);
+  height: 100%;
+  display: flex;
+  flex-direction: column-reverse;            /* stack from the bottom */
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--ds-space-1);
+  outline: none;
+  cursor: default;
+  padding-bottom: 0;
+}
+
+.ds-dot-timeline__col:focus-visible {
+  outline: 2px solid var(--ds-accent-live);
+  outline-offset: 2px;
+  border-radius: var(--ds-radius-xs);
+}
+
+.ds-dot-timeline__d {
+  flex: 0 0 auto;
+  width: var(--ds-size-dot);
+  height: var(--ds-size-dot);
+  border-radius: 50%;
+  background: var(--ds-text-muted);
+  opacity: 0.55;
+  transition:
+    background-color var(--ds-dur-standard) var(--ds-ease-out),
+    opacity var(--ds-dur-standard) var(--ds-ease-out);
+}
+
+.ds-dot-timeline__col[data-state="done"] .ds-dot-timeline__d {
+  background: var(--ds-accent-success);
+  opacity: 1;
+}
+
+.ds-dot-timeline__col[data-state="live"] .ds-dot-timeline__d {
+  background: var(--ds-accent-live);
+  opacity: 1;
+  animation: ds-dot-timeline-pulse var(--ds-dur-live-pulse) linear infinite;
+}
+
+.ds-dot-timeline__col[data-empty] .ds-dot-timeline__d {
+  opacity: 0.3;
+}
+
+@keyframes ds-dot-timeline-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+.ds-dot-timeline__axis {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-dot-timeline__d {
+    transition: none !important;
+  }
+  .ds-dot-timeline__col[data-state="live"] .ds-dot-timeline__d {
+    animation: none;
+    outline: 1px solid var(--ds-accent-live);
+    outline-offset: 0;
+  }
+}

@@ -223,9 +223,10 @@ The accent pair is semantic, not decorative:
 
 - `✓` `accent-success` for positive emphasis, completion, committed state, or a deliberately spotlighted good outcome
 - `✓` `accent-live` for alert, anomaly, error, negative variance, or urgent live-now state
-- `✓` Sanctioned success carriers: `SegmentedBar` when `value === total`, `DottedChart` endpoint marked as a closed positive result, a `DensityStrip` bucket in `done` state, or another explicitly documented completion state
-- `✓` Sanctioned attention carriers: `LiveDot`, `InlineStatus` in `tone="live"`, a live-pill prefix, a live-tone toast marker, a sparse `DottedChart` point marking anomaly/attention, or a `DensityStrip` bucket in `live` state
-- **`DensityStrip` note:** This is the one component permitted to carry both accents simultaneously. Each bucket holds a single state, so the two accents never overlap within one bucket; the component enforces state priority `live > done > queued` at bucketization time
+- `✓` Sanctioned success carriers: `SegmentedBar` when `value === total`, `DottedChart` endpoint marked as a closed positive result, a `DotTimeline` column in `done` state, or another explicitly documented completion state
+- `✓` Sanctioned attention carriers: `LiveDot`, `InlineStatus` in `tone="live"`, a live-pill prefix, a live-tone toast marker, a sparse `DottedChart` point marking anomaly/attention, a `DotTimeline` column in `live` state, or the head dot of `PulseTrail`
+- **`PulseTrail` note:** `PulseTrail` is the canonical carrier for the "live now" agent-activity feel — a single accent-live dot sweeping left→right with a fading trail of prior events. Other components should compose `<PulseTrail>` rather than recreate the trailing-dot pattern.
+- **`DotTimeline` note:** This is one of two components (alongside `PulseTrail`) permitted to carry both accents simultaneously. Each column holds a single state, so the two accents never overlap within one column; the component enforces state priority `live > done > queued` at bucketization time
 - `✗` Primary CTA button color
 - `✗` Link color
 - `✗` Any decorative or branding use

@@ -167,14 +167,15 @@
         "components/Toast.css",
         "components/SegmentedBar.css",
         "components/DottedChart.css",
-        "components/DensityStrip.css",
+        "components/DotTimeline.css",
+        "components/PulseTrail.css",
         "tokens.css",
         "preview.html",
         "examples/slop-vs-system.html"
       ],
       "severity": "error",
       "rationale": "Accent tokens are semantic carriers, not theme colors. `accent-live` is for live/now/active. `accent-success` is for terminal completion. Painting them onto arbitrary surfaces breaks the most important meaning contract in the system.",
-      "correct": "Carry `accent-live` via `<LiveDot>`, `<InlineStatus tone=\"live\">`, `<Pill live>`, `<Toast tone=\"live\">`, an anomaly point in `<DottedChart>`, or a running bucket in `<DensityStrip>`. Carry `accent-success` via `<SegmentedBar>` at full completion, a documented success endpoint in `<DottedChart>`, or a done bucket in `<DensityStrip>`. If a new semantic genuinely needs an accent, the PR must update DESIGN.md 'Accent discipline' and this refusal entry.",
+      "correct": "Carry `accent-live` via `<LiveDot>`, `<InlineStatus tone=\"live\">`, `<Pill live>`, `<Toast tone=\"live\">`, an anomaly point in `<DottedChart>`, a running column in `<DotTimeline>`, or the head of `<PulseTrail>`. Carry `accent-success` via `<SegmentedBar>` at full completion, a documented success endpoint in `<DottedChart>`, a done column in `<DotTimeline>`, or a done trail dot in `<PulseTrail>`. If a new semantic genuinely needs an accent, the PR must update DESIGN.md 'Accent discipline' and this refusal entry.",
       "source": "DESIGN.md#accent-carriers"
     },
     {

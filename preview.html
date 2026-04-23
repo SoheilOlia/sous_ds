@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>sous-ds / v0.2.0</title>
+<title>sous-ds / v0.2.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1385,8 +1385,8 @@ body {
 }
 
 /* ============================================================
-   Data Motif — DensityStrip exploration (three dot-based variants)
-   All variants share the 6px dot primitive from DottedChart.
+   Data Motif — <DotTimeline> and <PulseTrail>
+   Both built on the 6px dot primitive shared with DottedChart.
    ============================================================ */
 .variant-head {
   margin-top: var(--ds-space-8);
@@ -1468,31 +1468,34 @@ body {
   color: var(--ds-text-muted);
 }
 
-/* ---- Variant A: Dot-stack timeline ---- */
-.ds-stack {
+/* ---- <DotTimeline> (inline mirror of components/DotTimeline.css) ---- */
+.ds-dot-timeline__track {
   display: flex;
   align-items: flex-end;
   gap: var(--ds-space-2);
-  height: 110px;
+  height: var(--ds-space-10);
   padding: var(--ds-space-2) 0;
   border-bottom: 1px solid var(--ds-line);
 }
-.ds-stack__col {
+.ds-dot-timeline__col {
   position: relative;
   flex: 1 1 0;
+  min-width: var(--ds-space-2);
+  height: 100%;
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
-  gap: 3px;
+  gap: var(--ds-space-1);
   outline: none;
   cursor: default;
 }
-.ds-stack__col:focus-visible {
+.ds-dot-timeline__col:focus-visible {
   outline: 2px solid var(--ds-accent-live);
   outline-offset: 2px;
   border-radius: var(--ds-radius-xs);
 }
-.ds-stack__d {
+.ds-dot-timeline__d {
+  flex: 0 0 auto;
   width: var(--ds-size-dot);
   height: var(--ds-size-dot);
   border-radius: 50%;
@@ -1501,234 +1504,60 @@ body {
   transition: background-color var(--ds-dur-standard) var(--ds-ease-out),
               opacity var(--ds-dur-standard) var(--ds-ease-out);
 }
-.ds-stack__col[data-state="done"] .ds-stack__d { background: var(--ds-accent-success); opacity: 1; }
-.ds-stack__col[data-state="live"] .ds-stack__d {
+.ds-dot-timeline__col[data-state="done"] .ds-dot-timeline__d { background: var(--ds-accent-success); opacity: 1; }
+.ds-dot-timeline__col[data-state="live"] .ds-dot-timeline__d {
   background: var(--ds-accent-live); opacity: 1;
-  animation: ds-variant-pulse var(--ds-dur-live-pulse) linear infinite;
+  animation: ds-dot-timeline-pulse var(--ds-dur-live-pulse) linear infinite;
 }
-.ds-stack__col[data-empty] .ds-stack__d { opacity: 0.3; }
-
-@keyframes ds-variant-pulse {
+.ds-dot-timeline__col[data-empty] .ds-dot-timeline__d { opacity: 0.3; }
+@keyframes ds-dot-timeline-pulse {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.55; }
 }
 
-/* ---- Variant B: Trailing dot ---- */
-.ds-trail {
+/* ---- <PulseTrail> (inline mirror of components/PulseTrail.css) ---- */
+.ds-pulse-trail__canvas {
   position: relative;
-  height: 48px;
+  height: var(--ds-space-8);
   border-bottom: 1px solid var(--ds-line);
-  overflow: hidden;
 }
-.ds-trail__canvas {
-  position: absolute;
-  inset: 0;
-}
-.ds-trail__dot {
+.ds-pulse-trail__dot {
   position: absolute;
   top: 50%;
   width: var(--ds-size-dot);
   height: var(--ds-size-dot);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  will-change: transform, opacity;
+  background: var(--ds-text-muted);
+  will-change: opacity;
 }
-.ds-trail__dot[data-role="head"] {
+.ds-pulse-trail__dot[data-role="trail"][data-state="done"]   { background: var(--ds-accent-success); }
+.ds-pulse-trail__dot[data-role="trail"][data-state="live"]   { background: var(--ds-accent-live); }
+.ds-pulse-trail__dot[data-role="trail"][data-state="queued"] { background: var(--ds-text-muted); }
+.ds-pulse-trail__head {
   background: var(--ds-accent-live);
   z-index: 2;
-  animation: ds-variant-pulse var(--ds-dur-live-pulse) linear infinite;
+  left: 0%;
+  will-change: transform, opacity, left;
+  animation:
+    ds-pulse-trail-sweep 6000ms linear infinite,
+    ds-pulse-trail-pulse var(--ds-dur-live-pulse) linear infinite;
 }
-.ds-trail__dot[data-role="trail"] {
-  background: var(--ds-accent-success);
-}
-.ds-trail__dot[data-role="trail-fade"] {
-  background: var(--ds-text-muted);
-}
-
-/* The head sweeps left → right on a 6s loop; trail dots are static and fade with distance */
-.ds-trail__head-anim {
-  animation: ds-trail-sweep 6s cubic-bezier(0.23, 1, 0.32, 1) infinite;
-}
-@keyframes ds-trail-sweep {
+@keyframes ds-pulse-trail-sweep {
   0%   { left: 0%; }
   100% { left: 100%; }
 }
-
-/* ---- Variant C: Dot-line sparkline ---- */
-.ds-spark {
-  position: relative;
-  height: 96px;
-  border-bottom: 1px solid var(--ds-line);
-}
-.ds-spark__dot {
-  position: absolute;
-  width: var(--ds-size-dot);
-  height: var(--ds-size-dot);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  background: var(--ds-text-muted);
-  opacity: 0.55;
-  transition: background-color var(--ds-dur-standard) var(--ds-ease-out),
-              opacity var(--ds-dur-standard) var(--ds-ease-out);
-}
-.ds-spark__dot[data-state="done"] { background: var(--ds-accent-success); opacity: 1; }
-.ds-spark__dot[data-state="live"] {
-  background: var(--ds-accent-live); opacity: 1;
-  animation: ds-variant-pulse var(--ds-dur-live-pulse) linear infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ds-stack__col[data-state="live"] .ds-stack__d,
-  .ds-spark__dot[data-state="live"],
-  .ds-trail__dot[data-role="head"] { animation: none; }
-  .ds-trail__head-anim { animation: none; left: 100% !important; }
-}
-
-/* DensityStrip (inline mirror of components/DensityStrip.css) */
-.ds-strip {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-3);
-  width: 100%;
-  font-family: var(--ds-font-mono);
-}
-
-.ds-strip__track {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--ds-space-1);
-  height: var(--ds-size-strip-h);
-  padding: var(--ds-space-2) 0;
-  border-bottom: 1px solid var(--ds-line);
-  isolation: isolate;
-}
-
-.ds-strip__bucket {
-  position: relative;
-  flex: 1 1 0;
-  min-width: 4px;
-  height: 100%;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  cursor: default;
-  outline: none;
-}
-
-.ds-strip__bucket:focus-visible {
-  outline: 2px solid var(--ds-accent-live);
-  outline-offset: 2px;
-  border-radius: var(--ds-radius-xs);
-}
-
-.ds-strip__bar {
-  width: var(--ds-size-dot);
-  height: var(--ds-strip-h-pct, 0%);
-  min-height: var(--ds-size-strip-bar-min);
-  border-radius: var(--ds-radius-xs);
-  background: var(--ds-text-muted);
-  opacity: 0.55;
-  transform-origin: bottom center;
-  transition:
-    height var(--ds-dur-standard) var(--ds-ease-out),
-    background-color var(--ds-dur-standard) var(--ds-ease-out),
-    opacity var(--ds-dur-standard) var(--ds-ease-out);
-}
-
-.ds-strip__bucket[data-state="done"] .ds-strip__bar {
-  background: var(--ds-accent-success);
-  opacity: 1;
-}
-
-.ds-strip__bucket[data-state="live"] .ds-strip__bar {
-  background: var(--ds-accent-live);
-  opacity: 1;
-  animation: ds-strip-pulse var(--ds-dur-live-pulse) linear infinite;
-}
-
-@keyframes ds-strip-pulse {
+@keyframes ds-pulse-trail-pulse {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.55; }
 }
 
-.ds-strip__dot {
-  width: var(--ds-size-dot);
-  height: var(--ds-size-dot);
-  border-radius: 50%;
-  background: var(--ds-text-muted);
-  opacity: 0.35;
-  transition: opacity var(--ds-dur-standard) var(--ds-ease-out);
-}
-
-.ds-strip__bucket:focus-visible .ds-strip__dot {
-  opacity: 0.7;
-}
-
-.ds-strip__tooltip {
-  position: absolute;
-  bottom: calc(100% + var(--ds-space-2));
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  transform-origin: bottom center;
-  opacity: 0;
-  pointer-events: none;
-  padding: var(--ds-space-2) var(--ds-space-3);
-  background: var(--ds-surface-raised);
-  border: 1px solid var(--ds-line-strong);
-  border-radius: var(--ds-radius-sm);
-  box-shadow: var(--ds-elev-1);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-type-label-size);
-  line-height: var(--ds-type-label-lh);
-  letter-spacing: var(--ds-type-label-track);
-  color: var(--ds-text-primary);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  z-index: 2;
-  transition:
-    opacity 112ms var(--ds-ease-out),
-    transform 112ms var(--ds-ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .ds-strip__bucket:hover .ds-strip__tooltip {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-    transition-duration: var(--ds-dur-micro);
-  }
-}
-
-.ds-strip__bucket:focus-visible .ds-strip__tooltip {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-  transition-duration: var(--ds-dur-micro);
-}
-
-.ds-strip__axis {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-type-label-size);
-  line-height: var(--ds-type-label-lh);
-  letter-spacing: var(--ds-type-label-track);
-  text-transform: uppercase;
-  color: var(--ds-text-muted);
-  font-variant-numeric: tabular-nums;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .ds-strip__bar,
-  .ds-strip__dot,
-  .ds-strip__tooltip {
-    transition: none !important;
-  }
-  .ds-strip__bucket[data-state="live"] .ds-strip__bar {
-    animation: none;
-    outline: 2px solid var(--ds-accent-live);
-    outline-offset: -1px;
-  }
+  .ds-dot-timeline__col[data-state="live"] .ds-dot-timeline__d,
+  .ds-pulse-trail__head { animation: none; }
+  .ds-pulse-trail__head { left: 100%; }
 }
+
 
 /* ============================================================
    08 — Do & Don't
@@ -1792,7 +1621,7 @@ body {
         <i class="dim"></i><i></i><i></i><i class="dim"></i>
         <i></i><i></i><i class="dim"></i><i></i>
       </div>
-      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.2.0</span></h1>
+      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.2.2</span></h1>
     </div>
     <div class="status">
       <span class="clock" id="clock">00:00:00</span>
@@ -2223,12 +2052,12 @@ body {
         </div>
       </div>
 
-      <!-- DensityStrip — three variants under exploration.
-           All three share the dot motif (same primitive as DottedChart above).
-           Vary only: (1) what the dot encodes, (2) the motion of the dot. -->
+      <!-- Data Motif extensions: two new in-family components built on the
+           same 6px dot primitive as DottedChart. See
+           docs/superpowers/specs/2026-04-22-dot-motif-variants-design.md. -->
       <div class="variant-head">
-        <span class="variant-head__label">Second data-motif component</span>
-        <span class="variant-head__note">Same primitive · three takes on the motion</span>
+        <span class="variant-head__label">Data Motif — two new siblings</span>
+        <span class="variant-head__note">Same primitive · one quantitative · one qualitative</span>
       </div>
 
       <div class="variants">
@@ -2236,11 +2065,11 @@ body {
           <div class="variant__head">
             <span class="variant__letter">A</span>
             <div>
-              <div class="variant__name">Dot-stack timeline</div>
-              <div class="variant__note">Direct sibling of DottedChart — 24 time buckets instead of 12 months. Dot count = event density. Color = bucket state.</div>
+              <div class="variant__name">&lt;DotTimeline&gt;</div>
+              <div class="variant__note">Quantitative. 24 time buckets over 60s, each a vertical stack of up to 10 dots. Dot count = event density. Column color = bucket state. Direct sibling of DottedChart with a time axis.</div>
             </div>
           </div>
-          <div id="variant-a"></div>
+          <div id="demo-dot-timeline"></div>
           <div class="variant__axis"><span>60S AGO</span><span>NOW</span></div>
         </div>
 
@@ -2248,23 +2077,11 @@ body {
           <div class="variant__head">
             <span class="variant__letter">B</span>
             <div>
-              <div class="variant__name">Trailing dot · Emil-style</div>
-              <div class="variant__note">Single accent dot travels left → right, leaves a fading trail of prior positions. Motion IS the data. The most distinctive signature move.</div>
+              <div class="variant__name">&lt;PulseTrail&gt;</div>
+              <div class="variant__note">Qualitative — Emil-style signature motion. Single <code>accent-live</code> dot sweeps left→right on a 6s loop while pulsing on the LiveDot cadence; trail dots mark prior events at decaying opacity. Motion IS the data.</div>
             </div>
           </div>
-          <div id="variant-b"></div>
-          <div class="variant__axis"><span>60S AGO</span><span>NOW</span></div>
-        </div>
-
-        <div class="variant">
-          <div class="variant__head">
-            <span class="variant__letter">C</span>
-            <div>
-              <div class="variant__name">Dot-line sparkline</div>
-              <div class="variant__note">24 dots, Y-position = density, color = state. Densest data read — shows trend and state at a glance without animation.</div>
-            </div>
-          </div>
-          <div id="variant-c"></div>
+          <div id="demo-pulse-trail"></div>
           <div class="variant__axis"><span>60S AGO</span><span>NOW</span></div>
         </div>
       </div>
@@ -2314,7 +2131,7 @@ body {
   </div>
 
   <footer class="foot">
-    <span>sous-ds · v0.2.0 · 2026-04-22</span>
+    <span>sous-ds · v0.2.2 · 2026-04-22</span>
     <span><a href="./DESIGN.md">DESIGN.md</a> · <a href="./AGENTS.md">AGENTS.md</a> · <a href="./TASTE_LOG.md">TASTE_LOG.md</a></span>
   </footer>
 
@@ -2380,120 +2197,92 @@ body {
 })();
 
 /* ============================================================
-   Data Motif variants — three dot-based takes (A dot-stack · B trailing · C sparkline)
-   Shared data. Shared primitive (6px dot from --ds-size-dot). Only the
-   motion + what-the-dot-encodes varies. Guardrail: R-FAMILY-001.
+   Data Motif — inline demos of <DotTimeline> and <PulseTrail>
+   Renderers mirror the React components in components/. All data
+   shared so the two demos read as siblings. Guardrail: R-FAMILY-001.
    ============================================================ */
-(function dataMotifVariants () {
+(function dataMotifDemos () {
   const BUCKET_COUNT = 24;
+  const MAX_DOTS = 10;
 
-  // Shared activity pattern — same data drives all three variants
-  // so visual-language differences are the ONLY thing changing.
-  // Pattern: ramp up, plateau, live cluster, tail off into empty.
+  // Pattern: ramp up, peak, 3-bucket live cluster at position 13-15, tail into queued.
   const counts = [1, 2, 3, 4, 5, 4, 6, 7, 6, 8, 9, 7, 9, 10, 8, 6, 4, 3, 2, 1, 0, 0, 0, 0];
   const states = Array.from({ length: BUCKET_COUNT }, (_, i) => {
     if (i >= 20) return 'queued';
     if (i >= 13 && i <= 15) return 'live';
     return 'done';
   });
-  const MAX_DOTS = 10;   // tallest column = 10 dots
   const maxCount = Math.max(...counts, 1);
 
-  // ---------- Variant A: Dot-stack timeline ----------
-  (function renderA () {
-    const root = document.getElementById('variant-a');
+  // ---------- <DotTimeline> demo ----------
+  (function renderDotTimeline () {
+    const root = document.getElementById('demo-dot-timeline');
     if (!root) return;
-    const stack = document.createElement('div');
-    stack.className = 'ds-stack';
-    stack.setAttribute('role', 'img');
-    stack.setAttribute('aria-label', 'Dot-stack timeline: 24 time buckets, each a vertical stack of dots sized to event count.');
+    const track = document.createElement('div');
+    track.className = 'ds-dot-timeline__track';
+    track.setAttribute('role', 'img');
+    track.setAttribute(
+      'aria-label',
+      'DotTimeline: 24 time buckets, each a vertical stack of dots sized to event count.'
+    );
 
     for (let i = 0; i < BUCKET_COUNT; i++) {
       const col = document.createElement('div');
-      col.className = 'ds-stack__col';
+      col.className = 'ds-dot-timeline__col';
       col.setAttribute('data-state', states[i]);
       col.setAttribute('tabindex', '0');
       const c = counts[i];
       if (c === 0) {
         col.setAttribute('data-empty', 'true');
         const d = document.createElement('span');
-        d.className = 'ds-stack__d';
+        d.className = 'ds-dot-timeline__d';
         col.appendChild(d);
       } else {
         const n = Math.max(1, Math.round((c / maxCount) * MAX_DOTS));
         for (let k = 0; k < n; k++) {
           const d = document.createElement('span');
-          d.className = 'ds-stack__d';
+          d.className = 'ds-dot-timeline__d';
           col.appendChild(d);
         }
       }
-      stack.appendChild(col);
+      track.appendChild(col);
     }
-    root.appendChild(stack);
+    root.appendChild(track);
   })();
 
-  // ---------- Variant B: Trailing dot (Emil-style) ----------
-  (function renderB () {
-    const root = document.getElementById('variant-b');
+  // ---------- <PulseTrail> demo ----------
+  (function renderPulseTrail () {
+    const root = document.getElementById('demo-pulse-trail');
     if (!root) return;
-    const trail = document.createElement('div');
-    trail.className = 'ds-trail';
-    trail.setAttribute('role', 'img');
-    trail.setAttribute('aria-label', 'Trailing dot: a single accent dot moves left to right over the last 60 seconds, leaving a fading trail of prior events.');
-
     const canvas = document.createElement('div');
-    canvas.className = 'ds-trail__canvas';
+    canvas.className = 'ds-pulse-trail__canvas';
+    canvas.setAttribute('role', 'img');
+    canvas.setAttribute(
+      'aria-label',
+      'PulseTrail: a single accent-live dot sweeps left to right while pulsing, with a fading trail of prior events.'
+    );
 
-    // Static trail: sample 10 prior positions at decaying opacity.
-    // Each position corresponds to an earlier moment in the 60s window.
-    // Success dots = completed events; muted dots = queued events that never ran.
+    // Trail: 10 static positions, mostly done (green), with a couple muted queued.
     const trailCount = 10;
+    const trailStates = ['done','done','done','done','done','done','done','done','queued','queued'];
     for (let i = 0; i < trailCount; i++) {
       const d = document.createElement('span');
-      const xPct = (i / (trailCount - 1)) * 92; // 0 → 92% (leaves room at right edge for head)
-      d.className = 'ds-trail__dot';
-      d.setAttribute('data-role', i < trailCount - 3 ? 'trail' : 'trail-fade');
+      d.className = 'ds-pulse-trail__dot';
+      d.setAttribute('data-role', 'trail');
+      d.setAttribute('data-state', trailStates[i]);
+      const xPct = (i / (trailCount - 1)) * 94;
       d.style.left = xPct + '%';
-      d.style.opacity = String(0.15 + (i / (trailCount - 1)) * 0.6);
+      d.style.opacity = String(0.15 + (i / (trailCount - 1)) * 0.75);
       canvas.appendChild(d);
     }
 
-    // Head: the moving accent-live dot — animates across
+    // Head: the sweeping + pulsing accent-live dot.
     const head = document.createElement('span');
-    head.className = 'ds-trail__dot ds-trail__head-anim';
-    head.setAttribute('data-role', 'head');
+    head.className = 'ds-pulse-trail__dot ds-pulse-trail__head';
+    head.setAttribute('aria-hidden', 'true');
     canvas.appendChild(head);
 
-    trail.appendChild(canvas);
-    root.appendChild(trail);
-  })();
-
-  // ---------- Variant C: Dot-line sparkline ----------
-  (function renderC () {
-    const root = document.getElementById('variant-c');
-    if (!root) return;
-    const spark = document.createElement('div');
-    spark.className = 'ds-spark';
-    spark.setAttribute('role', 'img');
-    spark.setAttribute('aria-label', 'Dot-line sparkline: 24 dots, Y-position encodes density, color encodes state.');
-
-    for (let i = 0; i < BUCKET_COUNT; i++) {
-      const c = counts[i];
-      const d = document.createElement('span');
-      d.className = 'ds-spark__dot';
-      if (c === 0) {
-        d.setAttribute('data-empty', 'true');
-      } else {
-        d.setAttribute('data-state', states[i]);
-      }
-      const xPct = (i / (BUCKET_COUNT - 1)) * 100;
-      // Empty dots rest at the bottom (low Y); density scales the Y upward.
-      const yPct = c === 0 ? 92 : 92 - (c / maxCount) * 80;
-      d.style.left = xPct + '%';
-      d.style.top = yPct + '%';
-      spark.appendChild(d);
-    }
-    root.appendChild(spark);
+    root.appendChild(canvas);
   })();
 })();
 

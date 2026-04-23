@@ -44,14 +44,16 @@ Signal phrases that should trigger this skill:
 - `<Pill live>` — pill with the live-state prefix
 - `<Toast tone="live">` — toast marking live state change
 - `<DottedChart>` — a sparse anomaly or attention-needed point in an otherwise neutral chart
-- `<DensityStrip>` — a bucket in `live` state (currently-running time window)
+- `<DotTimeline>` — a column in `live` state (currently-running time window)
+- `<PulseTrail>` — the head dot that sweeps across; canonical carrier for agent "alive now" feel
 
 `--ds-accent-success` (#00E013) is the primary accent: success / committed / positive highlight / goal-met. It may appear ONLY on:
 - `<SegmentedBar>` when `value === total`
 - `<DottedChart>` on an explicitly-successful endpoint or closed positive result
-- `<DensityStrip>` — a bucket in `done` state (terminal, committed)
+- `<DotTimeline>` — a column in `done` state (terminal, committed)
+- `<PulseTrail>` — trail dots representing prior done events
 
-`<DensityStrip>` is the one component allowed to carry both accents simultaneously; each bucket holds exactly one state so the two never collide within a bucket.
+`<DotTimeline>` and `<PulseTrail>` are the two components allowed to carry both accents simultaneously; in each, per-element state is single-valued so the two accents never collide within one rendered element.
 
 **Accents are semantic, not decorative.** Any other use violates R-SEMANTIC-001.
 

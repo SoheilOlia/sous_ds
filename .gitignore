@@ -10,3 +10,5 @@ coverage/
 .turbo/
 .next/
 .vercel/
+.claude/settings.local.json
+.gstack/

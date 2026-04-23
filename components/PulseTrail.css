@@ -1,0 +1,97 @@
+/*
+ * PulseTrail.css · sous-ds
+ *
+ * Motion rules (Emil-aligned):
+ * - Trail dots are static (their "motion" is the decay of opacity)
+ * - Head dot uses two concurrent keyframe animations: position sweep +
+ *   opacity pulse at the LiveDot cadence
+ * - Transform/opacity only; position via CSS `left` (composited via transform)
+ * - prefers-reduced-motion: reduce pins the head at right edge, disables pulse
+ *
+ * Accent carriers used: --ds-accent-live (head), --ds-accent-success (trail
+ * done events). See DESIGN.md #accent-carriers and CL07 in scripts/lint.mjs.
+ */
+
+.ds-pulse-trail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+  width: 100%;
+  font-family: var(--ds-font-mono);
+}
+
+.ds-pulse-trail__canvas {
+  position: relative;
+  height: 48px;
+  border-bottom: 1px solid var(--ds-line);
+}
+
+.ds-pulse-trail__dot {
+  position: absolute;
+  top: 50%;
+  width: var(--ds-size-dot);
+  height: var(--ds-size-dot);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  will-change: opacity;
+  background: var(--ds-text-muted);
+}
+
+/* ---------- Trail dots (static positions, opacity set via inline style) ---------- */
+
+.ds-pulse-trail__dot[data-role="trail"] {
+  transition: background-color var(--ds-dur-standard) var(--ds-ease-out);
+}
+
+.ds-pulse-trail__dot[data-role="trail"][data-state="done"]   { background: var(--ds-accent-success); }
+.ds-pulse-trail__dot[data-role="trail"][data-state="live"]   { background: var(--ds-accent-live); }
+.ds-pulse-trail__dot[data-role="trail"][data-state="queued"] { background: var(--ds-text-muted); }
+
+/* ---------- Head (sweeps left → right + pulses on LiveDot cadence) ---------- */
+
+.ds-pulse-trail__head {
+  background: var(--ds-accent-live);
+  z-index: 2;
+  left: 0%;
+  will-change: transform, opacity, left;
+  animation:
+    ds-pulse-trail-sweep var(--ds-pulse-trail-loop, 6000ms) linear infinite,
+    ds-pulse-trail-pulse var(--ds-dur-live-pulse) linear infinite;
+}
+
+@keyframes ds-pulse-trail-sweep {
+  0%   { left: 0%; }
+  100% { left: 100%; }
+}
+
+@keyframes ds-pulse-trail-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+/* ---------- Axis ---------- */
+
+.ds-pulse-trail__axis {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-pulse-trail__head {
+    animation: none;
+    left: 100%;
+  }
+  .ds-pulse-trail__dot[data-role="trail"] {
+    transition: none;
+  }
+}
