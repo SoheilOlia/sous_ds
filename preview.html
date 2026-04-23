@@ -1388,32 +1388,6 @@ body {
    Data Motif — <DotTimeline> and <PulseTrail>
    Both built on the 6px dot primitive shared with DottedChart.
    ============================================================ */
-.variant-head {
-  margin-top: var(--ds-space-8);
-  padding-top: var(--ds-space-6);
-  border-top: 1px solid var(--ds-line);
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--ds-space-4);
-  margin-bottom: var(--ds-space-6);
-}
-.variant-head__label {
-  font-family: var(--ds-font-display);
-  font-size: 22px;
-  line-height: 1.1;
-  letter-spacing: -0.0075em;
-  color: var(--ds-text-primary);
-}
-.variant-head__note {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-type-label-size);
-  line-height: var(--ds-type-label-lh);
-  letter-spacing: var(--ds-type-label-track);
-  text-transform: uppercase;
-  color: var(--ds-text-muted);
-}
-
 .variants {
   display: grid;
   grid-template-columns: 1fr;
@@ -2052,12 +2026,13 @@ body {
         </div>
       </div>
 
-      <!-- Data Motif extensions: two new in-family components built on the
-           same 6px dot primitive as DottedChart. See
-           docs/superpowers/specs/2026-04-22-dot-motif-variants-design.md. -->
-      <div class="variant-head">
-        <span class="variant-head__label">Data Motif — two new siblings</span>
-        <span class="variant-head__note">Same primitive · one quantitative · one qualitative</span>
+    </section>
+
+    <!-- ==== 10 — Data Motif · two new siblings ====================== -->
+    <section class="section" data-col="12" style="animation-delay:360ms">
+      <div class="section-head">
+        <span class="section-num">10<b>/ Data Motif — Two New Siblings</b></span>
+        <span class="section-aside">Same primitive · one quantitative · one qualitative</span>
       </div>
 
       <div class="variants">
@@ -2087,10 +2062,10 @@ body {
       </div>
     </section>
 
-    <!-- ==== 10 — Do & Don't ========================================= -->
-    <section class="section" data-col="12" style="animation-delay:360ms">
+    <!-- ==== 11 — Do & Don't ========================================= -->
+    <section class="section" data-col="12" style="animation-delay:400ms">
       <div class="section-head">
-        <span class="section-num">10<b>/ Do &amp; Don't</b></span>
+        <span class="section-num">11<b>/ Do &amp; Don't</b></span>
         <span class="section-aside">Enforced by the Quality Evaluator</span>
       </div>
 
