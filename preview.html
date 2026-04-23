@@ -1365,6 +1365,8 @@ body {
   letter-spacing: 0.04em;
 }
 
+.bars-wrap { position: relative; }
+
 .bars {
   display: grid;
   grid-template-columns: repeat(12, 18px);
@@ -1378,6 +1380,7 @@ body {
   flex-direction: column-reverse;
   gap: 4px;
   align-items: center;
+  cursor: pointer;
 }
 
 .bar .d {
@@ -1385,10 +1388,94 @@ body {
   background: var(--ds-text-muted);
   opacity: 0;
   animation: dot-in var(--ds-dur-micro) var(--ds-ease-out) forwards;
+  transition: background-color var(--ds-dur-micro) var(--ds-ease-out);
 }
 .bar.active .d { background: var(--ds-text-primary); }
 .bar.success .d { background: var(--ds-accent-success); }
 .bar.attention .d { background: var(--ds-accent-live); }
+
+/* Agent Scrubber — the scrubber-head sweeps left→right across the 12
+   month columns, pausing ~1.2s per month. As it passes a column, the
+   column "lights up" to primary text color (accent columns keep their
+   accent). A typewriter caption below reports the month + value. Hover
+   pauses the auto-scrub and jumps the head to the hovered column;
+   mouseleave resumes auto from that position. Reduced motion pins the
+   head at the last month (Dec) and shows its caption statically. */
+
+.bar.is-focus .d          { background: var(--ds-text-primary); }
+.bar.attention.is-focus .d { background: var(--ds-accent-live); }
+.bar.success.is-focus .d   { background: var(--ds-accent-success); }
+
+.bars-scrubber__head {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--ds-accent-live);
+  box-shadow: 0 0 0 3px rgba(255, 46, 22, 0.18);
+  transform: translateX(-50%);
+  transition: left 320ms cubic-bezier(0.23, 1, 0.32, 1);
+  animation: live-pulse var(--ds-dur-live-pulse) linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+.bars-scrubber__head::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 4px);
+  width: 1px;
+  height: 180px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 46, 22, 0.22) 0%,
+    rgba(255, 46, 22, 0.02) 100%
+  );
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.bars-scrubber__caption {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  font-variant-numeric: tabular-nums;
+  min-height: 16px;
+}
+.bars-scrubber__mark {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ds-accent-live);
+  flex: none;
+  animation: live-pulse var(--ds-dur-live-pulse) linear infinite;
+}
+.bars-scrubber__caret {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  background: currentColor;
+  margin-left: 2px;
+  vertical-align: -0.12em;
+  animation: ds-livedot-caret-blink 1000ms steps(2, start) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bars-scrubber__head { animation: none; transition: none; }
+  .bars-scrubber__head::after { background: rgba(255, 46, 22, 0.12); }
+  .bars-scrubber__mark,
+  .bars-scrubber__caret { animation: none; opacity: 1; }
+}
 
 @keyframes dot-in {
   from { opacity: 0; transform: scale(0.85); }
@@ -2124,10 +2211,16 @@ body {
       <div class="chart">
         <div class="bars-wrap">
           <div class="bars" id="bars"></div>
+          <span class="bars-scrubber__head" id="scrubber-head" aria-hidden="true"></span>
           <div class="bar-labels">
             <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span>
             <span>May</span><span class="is-attention">Jun</span><span>Jul</span><span>Aug</span>
             <span>Sep</span><span>Oct</span><span>Nov</span><span class="is-success">Dec</span>
+          </div>
+          <div class="bars-scrubber__caption" role="status" aria-live="polite">
+            <span class="bars-scrubber__mark" aria-hidden="true"></span>
+            <span class="bars-scrubber__text" id="scrubber-text"></span>
+            <span class="bars-scrubber__caret" aria-hidden="true"></span>
           </div>
         </div>
 
@@ -2283,6 +2376,134 @@ body {
     }
     root.appendChild(col);
   });
+})();
+
+/* ============================================================
+   DottedChart Agent Scrubber — an accent-live read-head sweeps
+   left→right across the 12 month columns, pausing ~1.2s per month.
+   As it passes each column, that column "lights up" and a typewriter
+   caption below reports MONTH · VALUE. Hovering a column pauses the
+   auto-scrub and jumps the head to that column; mouse leaving the
+   chart resumes auto from the current position. Reduced motion pins
+   the head at the last month and shows its caption statically.
+   ============================================================ */
+(function dottedChartScrubber () {
+  const barsWrap = document.querySelector('.bars-wrap');
+  const head = document.getElementById('scrubber-head');
+  const textEl = document.getElementById('scrubber-text');
+  if (!barsWrap || !head || !textEl) return;
+
+  const LABELS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const TYPE_STEP = 35;   // ms per character typed
+  const HOLD = 600;       // ms to dwell after the caption finishes typing
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let currentIdx = 0;
+  let isAuto = true;
+  let typeTimer = 0;
+  let advanceTimer = 0;
+
+  function getBars () {
+    return Array.from(barsWrap.querySelectorAll('.bars .bar'));
+  }
+
+  function getValue (idx) {
+    const bar = getBars()[idx];
+    return bar ? bar.querySelectorAll('.d').length : 0;
+  }
+
+  function positionHead (idx) {
+    const bars = getBars();
+    if (!bars[idx]) return;
+    const barRect = bars[idx].getBoundingClientRect();
+    const wrapRect = barsWrap.getBoundingClientRect();
+    head.style.left = (barRect.left + barRect.width / 2 - wrapRect.left) + 'px';
+  }
+
+  function highlight (idx) {
+    getBars().forEach(function (el, i) {
+      el.classList.toggle('is-focus', i === idx);
+    });
+  }
+
+  function cancelTypeTimer () { if (typeTimer) { clearTimeout(typeTimer); typeTimer = 0; } }
+  function cancelAdvanceTimer () { if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = 0; } }
+
+  function setCaption (idx, instant) {
+    cancelTypeTimer();
+    const str = LABELS[idx] + ' · ' + getValue(idx);
+    if (instant || reduced) {
+      textEl.textContent = str;
+      return Promise.resolve();
+    }
+    textEl.textContent = '';
+    return new Promise(function (resolve) {
+      let i = 0;
+      (function tick () {
+        if (i >= str.length) { resolve(); return; }
+        i++;
+        textEl.textContent = str.slice(0, i);
+        typeTimer = window.setTimeout(tick, TYPE_STEP);
+      })();
+    });
+  }
+
+  function showMonth (idx, instant) {
+    currentIdx = idx;
+    positionHead(idx);
+    highlight(idx);
+    return setCaption(idx, instant);
+  }
+
+  function cycle () {
+    if (!isAuto) return;
+    showMonth(currentIdx).then(function () {
+      if (!isAuto) return;
+      advanceTimer = window.setTimeout(function () {
+        if (!isAuto) return;
+        currentIdx = (currentIdx + 1) % LABELS.length;
+        cycle();
+      }, HOLD);
+    });
+  }
+
+  function startAuto () {
+    isAuto = true;
+    if (reduced) {
+      showMonth(LABELS.length - 1, true);
+      return;
+    }
+    cycle();
+  }
+
+  function pauseAuto () {
+    isAuto = false;
+    cancelTypeTimer();
+    cancelAdvanceTimer();
+  }
+
+  function setupHover () {
+    getBars().forEach(function (bar, i) {
+      bar.addEventListener('mouseenter', function () {
+        pauseAuto();
+        showMonth(i, true);
+      });
+    });
+    barsWrap.addEventListener('mouseleave', function () {
+      startAuto();
+    });
+  }
+
+  // The chart() IIFE above populates #bars synchronously, but the
+  // staggered dot-in animations take a moment to finish. Wait past
+  // the stagger so the scrubber doesn't fight the entry animation.
+  window.setTimeout(function () {
+    setupHover();
+    startAuto();
+  }, 900);
+
+  window.addEventListener('resize', function () { positionHead(currentIdx); });
 })();
 
 /* ============================================================
