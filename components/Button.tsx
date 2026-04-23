@@ -19,7 +19,7 @@ export interface ButtonProps
 }
 
 /**
- * Button — reference implementation for soheil-ds.
+ * Button — reference implementation for sous-ds.
  *
  * Rules followed (do not deviate):
  *  • `:active` applies scale(0.97), var(--ds-dur-press), ease

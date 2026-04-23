@@ -199,3 +199,83 @@ DESIGN.md is a Google Stitch / Google Labs convention. A markdown file with YAML
 - The inspiration corpus is in `Inspiration/` at repo root, not `/Users/soheil/Desktop/Inspiration`.
 - The corpus currently contains 18 source files, not 8.
 - Why: provenance needs to be auditable if the taste log is going to act as system memory.
+
+---
+
+## ENTRY 006 — Additional Inspiration Drop
+**Date:** 2026-04-22
+**Source:** Newly added images in `Inspiration/` (latest 2026-04-22 batch)
+**Type:** Visual reference
+
+### Signals extracted
+
+**1. Segmented progress reads more instrument-like than continuous fill**
+- Repeated signal: thin discrete ticks for credits, quota, or completion.
+- Decision: add `SegmentedBar` as a first-class component alongside `DottedChart`.
+
+**2. Compact segmented controls are a strong fit for dense tool surfaces**
+- Repeated signal: pill-track mode switchers with a filled active segment and quiet inactive segments.
+- Decision: add `SegmentedControl` for tabs, scopes, and filter rows.
+
+**3. Light references still reward spacing discipline more than decoration**
+- Repeated signal: quiet paper-like canvases, thin dividers, minimal shadows, strong content hierarchy.
+- Decision: keep light mode as a secondary surface language, but do not soften radius or add elevation theater to imitate it.
+
+**4. Progress and state should feel explicit, not atmospheric**
+- Repeated signal: concrete usage, credits, and task status views.
+- Decision: formally discourage skeleton loaders and shimmer chrome. Status should read as text or discrete progress, not as placeholder theater.
+
+---
+
+## ENTRY 007 — Softer Display Voice + AI-Native State
+**Date:** 2026-04-22
+**Source:** Direct review of the live preview plus current inspiration batch
+**Type:** Correction / extension
+
+### Signals extracted
+
+**1. Large Geist at 600 reads too neutral in the hero**
+- Repeated signal: the big headline had the right restraint but the wrong tone. At 600, Geist started reading closer to Helvetica than intended.
+- Decision: keep Geist, but lighten `display` through `h3` to 500 and open tracking slightly. Fix the voice before changing the family.
+
+**2. Motion should clarify state, not just decorate sections**
+- Repeated signal: progress, hero copy, and metric surfaces wanted a clearer sense of arrival.
+- Decision: add staggered segment reveal to `SegmentedBar`, soft line-reveal motion in the hero, and a small fade/translate entrance for explicit state surfaces.
+
+**3. The system needed more first-class AI-native primitives**
+- Repeated signal: loading and execution states were still being composed ad hoc from generic parts.
+- Decision: add `InlineStatus` for explicit system state and `ToolCall` for invocation rows. These push the DS toward AI-native product surfaces without adding theatre.
+
+---
+
+## ENTRY 008 — Title Hierarchy Turns Toward Instrument Type
+**Date:** 2026-04-22
+**Source:** Direct review of the live preview and current title hierarchy
+**Type:** Correction / extension
+
+### Signals extracted
+
+**1. Section and card titles wanted more system authority than display softness**
+- Repeated signal: the Cash Sans section title was elegant, but too close to the page-title voice. The hierarchy felt flatter than intended.
+- Decision: move `h2` and `h3` to `Geist Mono` while keeping `display` and `h1` on Cash Sans. This makes framing text feel more like an instrument readout than a marketing subhead.
+
+**2. Chapter and page titles should prove the alpha/numeric mix**
+- Repeated signal: the system talks about data-forward typography, but the heading specimens were still all-letters.
+- Decision: update the display and h1 specimens to read `Aa 0123`, with the numeric run explicitly set in mono + tabular figures. Letters keep the editorial voice; numbers keep the machine voice.
+
+---
+
+## ENTRY 009 — Completion Accent, Not Decoration
+**Date:** 2026-04-22
+**Source:** Direct request during preview refinement
+**Type:** Extension
+
+### Signals extracted
+
+**1. The system needed a completion color without becoming a multicolor brand palette**
+- Repeated signal: red handled live/active well, but the system had no semantic endpoint color for "done", "committed", or "goal met".
+- Decision: add `accent-success` (`#00E013`) as a second semantic accent. It is reserved for terminal completion only, never generic "positive" decoration.
+
+**2. Green should appear only where the state has actually resolved**
+- Repeated signal: progress completion and a chart endpoint are the places where green feels earned.
+- Decision: allow `accent-success` on `SegmentedBar` only when `value === total`, and on `DottedChart` only for an explicitly documented success endpoint. Keep the rest of the graph monochrome.

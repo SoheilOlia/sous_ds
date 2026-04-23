@@ -1,0 +1,73 @@
+/* ============================================================
+   InlineStatus.css — explicit mono system state
+   ============================================================ */
+
+.ds-inline-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  font-weight: 500;
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(var(--ds-space-1)) scale(0.98);
+  transition:
+    opacity var(--ds-dur-standard) var(--ds-ease-out),
+    transform var(--ds-dur-micro) var(--ds-ease-out);
+  animation: ds-inline-status-in var(--ds-dur-micro) var(--ds-ease-out) forwards;
+}
+
+.ds-inline-status[data-tone="active"],
+.ds-inline-status[data-tone="live"] {
+  color: var(--ds-text-primary);
+}
+
+.ds-inline-status__bracket {
+  color: var(--ds-text-muted);
+}
+
+.ds-inline-status__dot {
+  width: var(--ds-size-dot);
+  height: var(--ds-size-dot);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-accent-live);
+  animation: ds-inline-status-pulse var(--ds-dur-live-pulse) linear infinite;
+}
+
+@keyframes ds-inline-status-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--ds-space-1)) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ds-inline-status-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-inline-status {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .ds-inline-status__dot {
+    animation: none;
+  }
+}

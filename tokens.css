@@ -1,6 +1,6 @@
 /* ============================================================
-   soheil-ds / tokens.css
-   Generated from design-tokens.json v0.1.0
+   sous-ds / tokens.css
+   Generated from design-tokens.json v0.2.0
    Every value here is the single source of truth for the system.
    Do not override in component CSS. Change the token instead.
    ============================================================ */
@@ -17,21 +17,28 @@
   --ds-text-secondary:  #A0A0A0;   /* 7.58:1 on bg  AAA */
   --ds-text-muted:      #888888;   /* 5.58:1 on bg  AA  */
   --ds-text-on-primary: #0A0A0A;
-  --ds-text-on-accent:  #FFFFFF;   /* 5.31:1 on accent  AA */
+  --ds-text-on-accent:  #FFFFFF;   /* 5.31:1 on accent-live  AA */
+  --ds-text-on-success: #0A0A0A;   /* 11.0:1 on accent-success AAA */
 
   --ds-accent-live:     #E5533C;
+  --ds-accent-success:  #00E013;
 
   /* ---- Type ----------------------------------------------- */
+  --ds-font-display: "Cash Sans", "Geist", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
   --ds-font-sans: "Geist", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
   --ds-font-mono: "Geist Mono", ui-monospace, "SF Mono", "JetBrains Mono", monospace;
 
   --ds-measure: 65ch;
 
   /* Type scale : size / line / weight / tracking            */
-  --ds-type-display-size:   64px;  --ds-type-display-lh:   72px;  --ds-type-display-weight: 600;  --ds-type-display-track: -0.03em;
-  --ds-type-h1-size:        40px;  --ds-type-h1-lh:        48px;  --ds-type-h1-weight:      600;  --ds-type-h1-track:      -0.02em;
-  --ds-type-h2-size:        28px;  --ds-type-h2-lh:        36px;  --ds-type-h2-weight:      600;  --ds-type-h2-track:      -0.015em;
-  --ds-type-h3-size:        20px;  --ds-type-h3-lh:        28px;  --ds-type-h3-weight:      600;  --ds-type-h3-track:      -0.01em;
+  --ds-type-display-family: var(--ds-font-display);
+  --ds-type-h1-family:      var(--ds-font-display);
+  --ds-type-h2-family:      var(--ds-font-mono);
+  --ds-type-h3-family:      var(--ds-font-mono);
+  --ds-type-display-size:   90px;  --ds-type-display-lh:   86px;  --ds-type-display-weight: 400;  --ds-type-display-track: -0.04em;
+  --ds-type-h1-size:        64px;  --ds-type-h1-lh:        61px;  --ds-type-h1-weight:      400;  --ds-type-h1-track:      -0.035em;
+  --ds-type-h2-size:        40px;  --ds-type-h2-lh:        38px;  --ds-type-h2-weight:      400;  --ds-type-h2-track:      -0.03em;
+  --ds-type-h3-size:        28px;  --ds-type-h3-lh:        30px;  --ds-type-h3-weight:      400;  --ds-type-h3-track:      -0.02em;
   --ds-type-body-lg-size:   17px;  --ds-type-body-lg-lh:   26px;
   --ds-type-body-size:      15px;  --ds-type-body-lh:      24px;
   --ds-type-body-sm-size:   13px;  --ds-type-body-sm-lh:   20px;
@@ -52,6 +59,10 @@
   --ds-space-9:  64px;
   --ds-space-10: 96px;
   --ds-space-11: 128px;
+  --ds-space-tight: var(--ds-space-3);
+  --ds-space-group: var(--ds-space-5);
+  --ds-space-section: var(--ds-space-7);
+  --ds-space-context: var(--ds-space-9);
 
   /* ---- Shared sizes ---------------------------------------- */
   --ds-size-control-sm:    32px;
@@ -60,6 +71,8 @@
   --ds-size-dot:           6px;
   --ds-size-icon-sm:       14px;
   --ds-size-toast-min-width: 280px;
+  --ds-size-strip-h:       48px;  /* DensityStrip row height; snaps to 8pt */
+  --ds-size-strip-bar-min: 4px;   /* DensityStrip: min bar height when count > 0 */
 
   /* ---- Radius --------------------------------------------- */
   --ds-radius-none: 0;

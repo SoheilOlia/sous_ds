@@ -70,6 +70,8 @@
   --ds-size-control-md: 40px;
   --ds-size-interactive-min: 44px;
   --ds-size-dot: 6px;
+  --ds-size-strip-h: 48px;
+  --ds-size-strip-bar-min: 4px;
   --ds-size-icon-sm: 14px;
 
   --ds-elev-0: none;
@@ -1383,6 +1385,194 @@ body {
 }
 
 /* ============================================================
+   Data Motif — DensityStrip (companion to Dotted bar chart)
+   ============================================================ */
+.strip-demos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ds-space-5);
+  margin-top: var(--ds-space-7);
+}
+
+.strip-demo {
+  padding: var(--ds-space-5);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+}
+
+.strip-demo__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--ds-space-4);
+  margin-bottom: var(--ds-space-4);
+}
+
+.strip-demo__role {
+  font-family: var(--ds-font-display);
+  font-size: 16px;
+  line-height: 1.1;
+  letter-spacing: -0.0075em;
+  color: var(--ds-text-primary);
+}
+
+.strip-demo__meta {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-muted);
+}
+
+/* DensityStrip (inline mirror of components/DensityStrip.css) */
+.ds-strip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+  width: 100%;
+  font-family: var(--ds-font-mono);
+}
+
+.ds-strip__track {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ds-space-1);
+  height: var(--ds-size-strip-h);
+  padding: var(--ds-space-2) 0;
+  border-bottom: 1px solid var(--ds-line);
+  isolation: isolate;
+}
+
+.ds-strip__bucket {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 4px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  cursor: default;
+  outline: none;
+}
+
+.ds-strip__bucket:focus-visible {
+  outline: 2px solid var(--ds-accent-live);
+  outline-offset: 2px;
+  border-radius: var(--ds-radius-xs);
+}
+
+.ds-strip__bar {
+  width: var(--ds-size-dot);
+  height: var(--ds-strip-h-pct, 0%);
+  min-height: var(--ds-size-strip-bar-min);
+  border-radius: var(--ds-radius-xs);
+  background: var(--ds-text-muted);
+  opacity: 0.55;
+  transform-origin: bottom center;
+  transition:
+    height var(--ds-dur-standard) var(--ds-ease-out),
+    background-color var(--ds-dur-standard) var(--ds-ease-out),
+    opacity var(--ds-dur-standard) var(--ds-ease-out);
+}
+
+.ds-strip__bucket[data-state="done"] .ds-strip__bar {
+  background: var(--ds-accent-success);
+  opacity: 1;
+}
+
+.ds-strip__bucket[data-state="live"] .ds-strip__bar {
+  background: var(--ds-accent-live);
+  opacity: 1;
+  animation: ds-strip-pulse var(--ds-dur-live-pulse) linear infinite;
+}
+
+@keyframes ds-strip-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+.ds-strip__dot {
+  width: var(--ds-size-dot);
+  height: var(--ds-size-dot);
+  border-radius: 50%;
+  background: var(--ds-text-muted);
+  opacity: 0.35;
+  transition: opacity var(--ds-dur-standard) var(--ds-ease-out);
+}
+
+.ds-strip__bucket:focus-visible .ds-strip__dot {
+  opacity: 0.7;
+}
+
+.ds-strip__tooltip {
+  position: absolute;
+  bottom: calc(100% + var(--ds-space-2));
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  transform-origin: bottom center;
+  opacity: 0;
+  pointer-events: none;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  background: var(--ds-surface-raised);
+  border: 1px solid var(--ds-line-strong);
+  border-radius: var(--ds-radius-sm);
+  box-shadow: var(--ds-elev-1);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  letter-spacing: var(--ds-type-label-track);
+  color: var(--ds-text-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  z-index: 2;
+  transition:
+    opacity 112ms var(--ds-ease-out),
+    transform 112ms var(--ds-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ds-strip__bucket:hover .ds-strip__tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    transition-duration: var(--ds-dur-micro);
+  }
+}
+
+.ds-strip__bucket:focus-visible .ds-strip__tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  transition-duration: var(--ds-dur-micro);
+}
+
+.ds-strip__axis {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-strip__bar,
+  .ds-strip__dot,
+  .ds-strip__tooltip {
+    transition: none !important;
+  }
+  .ds-strip__bucket[data-state="live"] .ds-strip__bar {
+    animation: none;
+    outline: 2px solid var(--ds-accent-live);
+    outline-offset: -1px;
+  }
+}
+
+/* ============================================================
    08 — Do & Don't
    ============================================================ */
 .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ds-space-7); }
@@ -1874,6 +2064,31 @@ body {
           </button>
         </div>
       </div>
+
+      <!-- DensityStrip: companion to DottedChart. State + density + progression in one strip. -->
+      <div class="strip-demos">
+        <div class="strip-demo">
+          <div class="strip-demo__head">
+            <span class="strip-demo__role">Steady activity</span>
+            <span class="strip-demo__meta">24 buckets · 60s window · 2.5s per bucket</span>
+          </div>
+          <div id="strip-steady"></div>
+        </div>
+        <div class="strip-demo">
+          <div class="strip-demo__head">
+            <span class="strip-demo__role">Live batch</span>
+            <span class="strip-demo__meta">3 buckets currently running · accent-live pulses</span>
+          </div>
+          <div id="strip-live"></div>
+        </div>
+        <div class="strip-demo">
+          <div class="strip-demo__head">
+            <span class="strip-demo__role">Mostly empty</span>
+            <span class="strip-demo__meta">Future slots render as muted dots · dot motif retained</span>
+          </div>
+          <div id="strip-empty"></div>
+        </div>
+      </div>
     </section>
 
     <!-- ==== 10 — Do & Don't ========================================= -->
@@ -1983,6 +2198,127 @@ body {
     }
     root.appendChild(col);
   });
+})();
+
+/* ============================================================
+   DensityStrip demos — 3 scenarios (steady, live-batch, mostly-empty)
+   ============================================================ */
+(function densityStripDemos () {
+  const pad = (n) => String(n).padStart(2, '0');
+  function formatTime (ts) {
+    const d = new Date(ts);
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+
+  function renderStrip (root, buckets, label, windowLabel) {
+    if (!root) return;
+    const maxCount = Math.max(1, ...buckets.map(b => b.count));
+    let done = 0, live = 0, queued = 0;
+    for (const b of buckets) {
+      if (b.state === 'done') done += b.count;
+      else if (b.state === 'live') live += b.count;
+      else queued += b.count;
+    }
+    const ariaSummary = `${label}, last ${windowLabel}. ${done} complete, ${live} running, ${queued} queued.`;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'ds-strip';
+    wrap.setAttribute('role', 'img');
+    wrap.setAttribute('aria-label', ariaSummary);
+
+    const track = document.createElement('div');
+    track.className = 'ds-strip__track';
+
+    buckets.forEach((bucket) => {
+      const cell = document.createElement('div');
+      cell.className = 'ds-strip__bucket';
+      cell.setAttribute('data-state', bucket.state);
+      cell.setAttribute('tabindex', '0');
+      const isEmpty = bucket.count === 0;
+      if (isEmpty) cell.setAttribute('data-empty', 'true');
+      cell.setAttribute(
+        'aria-label',
+        `${formatTime(bucket.ts)}, ${bucket.count} event${bucket.count === 1 ? '' : 's'}, ${bucket.state}`
+      );
+
+      if (isEmpty) {
+        const dot = document.createElement('span');
+        dot.className = 'ds-strip__dot';
+        dot.setAttribute('aria-hidden', 'true');
+        cell.appendChild(dot);
+      } else {
+        const bar = document.createElement('span');
+        bar.className = 'ds-strip__bar';
+        bar.setAttribute('aria-hidden', 'true');
+        const pct = Math.max(8, (bucket.count / maxCount) * 100);
+        bar.style.setProperty('--ds-strip-h-pct', `${pct}%`);
+        cell.appendChild(bar);
+      }
+
+      const tip = document.createElement('span');
+      tip.className = 'ds-strip__tooltip';
+      tip.setAttribute('role', 'tooltip');
+      tip.textContent = `${formatTime(bucket.ts)} · ${bucket.count} ${
+        bucket.count === 1 ? 'call' : 'calls'
+      } · ${bucket.state}`;
+      cell.appendChild(tip);
+
+      track.appendChild(cell);
+    });
+
+    const axis = document.createElement('div');
+    axis.className = 'ds-strip__axis';
+    axis.setAttribute('aria-hidden', 'true');
+    axis.innerHTML =
+      `<span class="ds-strip__axis-start">${windowLabel} ago</span>` +
+      `<span class="ds-strip__axis-end">now</span>`;
+
+    wrap.appendChild(track);
+    wrap.appendChild(axis);
+    root.appendChild(wrap);
+  }
+
+  // 24 buckets × 2.5s = 60s window. Now-timestamped so tooltips read plausibly.
+  const now = Date.now();
+  const bucketSize = 2500;
+  const windowMs = 60000;
+  const bucketCount = 24;
+
+  function make (stateFn, countFn) {
+    const out = [];
+    for (let i = 0; i < bucketCount; i++) {
+      const ts = now - windowMs + i * bucketSize;
+      out.push({ ts, count: countFn(i), state: stateFn(i) });
+    }
+    return out;
+  }
+
+  // Steady: mostly done with a 3-bucket live cluster near the right edge,
+  // density varying to show distribution.
+  const steadyCounts  = [2, 4, 3, 5, 7, 6, 4, 5, 8, 6, 7, 9, 8, 6, 7, 10, 8, 5, 6, 7, 4, 3, 2, 0];
+  const steady = make(
+    (i) => (i === 23 ? 'queued' : i >= 20 && i <= 22 ? 'queued' : 'done'),
+    (i) => steadyCounts[i]
+  );
+
+  // Live batch: dense activity with 3 running buckets in the middle, trailing queued.
+  const liveCounts    = [3, 5, 4, 6, 8, 7, 9, 10, 9, 12, 11, 9, 14, 12, 11, 8, 7, 5, 3, 2, 1, 0, 0, 0];
+  const live = make(
+    (i) => (i >= 21 ? 'queued' : i >= 12 && i <= 14 ? 'live' : 'done'),
+    (i) => liveCounts[i]
+  );
+
+  // Mostly empty: early done buckets on the left, then a long tail of empty
+  // future slots (dots), with one live marker at the present moment.
+  const emptyCounts   = [2, 3, 2, 4, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0];
+  const empty = make(
+    (i) => (i === 21 ? 'live' : i <= 5 ? 'done' : 'queued'),
+    (i) => emptyCounts[i]
+  );
+
+  renderStrip(document.getElementById('strip-steady'), steady, 'Tool calls',     '60s');
+  renderStrip(document.getElementById('strip-live'),   live,   'Active agent',   '60s');
+  renderStrip(document.getElementById('strip-empty'),  empty,  'Upcoming queue', '60s');
 })();
 
 /* ============================================================

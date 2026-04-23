@@ -42,14 +42,17 @@ These match the Quality Evaluator. Violating any of them fails review automatica
 - If a needed value isn't a token, open a PR to add it; do not improvise
 
 ### Typography
-- Primary face: `var(--ds-font-sans)` (Geist)
+- Display + page titles: `var(--ds-font-display)` (Cash Sans when available, Geist fallback)
+- `h2` / section framing and `h3` / card titles: `var(--ds-font-mono)` (Geist Mono) with `font-variant-numeric: tabular-nums`
+- Primary face: `var(--ds-font-sans)` (Geist) for UI and body copy
 - Data, labels, timestamps, code: `var(--ds-font-mono)` (Geist Mono) with `font-variant-numeric: tabular-nums`
 - Forbidden: Inter, Roboto, Helvetica, Arial, Open Sans, Lato, Nunito, Poppins, Space Grotesk, `system-ui` as the primary face
 - Body text: `max-width: var(--ds-measure)` (65ch). Never full-width.
 - Use the `…` character for truncation, not `...`
 
 ### Color
-- One accent meaning per viewport: `--ds-accent-live` (`#E5533C`), and only for temporal/status semantics
+- Semantic accents only: `--ds-accent-success` (`#00E013`) is the primary accent for success, positive highlight, and completion; `--ds-accent-live` (`#E5533C`) is the secondary attention rail for alert, anomaly, error, or urgent live-now state
+- Green and red may coexist inside one chart or workflow only when the semantic split is explicit and sparse. If the neutral palette stops carrying the structure, you are overusing accent.
 - Never use color to create hierarchy; use weight and luminance
 - Contrast minimum: WCAG AA (4.5:1). Run contrast checks before committing
 
@@ -110,8 +113,8 @@ If a prompt asks you to produce any of these, push back rather than comply:
 - A shadow with blur ≥ 25px
 - `transition: all`
 - An `Inter` or `system-ui` stack as the primary font
-- A CTA button colored with `--ds-accent-live`
-- Two different "live" dots in the same viewport with different semantics
+- A CTA button colored with `--ds-accent-live` or `--ds-accent-success`
+- Red and green sprayed across one component cluster without a clear positive/attention mapping
 - A rounded-20px dark card
 - A full-width paragraph of body text
 

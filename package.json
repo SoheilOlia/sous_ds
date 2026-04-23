@@ -1,13 +1,13 @@
 {
   "name": "sous-ds",
   "version": "0.2.0",
-  "description": "Dark-first, data-dense, restraint-led design system for AI-native interfaces. Monospace for data, 1px borders over shadows, one semantic accent, motion under 300ms. Distributes as a global Claude/Codex/Goose skill plus React reference implementations.",
+  "description": "Dark-first, data-dense, restraint-led design system for AI-native interfaces. Monospace for data, 1px borders over shadows, semantic accents for live and success only, motion under 300ms. Distributes as a global Claude/Codex/Goose skill plus React reference implementations.",
   "license": "Apache-2.0",
   "author": "Soheil Yasrebi",
-  "homepage": "https://sous-ds.dev",
+  "homepage": "https://github.com/soheilolia/sous_ds",
   "repository": {
     "type": "git",
-    "url": "https://github.com/soheil/sous-ds"
+    "url": "https://github.com/soheilolia/sous_ds.git"
   },
   "type": "module",
   "main": "./index.ts",
@@ -33,6 +33,7 @@
     "INSTALL.md",
     "LICENSE",
     "README.md",
+    "install.sh",
     "quality-evaluator.md",
     "refusals.json",
     "design-tokens.json",

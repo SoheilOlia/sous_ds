@@ -35,12 +35,12 @@ Rules are grouped. Severity is fixed per rule. Violations produce structured fin
 | ID | Severity | Check |
 |---|---|---|
 | `CL01` | error | Any color hex that is not a token reference. All colors must go through `var(--ds-*)` or a token name |
-| `CL02` | error | More than one semantically non-equivalent `--ds-accent-live` instance visible in a single component or viewport |
+| `CL02` | error | Accent colors used in one component cluster without a clear positive/attention semantic split, or in a way that overpowers the neutral palette |
 | `CL03` | error | Color pair failing WCAG AA (4.5:1 normal text, 3:1 large text) |
-| `CL04` | warning | Use of `--ds-accent-live` on a CTA button, link, or non-semantic element |
+| `CL04` | warning | Use of `--ds-accent-live` or `--ds-accent-success` on a CTA button, link, or non-semantic element |
 | `CL05` | warning | Use of green, gold, purple, or teal as decoration |
 | `CL06` | info | Token added without a `$description` field |
-| `CL07` | error | `--ds-accent-live` referenced outside the sanctioned carrier files (`components/LiveDot.css`, `components/Pill.css`, `components/Toast.css`, `tokens.css`, `preview.html`, `examples/slop-vs-system.html`, `refusals.json`, `SKILL.md`). Focus-ring `:focus-visible` rules are the documented exception and exempted by the linter. Rationale: one accent, one meaning, exhaustive carrier list (see DESIGN.md "Accent carriers") |
+| `CL07` | error | Semantic accent tokens referenced outside sanctioned carrier files. `--ds-accent-live` is limited to attention carriers (`LiveDot`, `InlineStatus`, `Pill`, `Toast`, sparse `DottedChart` anomalies, `DensityStrip` live buckets). `--ds-accent-success` is limited to positive/completion carriers (`SegmentedBar`, `DottedChart`, `DensityStrip` done buckets). `tokens.css`, `preview.html`, docs, and the teaching artifact are the documented exceptions. Focus-ring `:focus-visible` rules are exempted by the linter. `DensityStrip` is the one component that appears in both allowlists — its per-bucket state model keeps the two accents semantically isolated. |
 
 ### Typography (TY)
 
@@ -100,7 +100,8 @@ Rules are grouped. Severity is fixed per rule. Violations produce structured fin
 | `CO02` | warning | Focus ring uses browser default or is missing |
 | `CO03` | warning | Interactive element without `aria-*` attributes where appropriate |
 | `CO04` | warning | Button hit area below 44×44 CSS pixels |
-| `CO05` | error | Accent-bearing live markers appear in a viewport more than once with different semantic meanings |
+| `CO05` | error | Accent-bearing states compete inside one cluster without a clear positive/attention map, or accent replaces the neutral hierarchy |
+| `CO06` | warning | Skeleton loaders, shimmer placeholders, or `animate-pulse` loading chrome are present. Use terse mono status text or segmented progress instead |
 
 ### Restraint (RE)
 

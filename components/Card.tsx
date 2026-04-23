@@ -19,7 +19,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Card — reference implementation for soheil-ds.
+ * Card — reference implementation for sous-ds.
  *
  * Rules followed:
  *  • 1px border (--ds-line), no shadow. Ever.

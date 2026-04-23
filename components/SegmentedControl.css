@@ -1,0 +1,91 @@
+/* ============================================================
+   SegmentedControl.css — compact mode / filter switching
+   ============================================================ */
+
+.ds-segmented-control {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-2);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-surface);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.ds-segmented-control__thumb {
+  position: absolute;
+  inset: var(--ds-space-2) auto var(--ds-space-2) 0;
+  width: 0;
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-text-primary);
+  transform: translateX(0);
+  transition:
+    width var(--ds-dur-standard) var(--ds-ease-out),
+    transform var(--ds-dur-standard) var(--ds-ease-out),
+    opacity var(--ds-dur-micro) var(--ds-ease-out);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ds-segmented-control__button {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--ds-size-control-sm);
+  padding: 0 var(--ds-space-5);
+  border: 0;
+  border-radius: var(--ds-radius-pill);
+  background: transparent;
+  color: var(--ds-text-secondary);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-type-body-sm-size);
+  line-height: var(--ds-type-body-sm-lh);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    opacity var(--ds-dur-micro) var(--ds-ease-out),
+    transform var(--ds-dur-press) var(--ds-ease-out);
+}
+
+.ds-segmented-control__button::before {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: max(100%, var(--ds-size-interactive-min));
+  height: max(100%, var(--ds-size-interactive-min));
+  transform: translate(-50%, -50%);
+}
+
+.ds-segmented-control__button:hover {
+  color: var(--ds-text-primary);
+}
+
+.ds-segmented-control__button[data-selected] {
+  color: var(--ds-text-on-primary);
+}
+
+.ds-segmented-control__button:active {
+  transform: scale(0.97);
+}
+
+.ds-segmented-control__button:focus-visible {
+  outline: 2px solid var(--ds-line-strong);
+  outline-offset: 2px;
+}
+
+.ds-segmented-control__button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-segmented-control__thumb,
+  .ds-segmented-control__button {
+    transition: none;
+  }
+}

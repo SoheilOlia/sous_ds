@@ -272,39 +272,81 @@ function ruleCL01_hardcodedHex(src, file) {
 }
 
 function ruleCL07_accentCarrier(src, file) {
-  // --ds-accent-live may only appear in sanctioned carriers + tokens.css
-  // + slop-vs-system example. Focus-ring rules (:focus-visible) are
-  // a documented exception because focus is a transient carrier, not content.
-  const allowed = [
-    "components/LiveDot.css",
-    "components/Pill.css",
-    "components/Toast.css",
-    "tokens.css",
-    "preview.html",
-    "examples/slop-vs-system.html",
-    "refusals.json",
-    "SKILL.md",
+  // Semantic accent tokens may only appear in sanctioned carriers + docs.
+  // Focus-ring rules (:focus-visible) are a documented exception because
+  // focus is a transient carrier, not content.
+  const accentRules = [
+    {
+      token: "--ds-accent-live",
+      allowed: [
+        "components/LiveDot.css",
+        "components/InlineStatus.css",
+        "components/Pill.css",
+        "components/Toast.css",
+        "components/DottedChart.css",
+        "components/DensityStrip.css",
+        "tokens.css",
+        "preview.html",
+        "examples/slop-vs-system.html",
+        "refusals.json",
+        "SKILL.md",
+      ],
+      message: "--ds-accent-live used outside sanctioned attention carriers (LiveDot, InlineStatus, Pill, Toast, DottedChart anomalies, DensityStrip live buckets).",
+      suggestion: "Carry attention semantics via <LiveDot>, <InlineStatus tone=\"live\">, <Pill live>, <Toast tone=\"live\">, a sparse anomaly point in <DottedChart>, or a running bucket in <DensityStrip>. See DESIGN.md 'Accent discipline'.",
+    },
+    {
+      token: "--ds-accent-success",
+      allowed: [
+        "components/SegmentedBar.css",
+        "components/DottedChart.css",
+        "components/DensityStrip.css",
+        "tokens.css",
+        "preview.html",
+        "examples/slop-vs-system.html",
+        "refusals.json",
+        "SKILL.md",
+      ],
+      message: "--ds-accent-success used outside sanctioned completion carriers (SegmentedBar, DottedChart, DensityStrip completed buckets).",
+      suggestion: "Carry 'success' semantics via <SegmentedBar> at full completion, an explicit success endpoint in <DottedChart>, or a done bucket in <DensityStrip>. See DESIGN.md 'Accent discipline'.",
+    },
   ];
   const normalized = file.replace(/\\/g, "/");
-  if (allowed.some((p) => normalized.endsWith(p))) return [];
   if (!SCANNABLE.includes(path.extname(file))) return [];
 
   const findings = [];
-  const rx = /var\(\s*--ds-accent-live\b/g;
-  let m;
-  while ((m = rx.exec(src)) !== null) {
-    // Exempt focus-ring usage: scan back ~400 chars for :focus-visible selector
-    const window = src.slice(Math.max(0, m.index - 400), m.index);
-    if (/:focus-visible[^{]*\{[^}]*$/.test(window)) continue;
-    findings.push({
-      rule: "CL07",
-      severity: "error",
-      path: `${file}:${lineAt(src, m.index)}`,
-      message: "--ds-accent-live used outside sanctioned carriers (LiveDot, Pill, Toast).",
-      suggestion: "Carry 'live' semantics via <LiveDot>, <Pill live>, or <Toast tone=\"live\">. See DESIGN.md 'Accent carriers'.",
-    });
-  }
+  accentRules.forEach(({ token, allowed, message, suggestion }) => {
+    if (allowed.some((p) => normalized.endsWith(p))) return;
+    const rx = new RegExp(`var\\(\\s*${token.replace(/[-/\\\\^$*+?.()|[\\]{}]/g, "\\\\$&")}\\b`, "g");
+    let m;
+    while ((m = rx.exec(src)) !== null) {
+      const window = src.slice(Math.max(0, m.index - 400), m.index);
+      if (/:focus-visible[^{]*\{[^}]*$/.test(window)) continue;
+      findings.push({
+        rule: "CL07",
+        severity: "error",
+        path: `${file}:${lineAt(src, m.index)}`,
+        message,
+        suggestion,
+      });
+    }
+  });
   return findings;
+}
+
+function ruleCO06_skeletonLoaders(src, file) {
+  if (!SCANNABLE.includes(path.extname(file))) return [];
+  const rx = /\b(skeleton|shimmer|animate-pulse|loading-placeholder)\b/i;
+  const m = rx.exec(src);
+  if (!m) return [];
+  return [
+    {
+      rule: "CO06",
+      severity: "warning",
+      path: `${file}:${lineAt(src, m.index)}`,
+      message: "Skeleton or shimmer loading chrome is forbidden in this system.",
+      suggestion: "Use terse mono loading text or SegmentedBar when the total is known.",
+    },
+  ];
 }
 
 const RULES = [
@@ -317,6 +359,7 @@ const RULES = [
   ruleLY01_offGridSpacing,
   ruleCL01_hardcodedHex,
   ruleCL07_accentCarrier,
+  ruleCO06_skeletonLoaders,
 ];
 
 // ---------------------------------------------------------------

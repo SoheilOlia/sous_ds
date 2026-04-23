@@ -1,8 +1,8 @@
 {
   "$schema": "https://tr.designtokens.org/format/",
-  "$name": "soheil-ds",
-  "$version": "0.1.0",
-  "$description": "Canonical tokens for the system. Dark is default. Every token passes WCAG AA at minimum. Format inspired by the W3C DTCG spec.",
+  "$name": "sous-ds",
+  "$version": "0.2.0",
+  "$description": "Canonical tokens for the system. Dark is default. Every token passes WCAG AA at minimum. Semantic accents are reserved: live and success only. Format inspired by the W3C DTCG spec.",
 
   "color": {
     "bg": {
@@ -28,23 +28,26 @@
       "secondary-light": { "$value": "#6B6B6B", "$type": "color", "$description": "Light mode secondary. 5.33:1 on bg.light. AA. Replaces prior #999 which failed AA" },
       "muted-light":     { "$value": "#767676", "$type": "color", "$description": "Light mode muted. 4.55:1 on white. AA minimum" },
       "on-accent":     { "$value": "#FFFFFF", "$type": "color", "$description": "Text on accent-live. 5.31:1. AA" },
+      "on-success":    { "$value": "#0A0A0A", "$type": "color", "$description": "Text on accent-success. 11.0:1. AAA" },
       "on-primary":    { "$value": "#0A0A0A", "$type": "color", "$description": "Text on filled primary button" }
     },
     "accent": {
-      "live": { "$value": "#E5533C", "$type": "color", "$description": "Temporal/status only. Live, active, now, alerting. Never decorative, never a CTA color" }
+      "live": { "$value": "#E5533C", "$type": "color", "$description": "Secondary semantic accent. Attention, alerting, anomaly, error, or urgent live-now state. Never decorative, never a CTA color" },
+      "success": { "$value": "#00E013", "$type": "color", "$description": "Primary semantic accent. Success, completion, committed state, positive highlight, goal-met, resolved. Never decorative, never a CTA color" }
     }
   },
 
   "type": {
     "family": {
+      "display": { "$value": "\"Cash Sans\", \"Geist\", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif", "$type": "fontFamily", "$description": "Headline/display face. Cash Sans first when available, Geist fallback for portability." },
       "sans": { "$value": "\"Geist\", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif", "$type": "fontFamily", "$description": "Primary face. Geometric, neutral, characterful. Self-host or Google Fonts" },
       "mono": { "$value": "\"Geist Mono\", ui-monospace, \"SF Mono\", \"JetBrains Mono\", monospace", "$type": "fontFamily", "$description": "All data, labels, timestamps, code. tabular-nums always on" }
     },
     "scale": {
-      "display":  { "$value": { "family": "{type.family.sans}", "size": "64px", "lineHeight": "72px", "weight": 600, "tracking": "-0.03em" }, "$type": "typography" },
-      "h1":       { "$value": { "family": "{type.family.sans}", "size": "40px", "lineHeight": "48px", "weight": 600, "tracking": "-0.02em" },  "$type": "typography" },
-      "h2":       { "$value": { "family": "{type.family.sans}", "size": "28px", "lineHeight": "36px", "weight": 600, "tracking": "-0.015em" }, "$type": "typography" },
-      "h3":       { "$value": { "family": "{type.family.sans}", "size": "20px", "lineHeight": "28px", "weight": 600, "tracking": "-0.01em" },  "$type": "typography" },
+      "display":  { "$value": { "family": "{type.family.display}", "size": "90px", "lineHeight": "86px", "weight": 400, "tracking": "-0.04em" }, "$type": "typography" },
+      "h1":       { "$value": { "family": "{type.family.display}", "size": "64px", "lineHeight": "61px", "weight": 400, "tracking": "-0.035em" },  "$type": "typography" },
+      "h2":       { "$value": { "family": "{type.family.mono}", "size": "40px", "lineHeight": "38px", "weight": 400, "tracking": "-0.03em", "features": "tnum" }, "$type": "typography" },
+      "h3":       { "$value": { "family": "{type.family.mono}", "size": "28px", "lineHeight": "30px", "weight": 400, "tracking": "-0.02em", "features": "tnum" },  "$type": "typography" },
       "body-lg":  { "$value": { "family": "{type.family.sans}", "size": "17px", "lineHeight": "26px", "weight": 400, "tracking": "0" },       "$type": "typography" },
       "body":     { "$value": { "family": "{type.family.sans}", "size": "15px", "lineHeight": "24px", "weight": 400, "tracking": "0" },       "$type": "typography" },
       "body-sm":  { "$value": { "family": "{type.family.sans}", "size": "13px", "lineHeight": "20px", "weight": 400, "tracking": "0" },       "$type": "typography" },
@@ -69,7 +72,11 @@
     "8":  { "$value": "48px",  "$type": "dimension" },
     "9":  { "$value": "64px",  "$type": "dimension" },
     "10": { "$value": "96px",  "$type": "dimension" },
-    "11": { "$value": "128px", "$type": "dimension" }
+    "11": { "$value": "128px", "$type": "dimension" },
+    "tight":   { "$value": "{space.3}", "$type": "dimension", "$description": "Belongs together: icon and label, value and unit, tightly related inline content." },
+    "group":   { "$value": "{space.5}", "$type": "dimension", "$description": "Same group, separate items: segmented controls, compact rows, related actions." },
+    "section": { "$value": "{space.7}", "$type": "dimension", "$description": "New group starts here. Use for card sections and major list breaks." },
+    "context": { "$value": "{space.9}", "$type": "dimension", "$description": "New context entirely: hero to body, page region to page region." }
   },
 
   "size": {
@@ -78,7 +85,9 @@
     "interactive-min": { "$value": "44px", "$type": "dimension", "$description": "Minimum touch hit area for interactive elements." },
     "dot": { "$value": "6px", "$type": "dimension", "$description": "Live/status marker size." },
     "icon-sm": { "$value": "14px", "$type": "dimension", "$description": "Small inline icon and spinner size." },
-    "toast-min-width": { "$value": "280px", "$type": "dimension", "$description": "Minimum toast width on desktop before wrapping." }
+    "toast-min-width": { "$value": "280px", "$type": "dimension", "$description": "Minimum toast width on desktop before wrapping." },
+    "strip-h": { "$value": "48px", "$type": "dimension", "$description": "DensityStrip row height. Snaps to 8pt scale; matches Button md visual footprint." },
+    "strip-bar-min": { "$value": "4px", "$type": "dimension", "$description": "DensityStrip: minimum bar height when a bucket has any events, so a 'count of 1' bucket is still visible." }
   },
 
   "radius": {
@@ -186,6 +195,19 @@
       "radius": { "$value": "{radius.sm}", "$type": "dimension" },
       "height": { "$value": "{size.control-md}", "$type": "dimension" },
       "type":   { "$value": "{type.scale.body-sm}", "$type": "typography" }
+    },
+    "inline-status": {
+      "type": { "$value": "{type.scale.label}", "$type": "typography" },
+      "gap": { "$value": "{space.2}", "$type": "dimension" },
+      "$description": "Bracketed mono status for queued, loading, saved, and live system state. Prefer this over skeleton loaders."
+    },
+    "tool-call": {
+      "bg": { "$value": "{color.surface.raised}", "$type": "color" },
+      "border": { "$value": "1px solid {color.line.default}", "$type": "border" },
+      "radius": { "$value": "{radius.md}", "$type": "dimension" },
+      "padY": { "$value": "{space.4}", "$type": "dimension" },
+      "padX": { "$value": "{space.5}", "$type": "dimension" },
+      "$description": "AI-native execution row for tool invocations, statuses, and durations."
     }
   }
 }

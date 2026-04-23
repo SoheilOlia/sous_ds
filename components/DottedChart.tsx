@@ -12,6 +12,10 @@ export interface DottedChartProps {
   data: DottedChartDatum[];
   /** Index of the "active" column (rendered with primary text color). Defaults to last. */
   activeIndex?: number;
+  /** Optional semantic success endpoint. Use only for closed positive results. */
+  successIndex?: number;
+  /** Optional semantic attention/anomaly columns. Use sparingly. */
+  attentionIndices?: number[];
   /** Pixel width of one column cell. Default 16 for 8pt alignment. */
   columnWidth?: number;
   /** Pixel gap between columns. Default 8. */
@@ -23,10 +27,12 @@ export interface DottedChartProps {
 }
 
 /**
- * DottedChart — the signature visualization for soheil-ds.
+ * DottedChart — the signature visualization for sous-ds.
  *
  * Rules followed:
- *  • No color hierarchy. Active = --ds-text-primary, inactive = --ds-text-muted.
+ *  • No decorative color hierarchy. Active = --ds-text-primary, inactive = --ds-text-muted.
+ *  • `accent-success` is reserved for an explicit closed positive endpoint.
+ *  • `accent-live` may mark a sparse anomaly or attention-needed point.
  *  • Dots instead of solid rectangles. Density carries magnitude.
  *  • Mono typography on all labels. tabular-nums.
  *  • Animation: opacity 0 → 1 and scale(0.85) → 1 per dot, staggered by
@@ -36,6 +42,8 @@ export interface DottedChartProps {
 export function DottedChart({
   data,
   activeIndex,
+  successIndex,
+  attentionIndices = [],
   columnWidth = 16,
   columnGap = 8,
   animate = true,
@@ -43,6 +51,7 @@ export function DottedChart({
 }: DottedChartProps) {
   const maxValue = Math.max(...data.map((d) => d.value), 1);
   const active = activeIndex ?? data.length - 1;
+  const attention = new Set(attentionIndices);
 
   return (
     <figure
@@ -61,7 +70,7 @@ export function DottedChart({
         {data.map((d, colIndex) => (
           <div
             key={`${d.label}-${colIndex}`}
-            className={`ds-chart__bar${colIndex === active ? " is-active" : ""}`}
+            className={`ds-chart__bar${colIndex === active ? " is-active" : ""}${colIndex === successIndex ? " is-success" : ""}${attention.has(colIndex) ? " is-attention" : ""}`}
           >
             {Array.from({ length: d.value }).map((_, dotIndex) => (
               <span
@@ -89,7 +98,7 @@ export function DottedChart({
         {data.map((d, i) => (
           <span
             key={`lbl-${d.label}-${i}`}
-            className={`ds-chart__label${i === active ? " is-active" : ""}`}
+            className={`ds-chart__label${i === active ? " is-active" : ""}${i === successIndex ? " is-success" : ""}${attention.has(i) ? " is-attention" : ""}`}
           >
             {d.label}
           </span>

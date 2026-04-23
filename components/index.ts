@@ -1,12 +1,12 @@
 /**
- * soheil-ds component suite · v0.1.0
+ * sous-ds component suite · v0.2.0
  *
  * Every component is a reference implementation of the rules in DESIGN.md.
  * Components should prefer tokens and documented system values over ad hoc
  * literals so agents can learn the right defaults from the source.
  *
  * Usage:
- *   import { Button, Card, Pill, LiveDot, ToastProvider, useToast } from "soheil-ds";
+ *   import { Button, Card, Pill, LiveDot, InlineStatus, MetricStat, ToolCall, ToastProvider, useToast } from "sous-ds";
  */
 
 export { Button } from "./Button";
@@ -25,3 +25,21 @@ export { ToastProvider, useToast } from "./Toast";
 
 export { DottedChart } from "./DottedChart";
 export type { DottedChartProps, DottedChartDatum } from "./DottedChart";
+
+export { DensityStrip } from "./DensityStrip";
+export type { DensityStripProps, Bucket, BucketState, StripEvent } from "./DensityStrip";
+
+export { SegmentedBar } from "./SegmentedBar";
+export type { SegmentedBarProps } from "./SegmentedBar";
+
+export { SegmentedControl } from "./SegmentedControl";
+export type { SegmentedControlOption, SegmentedControlProps } from "./SegmentedControl";
+
+export { InlineStatus } from "./InlineStatus";
+export type { InlineStatusProps } from "./InlineStatus";
+
+export { MetricStat } from "./MetricStat";
+export type { MetricStatProps } from "./MetricStat";
+
+export { ToolCall } from "./ToolCall";
+export type { ToolCallProps } from "./ToolCall";

@@ -4,6 +4,34 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## Unreleased
+
+### Added
+- **`<DensityStrip>`** — new Data Motif component. Horizontal segmented strip for AI-native data like "N tool calls across the last 60s, some complete, some running, some queued." Per-bucket micro-bar shows density (count); fill color shows state (`accent-success` = done, `accent-live` = live, `text-muted` = queued, 6px dot at base for empty/future buckets). Companion to `<DottedChart>`, not replacement. Accepts either pre-bucketed `buckets` or raw `events` (component bucketizes). Preview includes three demo scenarios: steady, live-batch, mostly-empty.
+- `DensityStrip` joins the accent-carrier allowlist for **both** `--ds-accent-live` and `--ds-accent-success` — the first component permitted to carry both, justified by the per-bucket state model (priority `live > done > queued`) that keeps the semantics isolated.
+- Motion rules (Emil-grounded): state transitions on `opacity`/`background-color`/`height` via interruptible CSS transitions at `--ds-dur-standard` (220ms) with `--ds-ease-out`; live-bucket opacity pulse `1 → 0.55 → 1` via `@keyframes` at `--ds-dur-live-pulse` (2000ms, matches `<LiveDot>` cadence); tooltip asymmetric timing (140ms enter, 112ms exit) with `transform-origin: bottom center`. `prefers-reduced-motion` collapses all transitions and replaces the pulse with a static outline.
+- New size tokens: `--ds-size-strip-h` (48px), `--ds-size-strip-bar-min` (4px). All other timing, easing, and dot-size values reuse existing system tokens.
+- `SegmentedBar` — discrete progress for quota, credits, and task completion when the total is known.
+- `SegmentedControl` — compact mode switching for filters, scopes, and tool rows.
+- `InlineStatus` — bracketed mono state for queued, loading, saved, and live system feedback.
+- `MetricStat` — large mono KPI readout with restrained count-up for revenue, usage, and agent metrics.
+- `ToolCall` — AI-native execution row for tool invocations, duration, and explicit status.
+- `R-STATE-001` in `refusals.json` plus `CO06` in the evaluator and linter, so skeleton and shimmer loading chrome are now explicitly discouraged.
+- `install.sh` — non-destructive scaffold installer so the contract can land in another repo without manual file copying.
+- `accent-success` (`#00E013`) — semantic completion accent for fully committed progress and closed positive endpoints.
+
+### Changed
+- Added semantic spacing aliases (`space-tight`, `space-group`, `space-section`, `space-context`) on top of the numeric scale so agents can compose by relationship, not just by raw number.
+- Softened the large Geist voice by dropping display and heading weights from 600 to 500 and easing the tracking slightly open, reducing the neutral/Helvetica feel without changing the family.
+- Updated `DESIGN.md`, `SKILL.md`, and the preview surface so segmented controls, segmented progress, inline status, and tool-call rows are first-class patterns instead of future ideas.
+- Re-tiered headline typography: `h2` and `h3` now use `Geist Mono` as the framing voice, while display / h1 stay on `Cash Sans`. Chapter and page title specimens now render as mixed alpha + mono numerals (`Aa 0123`) to reflect the system’s data-forward title language.
+- Tightened preview interactions so segmented control selection moves with a shared thumb, status toggles between playing and paused, progress can replay from click, and revenue metrics replay a restrained count-up on demand.
+- Added semantic green completion states to the preview and React primitives: `SegmentedBar` can switch to `accent-success` at full completion, and `DottedChart` can mark a terminal success endpoint without turning color into hierarchy.
+- Switched release/install metadata to the target GitHub remote `soheilolia/sous_ds`.
+
+### Removed
+- Stale export folders and duplicate inspiration artifacts are being retired so the repo has one working source of truth.
+
 ## [0.2.0] — 2026-04-22
 
 Truth-layer release. The repo now matches its own documentation, three verified contract-vs-reference contradictions are resolved, the system ships as an installable skill package, and the taste corpus is machine-readable.

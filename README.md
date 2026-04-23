@@ -1,13 +1,13 @@
 # sous-ds
 
 A dark-first, data-dense, restraint-led design system for AI coding agents.
-Monospace for data. 1px borders over shadows. One semantic accent. Motion under 300ms.
+Monospace for data. 1px borders over shadows. Two semantic accents only. Motion under 300ms.
 
 ```
 v0.2.0 · alpha · 2026-04-22
 ```
 
-Geist + Geist Mono. WCAG AA on every foreground/background pair. Structured as a skill-ready repo.
+Cash Sans display + Geist body + Geist Mono. WCAG AA on every foreground/background pair. Structured as a skill-ready repo.
 
 ---
 
@@ -34,13 +34,21 @@ Plus: `tokens.css` (runtime CSS variables), `components/` (reference implementat
 
 This repo contains a real root `SKILL.md` plus the rule files it points to. If your agent supports repo-backed skills, point it at the repo root and let `SKILL.md` serve as the entrypoint.
 
+### One-line scaffold installer (release-ready)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/soheilolia/sous_ds/main/install.sh | bash
+```
+
+The same script already lives in this repo as [install.sh](./install.sh), so you can validate the install path before the public remote is live.
+
 ### As a published skill (release target)
 
 ```bash
-npx skills add soheil/sous-ds
+npx skills add soheilolia/sous_ds
 ```
 
-Until that release exists, use the local workflow in [INSTALL.md](/Users/soheil/Sous_DS/INSTALL.md:1).
+Until that release exists, use the local workflow in [INSTALL.md](./INSTALL.md).
 
 ### As a direct dependency
 
@@ -49,8 +57,10 @@ Copy the contract and token files into your project root, then reference `tokens
 ```html
 <link rel="stylesheet" href="./tokens.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap">
 ```
+
+`Cash Sans` is the display/page-title face. `h2`/`h3` framing and numeric runs inside chapter/page titles should use `Geist Mono`. If `Cash Sans` is installed locally or self-hosted in your product, `--ds-font-display` will pick it up automatically; otherwise those display roles fall back to Geist.
 
 ### Recommended companion
 
@@ -71,7 +81,7 @@ A coding agent landing in a repo with this system should:
 2. Read `AGENTS.md` for code conventions.
 3. Reference `tokens.css` and use `var(--ds-*)` for every value.
 4. Check `components/` for existing reference implementations before building new.
-5. Run the linter before committing: `node scripts/lint.mjs`.
+5. Run the linter before committing: `node scripts/lint.mjs components/ preview.html`.
 6. Run `npm run pack:check` before cutting a release.
 
 Never hardcode a color, size, or duration. Never use Inter. Never use a shadow with blur ≥ 25px.
@@ -85,7 +95,7 @@ Never hardcode a color, size, or duration. Never use Inter. Never use a shadow w
 npx @google/design.md lint DESIGN.md
 
 # Lint implementations against the rules
-node scripts/lint.mjs components/
+node scripts/lint.mjs components/ preview.html
 
 # Verify release tarball contents
 npm run pack:check
@@ -117,6 +127,7 @@ sous-ds/
 ├── CHANGELOG.md               ← semver history
 ├── CONTRIBUTING.md            ← how to evolve the system
 ├── INSTALL.md                 ← local-install and release-state guide
+├── install.sh                 ← one-line scaffold installer
 ├── quality-evaluator.md       ← lint rule IDs and severities
 │
 ├── design-tokens.json         ← DTCG machine source
@@ -128,6 +139,11 @@ sous-ds/
 │   ├── Card.tsx    / .css
 │   ├── Pill.tsx    / .css
 │   ├── LiveDot.tsx / .css
+│   ├── InlineStatus.tsx / .css
+│   ├── MetricStat.tsx / .css
+│   ├── SegmentedBar.tsx / .css
+│   ├── SegmentedControl.tsx / .css
+│   ├── ToolCall.tsx / .css
 │   ├── Toast.tsx   / .css     ← Sonner-style, Emil's conventions
 │   └── DottedChart.tsx / .css ← signature data motif
 │
@@ -153,7 +169,7 @@ sous-ds/
 3. **Data is a design element.** Mono, tabular, display-size. The number is the hero.
 4. **Precision over softness.** 1px borders, tight radii, snappy motion.
 5. **The dot motif.** Dots, dashes, pills as data encoding. Length = duration. Density = volume.
-6. **One accent, one meaning.** `#E5533C` marks live/now/active only. Never a CTA.
+6. **Each accent has one meaning.** `#00E013` is the primary accent for success, positive highlight, and completion. `#E5533C` is the secondary attention rail for alert, anomaly, error, or urgent live-now state. Neither is a CTA.
 
 Full rationale in `DESIGN.md`. Source references and conflict resolution in `TASTE_LOG.md`.
 

@@ -134,7 +134,7 @@
   cursor: pointer;
   transition:
     background-color var(--ds-dur-micro) var(--ds-ease-out),
-    transform var(--ds-dur-press) ease;
+    transform var(--ds-dur-press) var(--ds-ease-out);
 }
 .ds-toast__action::before {
   content: "";

@@ -1,6 +1,6 @@
 /* ============================================================
    DottedChart.css — the signature data motif
-   Density = magnitude. No color hierarchy.
+   Density = magnitude. No decorative color hierarchy.
    ============================================================ */
 
 .ds-chart {
@@ -35,6 +35,14 @@
   background: var(--ds-text-primary);
 }
 
+.ds-chart__bar.is-success .ds-chart__dot {
+  background: var(--ds-accent-success);
+}
+
+.ds-chart__bar.is-attention .ds-chart__dot {
+  background: var(--ds-accent-live);
+}
+
 @keyframes ds-chart-dot-in {
   from { opacity: 0; transform: scale(0.85); }
   to   { opacity: 1; transform: scale(1); }
@@ -54,6 +62,14 @@
 
 .ds-chart__label.is-active {
   color: var(--ds-text-primary);
+}
+
+.ds-chart__label.is-success {
+  color: var(--ds-accent-success);
+}
+
+.ds-chart__label.is-attention {
+  color: var(--ds-accent-live);
 }
 
 @media (prefers-reduced-motion: reduce) {

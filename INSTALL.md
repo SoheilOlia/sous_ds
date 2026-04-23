@@ -20,6 +20,24 @@ For Codex, opening a project that includes these files is enough for the agent t
 
 ---
 
+## One-line scaffold installer
+
+The repo now ships `install.sh` so the public install path is ready as soon as the remote is live:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/soheilolia/sous_ds/main/install.sh | bash
+```
+
+Until that public URL exists, run the same installer from a checkout:
+
+```bash
+bash ./install.sh
+```
+
+Set `SOUS_DS_INCLUDE_CI=1` when you also want `.github/workflows/design.yml` copied into the target repo.
+
+---
+
 ## Verification
 
 Run all three checks before treating a change as shippable:
@@ -39,7 +57,7 @@ The public one-liner only becomes true after you actually publish the package or
 Target command after publication:
 
 ```bash
-npx skills add soheil/sous-ds
+npx skills add soheilolia/sous_ds
 ```
 
 Until that release exists, use the local checkout workflow above and keep the docs honest about the package state.

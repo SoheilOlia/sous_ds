@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: sous-ds
-description: A dark-first, data-dense, restraint-led interface system. Monospace for all data, single semantic accent, 1px borders over shadows, precise motion under 300ms.
+description: A dark-first, data-dense, restraint-led interface system. Monospace for all data, semantic accent pair only, 1px borders over shadows, precise motion under 300ms.
 
 colors:
   # Dark mode (default)
@@ -15,7 +15,9 @@ colors:
   text-muted:        "#888888"
   text-on-primary:   "#0A0A0A"
   text-on-accent:    "#FFFFFF"
+  text-on-success:   "#0A0A0A"
   accent-live:       "#E5533C"
+  accent-success:    "#00E013"
 
   # Light mode (alternate)
   bg-light:               "#F4F4F4"
@@ -27,29 +29,29 @@ colors:
 
 typography:
   display:
-    fontFamily: Geist
-    fontSize: 64px
-    lineHeight: 72px
-    fontWeight: 600
-    letterSpacing: "-0.03em"
+    fontFamily: Cash Sans
+    fontSize: 90px
+    lineHeight: 86px
+    fontWeight: 400
+    letterSpacing: "-0.04em"
   h1:
-    fontFamily: Geist
-    fontSize: 40px
-    lineHeight: 48px
-    fontWeight: 600
-    letterSpacing: "-0.02em"
+    fontFamily: Cash Sans
+    fontSize: 64px
+    lineHeight: 61px
+    fontWeight: 400
+    letterSpacing: "-0.035em"
   h2:
-    fontFamily: Geist
-    fontSize: 28px
-    lineHeight: 36px
-    fontWeight: 600
-    letterSpacing: "-0.015em"
+    fontFamily: Geist Mono
+    fontSize: 40px
+    lineHeight: 38px
+    fontWeight: 400
+    letterSpacing: "-0.03em"
   h3:
-    fontFamily: Geist
-    fontSize: 20px
-    lineHeight: 28px
-    fontWeight: 600
-    letterSpacing: "-0.01em"
+    fontFamily: Geist Mono
+    fontSize: 28px
+    lineHeight: 30px
+    fontWeight: 400
+    letterSpacing: "-0.02em"
   body-lg:
     fontFamily: Geist
     fontSize: 17px
@@ -166,7 +168,7 @@ components:
 
 ### Visual theme
 
-Terminal gravity meets editorial restraint. The interface feels like a precision instrument, not a brochure. Dark by default, near-black rather than charcoal. Monospace carries all data. One accent color, used only where it means "now" or "live." Cards float on contrast, not shadow. Every element justifies its presence or it gets removed.
+Terminal gravity meets editorial restraint. The interface feels like a precision instrument, not a brochure. Dark by default, near-black rather than charcoal. Monospace carries all data. The system is monochrome first: blacks, grays, and whites carry the structure; green is the primary semantic accent for positive emphasis, while red is a secondary rail for attention, anomaly, error, or urgent live-now state. Cards float on contrast, not shadow. Every element justifies its presence or it gets removed.
 
 ### Principles (in priority order)
 
@@ -175,7 +177,7 @@ Terminal gravity meets editorial restraint. The interface feels like a precision
 3. **Data is a design element.** Numbers, times, and metrics are set in mono at display size. The value is the hero, not the label.
 4. **Precision over softness.** 1px borders, tight radii, snappy motion. Nothing blurs or glows unless it must.
 5. **The dot motif.** Dots, dashes, and pill-shapes as data encoding. Length = duration. Darkness = intensity. Density = volume. This is the system's visual signature.
-6. **One accent, one meaning.** `accent-live` (#E5533C) only marks temporal or status semantics. Never a CTA, never decorative.
+6. **Each accent has one meaning.** `accent-success` (#00E013) is the primary accent for positive highlight, completion, and committed outcomes. `accent-live` (#E5533C) is the secondary attention rail for anomaly, alert, error, or urgent live-now state. Neither is a CTA or decoration.
 
 ### What this is not
 
@@ -197,7 +199,8 @@ Not a SaaS marketing aesthetic. No gold stars, no gradient hero blobs, no glass 
 | Primary text | `text-primary` | `#F0F0F0` | `#1A1A1A` | Headings, body, filled button bg |
 | Secondary text | `text-secondary` | `#A0A0A0` | `#6B6B6B` | Sub-headings, captions |
 | Muted text | `text-muted` | `#888888` | `#767676` | Labels, timestamps, meta |
-| Accent (live) | `accent-live` | `#E5533C` | `#E5533C` | Live, active, alerting, "now" |
+| Accent (success) | `accent-success` | `#00E013` | `#00E013` | Success, positive highlight, complete, committed, goal-met, resolved |
+| Accent (attention) | `accent-live` | `#E5533C` | `#E5533C` | Alert, anomaly, error, urgent live-now, negative variance |
 
 ### Contrast guarantees (WCAG)
 
@@ -212,21 +215,23 @@ Every foreground/background pair in this palette passes AA minimum. Computed, no
 | `text-secondary-light` on `bg-light` | 5.33:1 | AA |
 | `text-muted-light` on `bg-light` | 4.55:1 | AA (min) |
 | `text-on-accent` on `accent-live` | 5.31:1 | AA |
+| `text-on-success` on `accent-success` | 11.0:1 | AAA |
 
 ### Accent discipline
 
-`accent-live` is the only hue in the system. Its job is semantic:
+The accent pair is semantic, not decorative:
 
-- `✓` Live indicator (streaming, recording, airing now)
-- `✓` Active/current state in a timeline
-- `✓` Alert or attention-requiring status
-- `✓` Sanctioned semantic carriers: `LiveDot`, a live-pill prefix, or a live-tone toast marker when all visible accent instances mean the same thing
+- `✓` `accent-success` for positive emphasis, completion, committed state, or a deliberately spotlighted good outcome
+- `✓` `accent-live` for alert, anomaly, error, negative variance, or urgent live-now state
+- `✓` Sanctioned success carriers: `SegmentedBar` when `value === total`, `DottedChart` endpoint marked as a closed positive result, a `DensityStrip` bucket in `done` state, or another explicitly documented completion state
+- `✓` Sanctioned attention carriers: `LiveDot`, `InlineStatus` in `tone="live"`, a live-pill prefix, a live-tone toast marker, a sparse `DottedChart` point marking anomaly/attention, or a `DensityStrip` bucket in `live` state
+- **`DensityStrip` note:** This is the one component permitted to carry both accents simultaneously. Each bucket holds a single state, so the two accents never overlap within one bucket; the component enforces state priority `live > done > queued` at bucketization time
 - `✗` Primary CTA button color
 - `✗` Link color
 - `✗` Any decorative or branding use
-- `✗` More than one non-equivalent accent meaning visible per viewport
+- `✗` Letting the accent pair do the neutral palette's structural work
 
-If there are two accent dots on screen at once and they are not semantically equivalent, one of them is wrong.
+If green and red appear together, the semantic split must be explicit: green marks positive resolution or highlight, red marks attention or downside, and the neutral palette still carries the layout. If the cluster reads like a holiday theme instead of an instrument panel, one of the accents is wrong.
 
 ---
 
@@ -236,10 +241,10 @@ If there are two accent dots on screen at once and they are not semantically equ
 
 | Role | Family | Size / Line | Weight | Tracking | Use |
 |---|---|---|---|---|---|
-| `display` | Geist | 64 / 72 | 600 | -0.03em | Hero numbers, marquee metrics |
-| `h1` | Geist | 40 / 48 | 600 | -0.02em | Page title |
-| `h2` | Geist | 28 / 36 | 600 | -0.015em | Section title |
-| `h3` | Geist | 20 / 28 | 600 | -0.01em | Card title |
+| `display` | Cash Sans | 90 / 86 | 400 | -0.04em | Hero chapter title, marquee statement |
+| `h1` | Cash Sans | 64 / 61 | 400 | -0.035em | Page title |
+| `h2` | Geist Mono | 40 / 38 | 400 | -0.03em | Section title, instrument framing |
+| `h3` | Geist Mono | 28 / 30 | 400 | -0.02em | Card title, compact system framing |
 | `body-lg` | Geist | 17 / 26 | 400 | 0 | Editorial body |
 | `body` | Geist | 15 / 24 | 400 | 0 | Default UI body |
 | `body-sm` | Geist | 13 / 20 | 400 | 0 | Dense UI, buttons |
@@ -257,6 +262,8 @@ If there are two accent dots on screen at once and they are not semantically equ
 6. **Weight over color for emphasis.** Bold for UI stress. Italic only for citations and prose.
 7. **Underlines are for links only.**
 8. **Declare a fallback stack with matching x-height** to prevent layout shift on font load.
+9. **Headline voice is tiered, not flat.** `display` and `h1` use Cash Sans; `h2` and `h3` pivot into the mono/data voice. Body stays on Geist.
+10. **Numerals inside display or page titles switch to mono.** When a chapter or page title includes a number, set the numeric run in mono with `tabular-nums` so the title reads as `Aa 0123`, not as a marketing headline with decorative digits.
 
 ### Forbidden typefaces
 
@@ -271,6 +278,13 @@ Inter, Roboto, system-ui, Helvetica, Arial, Open Sans, Lato, Nunito, Poppins. Th
 8pt base grid. Scale: 0, 2, 4, 8, 12, 16, 24, 32, 48, 64, 96, 128. Named `space-0` through `space-11`.
 
 All padding, margin, and gap values must snap to this scale. `15px`, `20px`, `18px` are never acceptable. If the design calls for something off-grid, the design is wrong.
+
+Semantic aliases sit on top of the numeric scale and speed up composition decisions:
+
+- `space-tight` = 8px. Use when elements belong together: icon + label, value + unit, inline metadata.
+- `space-group` = 16px. Use for siblings inside the same component or tool row.
+- `space-section` = 32px. Use when a new card section or data group begins.
+- `space-context` = 64px. Use when the page changes context entirely.
 
 ### Composition
 
@@ -364,11 +378,27 @@ Two variants, mapped to status hierarchy:
 
 ### Dot (live indicator)
 
-6px circle, `accent-live` fill, radius `pill`. Optionally pulses opacity `1 → 0.5 → 1` on a 2000ms linear loop. Never scale, never color change. The primary carrier is `LiveDot`; the same accent may also appear in a live-pill prefix or live-tone toast marker when every visible accent instance expresses the same semantic state.
+6px circle, `accent-live` fill, radius `pill`. Optionally pulses opacity `1 → 0.5 → 1` on a 2000ms linear loop. Never scale, never color change. The primary carrier is `LiveDot`; the same accent may also appear in `InlineStatus tone="live"`, a live-pill prefix, or a live-tone toast marker when every visible accent instance expresses the same semantic state.
 
 ### Input
 
 Background `surface`, 1px `line-strong` border, radius `sm`, 40px height. Numeric inputs use mono. Focus state lifts border to `text-primary`. No colored focus glow.
+
+### Segmented control
+
+Compact mode switching for filters, tabs, and scope changes. Surface background, 1px `line` border, radius `pill`. Internal buttons are 32px tall inside a 44px minimum hit target. Selected state uses a filled chip; unselected state stays transparent and muted. Never more than five options per row.
+
+### Segmented bar
+
+Discrete progress meter. Progress is communicated through segment count, not a continuous fill sweep. Active segments use `text-primary`; pending segments use `line-strong`. When the meter reaches `value === total`, the completed state may switch to `accent-success` to mark terminal success. Use for quotas, usage, credit burn, and task progress when the total is known.
+
+### Inline status
+
+Bracketed mono status for explicit system state: `[QUEUED]`, `[LOADING 00:03]`, `[SAVED]`. Uses `label` typography, optional live dot only when the state is truly live. Completion should stay monochrome unless the state is the terminal success carrier for the cluster. Prefer this over placeholder chrome or atmospheric loading UI.
+
+### Tool call
+
+AI-native execution row for tool invocation surfaces. Background `surface-raised`, 1px `line` border, radius `md`, 12px × 16px padding. Title uses `body-sm` at weight 500. Duration stays mono. Status is rendered with `InlineStatus`. Detail copy uses `body-sm` secondary and wraps naturally.
 
 ### Modal / Drawer
 
@@ -380,7 +410,7 @@ Background `surface-raised`, radius `md`, elevation 1, 12px × 16px padding. Sta
 
 ### Data motif: dotted bar chart
 
-The system's signature data visualization. Bars are rendered as columns of dots rather than solid rectangles. Dot count = bar value. Active column uses `text-primary` dots; inactive columns use `text-muted`. No color is needed to distinguish foreground from background data. See `preview.html` for a working implementation.
+The system's signature data visualization. Bars are rendered as columns of dots rather than solid rectangles. Dot count = bar value. Active column uses `text-primary` dots; inactive columns use `text-muted`. `accent-success` is reserved for a closed positive endpoint or highlighted good result; `accent-live` may appear sparingly on a negative or attention-worthy outlier. Neutral tone should still do most of the work. See `preview.html` for a working implementation.
 
 ---
 
@@ -389,13 +419,14 @@ The system's signature data visualization. Bars are rendered as columns of dots 
 ### Do
 
 - Use `text-primary` for filled buttons and primary emphasis
-- Use `accent-live` only for temporal/status semantics
+- Use `accent-success` as the primary accent for positive emphasis and `accent-live` as the secondary attention rail
 - Show data in mono with `tabular-nums`
 - Reach for 1px border before shadow
 - Keep motion under 300ms
 - Start entry scale from 0.95 or higher, never 0
 - Make exits 20% faster than entries
 - Set `transform-origin` explicitly on popovers
+- Use terse mono loading text or segmented progress when loading state must be visible
 - Add `will-change: transform` on anything testing jittery
 - Use the `…` ellipsis character, not three periods
 - Cap body at 65ch
@@ -410,7 +441,8 @@ The system's signature data visualization. Bars are rendered as columns of dots 
 - Use gradient fills on buttons, cards, or backgrounds
 - Use purple, teal, green, or gold as decorative color
 - Use elevation to simulate a lit room (no "floating UI" theater)
-- Use more than one `accent-live` dot in a viewport with different meanings
+- Spray green and red across the same cluster without a crisp positive/attention mapping
+- Use skeleton loading placeholders or shimmer chrome
 - Use full-width body text
 - Use colored focus rings that differ from the system value
 - Use drop shadow and 1px border on the same element
@@ -422,7 +454,7 @@ The system's signature data visualization. Bars are rendered as columns of dots 
 When a coding agent reads this file, it should use the following prompt scaffolds:
 
 **For a new page:**
-> "Build this using sous-ds. Dark mode by default. Reference `DESIGN.md` tokens via `tokens.css`. Use `Geist` for all sans, `Geist Mono` for all data, labels, and code. No Inter. No shadows on cards. Body caps at 65ch. Use the bento pattern for multi-card layouts. One accent only, and only on temporal/status elements."
+> "Build this using sous-ds. Dark mode by default. Reference `DESIGN.md` tokens via `tokens.css`. Use `Cash Sans` for display and page-title roles, `Geist Mono` for h2/h3 framing plus all data, labels, and code, and `Geist` for body and UI copy. No Inter. No shadows on cards. Body caps at 65ch. Use the bento pattern for multi-card layouts. Keep the palette monochrome-first. Use `accent-success` as the primary accent for positive highlight and completion, and `accent-live` only as a secondary attention rail."
 
 **For a component:**
 > "Use the tokens defined in `DESIGN.md`. Button height 40px, radius `sm`. Active state `scale(0.97)`. Animation under 220ms with `ease-out`. `will-change: transform` if the component animates. Set `transform-origin` to trigger location if it's a popover."
@@ -431,8 +463,8 @@ When a coding agent reads this file, it should use the following prompt scaffold
 - Background: `#0A0A0A`
 - Text: `#F0F0F0`
 - Muted: `#888888`
-- Accent (semantic only): `#E5533C`
-- Font: `Geist` / `Geist Mono`
+- Accents (semantic only): `#E5533C` live, `#00E013` success
+- Font: `Cash Sans` for display/page titles, `Geist Mono` for section/card titles and data, `Geist` for body
 
 ---
 

@@ -3,12 +3,13 @@
   "version": "0.2.0",
   "description": "Machine-readable refusal corpus. Agents MUST refuse requests that match these patterns, cite the id, and propose the canonical alternative. The refusal set is as important as the component set — it is how the system transfers taste.",
   "categories": {
-    "color": "Hue, tone, and the single semantic accent",
+    "color": "Hue, tone, and the reserved semantic accents",
     "typography": "Primary face, mono face, measure, truncation",
     "elevation": "Shadows vs 1px borders, radius limits",
     "motion": "Duration, easing, entry scale, forbidden properties",
     "layout": "Spacing scale, measure, hit areas",
-    "semantic": "Single-meaning accent, carrier discipline",
+    "state": "Loading, progress, and transient system state",
+    "semantic": "Meaningful accent carriers and semantic discipline",
     "anti-slop": "The recognizable AI-slop signatures"
   },
   "refusals": [
@@ -25,21 +26,21 @@
     {
       "id": "R-COLOR-002",
       "category": "color",
-      "title": "Decorative accent hues (purple, teal, green, gold, orange)",
+      "title": "Decorative accent hues (purple, teal, gold, orange, or arbitrary green)",
       "pattern": "#(800080|008080|008000|ffd700|ffa500|[4-9a-f][0-9a-f]{2}[4-9a-f][0-9a-f]{2}[4-9a-f][0-9a-f]{2})",
       "severity": "error",
-      "rationale": "The system has one semantic hue: `--ds-accent-live` (#E5533C). Adding decoration hues breaks the 'one accent, one meaning' rule. Agents reading a DS with six brand hues cannot learn semantic discipline.",
-      "correct": "Use `var(--ds-text-primary|secondary|muted)` for type hierarchy. Use `var(--ds-accent-live)` ONLY for live/now/active state, and only in sanctioned carriers (see R-SEMANTIC-001).",
+      "rationale": "The system reserves hue for semantics only: `--ds-accent-live` for live/now/active and `--ds-accent-success` for complete/goal-met. Decorative hues break semantic discipline and flatten meaning into branding noise.",
+      "correct": "Use `var(--ds-text-primary|secondary|muted)` for hierarchy. Use `var(--ds-accent-live)` only for live/now/active or `var(--ds-accent-success)` only for terminal completion, and only in sanctioned carriers (see R-SEMANTIC-001).",
       "source": "DESIGN.md#color"
     },
     {
       "id": "R-COLOR-003",
       "category": "color",
-      "title": "`--ds-accent-live` on a CTA button",
-      "pattern": "\\.ds-btn\\[data-variant=\"primary\"\\][^}]*accent-live",
+      "title": "Semantic accent on a CTA button",
+      "pattern": "\\.ds-btn\\[data-variant=\"primary\"\\][^}]*(accent-live|accent-success)",
       "severity": "error",
-      "rationale": "The accent encodes semantic 'now/live/active'. A primary CTA is directional, not temporal. Coloring it accent confuses what the hue means across the interface.",
-      "correct": "Primary button uses `var(--ds-text-primary)` fill on dark bg with `var(--ds-bg)` ink — a reversed-contrast chip. Accent stays reserved for live/status semantics.",
+      "rationale": "Semantic accents encode status meaning. A primary CTA is directional, not temporal or terminal. Coloring it with either accent confuses what the hue means across the interface.",
+      "correct": "Primary button uses `var(--ds-text-primary)` fill on dark bg with `var(--ds-bg)` ink — a reversed-contrast chip. Accents stay reserved for live/status or terminal completion semantics.",
       "source": "DESIGN.md#buttons"
     },
     {
@@ -156,30 +157,45 @@
     {
       "id": "R-SEMANTIC-001",
       "category": "semantic",
-      "title": "`--ds-accent-live` used outside sanctioned carriers",
-      "pattern": "var\\(--ds-accent-live\\)",
+      "title": "Semantic accent used outside sanctioned carriers",
+      "pattern": "var\\(--ds-accent-(live|success)\\)",
       "allowedFiles": [
         "components/LiveDot.css",
+        "components/InlineStatus.css",
         "components/Pill.css",
         "components/Toast.css",
+        "components/SegmentedBar.css",
+        "components/DottedChart.css",
+        "components/DensityStrip.css",
         "tokens.css",
+        "preview.html",
         "examples/slop-vs-system.html"
       ],
       "severity": "error",
-      "rationale": "The accent has one semantic meaning: live/now/active. Carriers are an exhaustive list, not a theme color. Agents generating UI that paints accent onto arbitrary elements break the most important rule in the system.",
-      "correct": "Carry accent via `<LiveDot>`, `<Pill live>`, or `<Toast tone=\"live\">`. If a new semantic genuinely needs the accent, the PR must update DESIGN.md 'Accent carriers' and this refusal entry.",
+      "rationale": "Accent tokens are semantic carriers, not theme colors. `accent-live` is for live/now/active. `accent-success` is for terminal completion. Painting them onto arbitrary surfaces breaks the most important meaning contract in the system.",
+      "correct": "Carry `accent-live` via `<LiveDot>`, `<InlineStatus tone=\"live\">`, `<Pill live>`, `<Toast tone=\"live\">`, an anomaly point in `<DottedChart>`, or a running bucket in `<DensityStrip>`. Carry `accent-success` via `<SegmentedBar>` at full completion, a documented success endpoint in `<DottedChart>`, or a done bucket in `<DensityStrip>`. If a new semantic genuinely needs an accent, the PR must update DESIGN.md 'Accent discipline' and this refusal entry.",
       "source": "DESIGN.md#accent-carriers"
     },
     {
       "id": "R-SEMANTIC-002",
       "category": "semantic",
-      "title": "Two live dots in one viewport with different meanings",
+      "title": "Two accent meanings compete inside one cluster",
       "pattern": "",
       "severity": "error",
-      "rationale": "Two accents meaning two different things destroys the 'one accent, one meaning' contract. Users learn the hue is noise, not information.",
-      "correct": "Pick the dominant live state for the viewport. Express secondary statuses with text or non-accent chrome.",
+      "rationale": "If live and success fight for attention inside one cluster, users stop trusting hue as information. Accent must read as meaning, not as decoration.",
+      "correct": "Pick the dominant semantic for the cluster. Live and success may coexist only when they describe different stages of the same workflow or live in clearly separate clusters.",
       "source": "DESIGN.md#accent",
       "manualCheck": true
+    },
+    {
+      "id": "R-STATE-001",
+      "category": "state",
+      "title": "Skeleton or shimmer loading placeholders",
+      "pattern": "(skeleton|shimmer|animate-pulse|loading-placeholder)",
+      "severity": "warning",
+      "rationale": "Skeletons are generic product-ui filler. In this system, loading state should read as an instrument update, not a blurred promise of future layout.",
+      "correct": "Use terse mono status text for indefinite work or `SegmentedBar` when total progress is known.",
+      "source": "DESIGN.md#do-and-dont"
     },
     {
       "id": "R-SLOP-001",

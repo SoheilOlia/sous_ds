@@ -1,0 +1,58 @@
+/* ============================================================
+   SegmentedBar.css — discrete progress with optional completion accent
+   ============================================================ */
+
+.ds-segmented-bar {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--ds-space-2);
+  gap: var(--ds-space-2);
+  align-items: end;
+  min-height: var(--ds-space-5);
+}
+
+.ds-segmented-bar__segment {
+  width: var(--ds-space-2);
+  height: var(--ds-space-5);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-line-strong);
+  transform-origin: center bottom;
+  transition:
+    background-color var(--ds-dur-micro) var(--ds-ease-out),
+    opacity var(--ds-dur-micro) var(--ds-ease-out);
+}
+
+.ds-segmented-bar__segment.is-active {
+  background: var(--ds-text-primary);
+}
+
+.ds-segmented-bar[data-complete-tone="success"] .ds-segmented-bar__segment.is-active {
+  background: var(--ds-accent-success);
+}
+
+.ds-segmented-bar[data-animated] .ds-segmented-bar__segment {
+  opacity: 0;
+  transform: scaleY(0.72);
+  animation: ds-segmented-bar-in var(--ds-dur-standard) var(--ds-ease-out) forwards;
+  animation-delay: calc(var(--ds-dur-stagger-item) * var(--ds-segment-index, 0));
+}
+
+@keyframes ds-segmented-bar-in {
+  from {
+    opacity: 0;
+    transform: scaleY(0.72);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-segmented-bar__segment {
+    transition: none;
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

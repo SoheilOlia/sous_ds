@@ -1,0 +1,53 @@
+/* ============================================================
+   MetricStat.css — large mono metric / KPI readout
+   ============================================================ */
+
+.ds-metric-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+}
+
+.ds-metric-stat__label {
+  display: block;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  color: var(--ds-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.ds-metric-stat__value {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0;
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 72px;
+  line-height: 80px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--ds-text-primary);
+}
+
+.ds-metric-stat__prefix,
+.ds-metric-stat__number {
+  display: inline-block;
+}
+
+.ds-metric-stat__suffix {
+  font-size: 0.32em;
+  color: var(--ds-text-muted);
+  margin-left: 4px;
+  vertical-align: top;
+}
+
+.ds-metric-stat__delta {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  color: var(--ds-text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

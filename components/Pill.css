@@ -18,6 +18,10 @@
   letter-spacing: var(--ds-type-label-track);
   text-transform: uppercase;
   white-space: nowrap;
+  transition:
+    opacity var(--ds-dur-standard) var(--ds-ease-out),
+    background-color var(--ds-dur-micro) var(--ds-ease-out),
+    transform var(--ds-dur-press) var(--ds-ease-out);
 }
 
 /* Filled : primary status, active, current */
@@ -32,6 +36,18 @@
   background: transparent;
   color: var(--ds-text-secondary);
   border: 1px dashed var(--ds-line-strong);
+}
+
+.ds-pill[data-variant="outline"][data-tone="draft"] {
+  color: var(--ds-text-muted);
+  border-color: var(--ds-line);
+  opacity: 0.82;
+}
+
+.ds-pill[data-variant="outline"][data-tone="progress"] {
+  background: var(--ds-surface-raised);
+  color: var(--ds-text-primary);
+  border-color: var(--ds-line-strong);
 }
 
 /* Embedded live dot (filled variant only by convention) */
@@ -49,5 +65,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .ds-pill {
+    transition: none;
+  }
+
   .ds-pill__dot { animation: none; opacity: 1; }
 }

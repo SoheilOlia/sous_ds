@@ -46,7 +46,7 @@ docs(design): document contrast guarantees table
 npx @google/design.md lint DESIGN.md
 
 # Lint implementations
-node scripts/lint.mjs components/
+node scripts/lint.mjs components/ preview.html
 
 # Contract diff against main (if you touched DESIGN.md)
 npx @google/design.md diff main:DESIGN.md HEAD:DESIGN.md
