@@ -1390,13 +1390,17 @@ body {
    ============================================================ */
 .variants {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--ds-space-8);
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ds-space-7);
+}
+@media (max-width: 880px) {
+  .variants { grid-template-columns: 1fr; gap: var(--ds-space-8); }
 }
 
 .variant {
   display: grid;
   gap: var(--ds-space-5);
+  min-width: 0;
 }
 
 .variant__head {
@@ -1444,22 +1448,23 @@ body {
 
 /* ---- <DotTimeline> (inline mirror of components/DotTimeline.css) ---- */
 .ds-dot-timeline__track {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--ds-space-2);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--ds-size-dot);
+  align-items: end;
+  gap: var(--ds-space-3);
   height: var(--ds-space-10);
   padding: var(--ds-space-2) 0;
   border-bottom: 1px solid var(--ds-line);
 }
 .ds-dot-timeline__col {
   position: relative;
-  flex: 1 1 0;
-  min-width: var(--ds-space-2);
+  width: var(--ds-size-dot);
   height: 100%;
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
-  gap: var(--ds-space-1);
+  gap: var(--ds-space-2);
   outline: none;
   cursor: default;
 }

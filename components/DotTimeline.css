@@ -21,10 +21,14 @@
 }
 
 .ds-dot-timeline__track {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--ds-space-2);
-  /* 10 dots × 6 + 9 × 2 gaps + padding = 86 (fits comfortably in 96 = space-10) */
+  display: grid;
+  grid-auto-flow: column;
+  /* Each column is exactly the dot width; spacing lives in the gap so the
+     horizontal rhythm matches <DottedChart> (6px dot + 8px gap). */
+  grid-auto-columns: var(--ds-size-dot);
+  align-items: end;
+  gap: var(--ds-space-3);
+  /* 10 dots × 6 + 9 × 4 gaps + padding = 96 (fits space-10) */
   height: var(--ds-space-10);
   padding: var(--ds-space-2) 0;
   border-bottom: 1px solid var(--ds-line);
@@ -33,14 +37,13 @@
 
 .ds-dot-timeline__col {
   position: relative;
-  flex: 1 1 0;
-  min-width: var(--ds-space-2);
+  width: var(--ds-size-dot);
   height: 100%;
   display: flex;
   flex-direction: column-reverse;            /* stack from the bottom */
   align-items: center;
   justify-content: flex-start;
-  gap: var(--ds-space-1);
+  gap: var(--ds-space-2);                    /* 4px — matches DottedChart */
   outline: none;
   cursor: default;
   padding-bottom: 0;
