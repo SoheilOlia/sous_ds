@@ -4,6 +4,39 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.2.4] — 2026-04-22
+
+Second-look pass on v0.2.3. The compact bar variant shipped one day
+and didn't hold up visually — removed before it hardens into a
+pattern. Two small polish items landed alongside.
+
+### Added
+- `<PulseTrail>` trail dots now pulse on hover at the `<LiveDot>`
+  cadence (`--ds-dur-live-pulse` = 2000ms) with a 1.15× scale lift,
+  so each prior event marker is individually inspectable. Scoped to
+  `@media (hover: hover) and (pointer: fine)`; `prefers-reduced-motion`
+  swaps to a static "lifted" state (no animation, full opacity).
+
+### Changed
+- Preview §10 typography aligned with the page voice: `.variant__name`
+  dropped from Cash Sans display 22px to mono 11px uppercase 500
+  (matches `.label`); `.variant__note` line-height bumped to 24px
+  (matches `.t-body`); letter square shrunk from 32px to 24px and
+  re-styled as small uppercase metadata. The `<DotTimeline>` and
+  `<PulseTrail>` headings now read as named component rows rather
+  than section pull-quotes.
+
+### Removed
+- **`<DotTimeline density="compact">`** bar variant, retracted one
+  revision after it shipped. Its thin-bar read didn't hold up visually;
+  keeping DotTimeline as one thing (per-bucket dot stack, direct
+  sibling of `<DottedChart>`) preserves the dot-motif family grammar.
+  The prop, its CSS, and the preview A' demo block are fully removed.
+  If a denser read is needed later, R-FAMILY-001 directs that toward
+  a new in-family component rather than a mode switch on this one.
+
+---
+
 ## [0.2.3] — 2026-04-22
 
 Polish pass on the v0.2.2 Data Motif siblings based on first-read
