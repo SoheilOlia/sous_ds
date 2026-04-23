@@ -4,6 +4,34 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.2.9] — 2026-04-23
+
+Tighter body-voice match + slower animation cadence.
+
+### Changed
+- `.variant__note` now byte-for-byte matches `.site-copy` (§01
+  manifesto): `max-width: 38ch`, `line-height: 1.1`, `margin: 0`.
+  v0.2.8 was close but drifted on line-height and max-width — enough
+  that the two body surfaces didn't read as the same voice.
+- §09 revenue counter slowed: `CYCLE` 1500 → 3000 (3 seconds between
+  target picks) and `COUNT_DURATION` 680 → 1500 (the count animation
+  itself is 1.5 seconds). The stat dwells long enough after each
+  count that the destination value is legible before the next cycle
+  begins.
+- §09 scrubber slowed: `HOLD_BASE` 500 → 1500; `HOLD_JITTER`
+  200 → 300; `TYPE_STEP` 35 → 60 for the caption typewriter. Head
+  auto-drift between months is now 1500ms (from 260ms). Hover snaps
+  the head instantly so manual scrubbing stays responsive — the
+  slow pacing is for the auto-read, not user input.
+
+### Technical
+- Scrubber head motion moved off CSS `transition: transform` (capped
+  at 300ms by the MO04 lint rule) onto a requestAnimationFrame tween
+  driving the `--x` custom property through an ease-in-out sine
+  curve. Only the opacity fade-in still uses a CSS transition.
+
+---
+
 ## [0.2.8] — 2026-04-23
 
 Preview voice alignment + live revenue counter.
