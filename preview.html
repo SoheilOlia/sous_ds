@@ -1388,11 +1388,20 @@ body {
   background: var(--ds-text-muted);
   opacity: 0;
   animation: dot-in var(--ds-dur-micro) var(--ds-ease-out) forwards;
-  transition: background-color var(--ds-dur-micro) var(--ds-ease-out);
+  /* Slow release by default — scrubber wake. When .is-focus is
+     removed, dots decay back to muted over 280ms (system ceiling)
+     so the scrubber leaves a visible trail. */
+  transition: background 280ms var(--ds-ease-out);
 }
 .bar.active .d { background: var(--ds-text-primary); }
 .bar.success .d { background: var(--ds-accent-success); }
 .bar.attention .d { background: var(--ds-accent-live); }
+
+/* Fast attack when the scrubber arrives — asymmetric with the 280ms
+   release so attention snaps in, then lingers on the way out. */
+.bar.is-focus .d {
+  transition: background 120ms var(--ds-ease-out);
+}
 
 /* Agent Scrubber — the scrubber-head sweeps left→right across the 12
    month columns, pausing ~1.2s per month. As it passes a column, the
@@ -1421,8 +1430,12 @@ body {
      before the first positioning pass. */
   transform: translateX(calc(var(--x, 0px) - 50%));
   opacity: 0;
+  /* Ease-in-out for cross-chart motion — ease-out starts fast and
+     reads as mechanical click-click-click when stepping between
+     discrete columns. The strong cubic-bezier below is the system's
+     ease-in-out curve, slightly slowed so the motion breathes. */
   transition:
-    transform 200ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 260ms cubic-bezier(0.77, 0, 0.175, 1),
     opacity 200ms var(--ds-ease-out);
   animation: live-pulse var(--ds-dur-live-pulse) linear infinite;
   pointer-events: none;
@@ -1539,17 +1552,32 @@ body {
    Data Motif — <DotTimeline> and <PulseTrail>
    Both built on the 6px dot primitive shared with DottedChart.
    ============================================================ */
+/*
+ * Subgrid: .variants defines the three rows (head / chart / axis);
+ * each .variant inherits those rows via `grid-template-rows: subgrid`.
+ * Consequence: cards align at every row regardless of description
+ * length — the short DotTimeline description doesn't push its chart
+ * higher than the longer PulseTrail description.
+ */
 .variants {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr auto;
   gap: var(--ds-space-7);
 }
 @media (max-width: 880px) {
-  .variants { grid-template-columns: 1fr; gap: var(--ds-space-8); }
+  .variants {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    gap: var(--ds-space-8);
+  }
+  .variant { grid-template-rows: auto auto auto; grid-row: auto; }
 }
 
 .variant {
   display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 3;
   gap: var(--ds-space-5);
   min-width: 0;
 }
@@ -2414,7 +2442,9 @@ body {
 
   const LABELS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const TYPE_STEP = 35;   // ms per character typed
-  const HOLD = 600;       // ms to dwell after the caption finishes typing
+  const HOLD_BASE = 500;  // ms base dwell after the caption finishes typing
+  const HOLD_JITTER = 200; // +/- range around HOLD_BASE — small randomness
+                          // breaks the metronome feel of a perfectly-timed loop
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -2483,11 +2513,14 @@ body {
     if (!isAuto) return;
     showMonth(currentIdx).then(function () {
       if (!isAuto) return;
+      // Organic jitter around HOLD_BASE so the scrubber doesn't feel
+      // like a metronome. Range: [HOLD_BASE - HOLD_JITTER, HOLD_BASE + HOLD_JITTER].
+      const hold = HOLD_BASE + (Math.random() * 2 - 1) * HOLD_JITTER;
       advanceTimer = window.setTimeout(function () {
         if (!isAuto) return;
         currentIdx = (currentIdx + 1) % LABELS.length;
         cycle();
-      }, HOLD);
+      }, hold);
     });
   }
 
