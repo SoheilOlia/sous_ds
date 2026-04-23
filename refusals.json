@@ -10,6 +10,7 @@
     "layout": "Spacing scale, measure, hit areas",
     "state": "Loading, progress, and transient system state",
     "semantic": "Meaningful accent carriers and semantic discipline",
+    "process": "How new components get designed, proposed, and added to the system",
     "anti-slop": "The recognizable AI-slop signatures"
   },
   "refusals": [
@@ -228,6 +229,22 @@
       "correct": "Name the action (`Summarize`, `Regenerate`, `Cite`). Use geometric or text-only affordance. Reserve the accent-live dot for active processing, not for 'AI present'.",
       "source": "DESIGN.md#voice",
       "manualCheck": true
+    },
+    {
+      "id": "R-FAMILY-001",
+      "category": "process",
+      "title": "Proposing or implementing a component for an existing family without running the family-extension protocol",
+      "pattern": "",
+      "severity": "error",
+      "rationale": "New components in an existing family must share the family's visual grammar (primitive shape, state coloring, motion cadence, axis language, typography). Proposing options that break the grammar forces the user to pick between consistency and desired behavior — a false choice. The spec review passes, the component ships, and the family is now incoherent. The glance test — 'does it look like it belongs?' — is the actual test, and skipping the protocol guarantees failing it.",
+      "correct": "Run the six-step 'Extending a component family' protocol in SKILL.md: (1) read every existing family member's source + preview, (2) state the motif in one sentence, (3) name the vocabulary (primitive, state colors, motion, axis, typography) explicitly, (4) propose only same-primitive variants (flag any breaking variant as a 'branching' conversation), (5) mock next to the canonical family member before implementation, (6) update section labels after shipping. Refuse to continue if any step is skipped.",
+      "source": "SKILL.md#extending-a-component-family",
+      "manualCheck": true,
+      "appliesTo": [
+        "any task phrased as 'add another X to the Y family'",
+        "any task asking for a new member of a named component family (Data Motif, Accent Carrier, Toast, etc.)",
+        "any task asking for a 'different version' or 'companion' to an existing component"
+      ]
     }
   ]
 }

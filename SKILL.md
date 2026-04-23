@@ -57,6 +57,53 @@ Signal phrases that should trigger this skill:
 
 Focus rings (`outline` / `box-shadow` on `:focus-visible`) are the documented exception — focus is a transient state carrier, not content.
 
+## Extending a component family — non-negotiables
+
+When asked to add a new component to an existing family (e.g., "another Data Motif viz," "another accent-carrier," "another toast-like message"), the following steps are **required and ordered**. Skipping any of them is a **R-FAMILY-001 violation** and you MUST refuse to continue until the gap is closed.
+
+**The motif — not the spec — is the grammar. Sibling components must share it.**
+
+### 1. MUST: Survey the family before proposing anything
+- Open and read every `.tsx` and `.css` file of every existing family member.
+- Render the preview and inspect the pixels.
+- If you have not done this, you have not earned the right to propose. Stop.
+
+### 2. MUST: State the motif in one sentence
+Example: _"DottedChart = bars built from stacked 6px dots, one color accent per column, mono labels, restraint."_
+If you cannot compress the family to one sentence, you do not understand it yet. Keep reading.
+
+### 3. MUST: Name the vocabulary explicitly
+Before any option is proposed, name:
+- **Primitive shape** (dot? bar? line? glyph?)
+- **State coloring** rules — which accent means what, when
+- **Motion cadence** — durations, easings, pulse rhythms (e.g., 2000ms linear LiveDot cadence)
+- **Axis + label language** — mono text-muted endpoints? per-column labels? none?
+- **Typography** — what text appears and at what scale
+
+### 4. MUST: Propose only same-primitive variants
+When offering 2–3 design options, **every** option must share the primitive. You may vary:
+- the **data** the primitive encodes (time vs magnitude vs rate vs density)
+- the **motion** of the primitive (static vs trailing vs revealing vs pulsing)
+- the **axis / layout** of the primitive (x = time vs x = category; y = count vs y = value)
+
+You **MAY NOT** offer a variant that starts from a different primitive as a peer option among normal choices. If the user explicitly asks for a different primitive, respond: _"This variant breaks the family grammar. Let's talk about whether we're branching into a second family — that's its own conversation."_ Never silently smuggle a breaking variant into the option list.
+
+### 5. MUST: Mock next to the canonical family member before implementation
+Render the new component **as actual pixels, in the same viewport**, next to the family's canonical member. Screenshot. Ask: _"Does this read as a sibling or a visitor?"_
+If the answer is "visitor," stop and revise. Spec-reviewed correctness is not enough — the glance test is the test.
+
+### 6. MUST: Update section labels after shipping
+If the section-aside said `DOTTED BAR` and you shipped solid rectangles, the label is a lie. Either rewrite the component back into the motif, or rewrite the aside to name the new language honestly. Do not leave drift.
+
+### The test
+
+"Does it pass the spec review?" is **not** the test.
+"Does it look like it belongs?" is the test.
+
+### Refusal behavior
+
+If you are asked to skip any of steps 1–6, or to propose/implement a family member without first completing 1–3, **refuse and cite R-FAMILY-001**. Offer to run the protocol first.
+
 ## Refuse to generate
 
 Load `refusals.json` for the full machine-readable corpus with patterns. Summary:
