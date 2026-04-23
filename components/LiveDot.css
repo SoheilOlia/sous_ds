@@ -45,8 +45,34 @@
 
 .ds-livedot__label {
   color: var(--ds-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  /* Reserve vertical room so the caret does not push neighbors around
+     as characters type in. */
+  line-height: 1.2;
+  /* Prevent per-character reflow from jiggling the label baseline. */
+  font-variant-numeric: tabular-nums;
+}
+
+/* Blinking caret, only rendered in rotating mode. The caret sits after
+   the visible text and blinks on a 1s cycle. Under reduced motion it
+   holds steady at full opacity. */
+.ds-livedot__caret {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 2px;
+  background: currentColor;
+  vertical-align: -0.12em;
+  animation: ds-livedot-caret-blink 1000ms steps(2, start) infinite;
+}
+
+@keyframes ds-livedot-caret-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ds-livedot__mark { animation: none; opacity: 1; }
+  .ds-livedot__caret { animation: none; opacity: 1; }
 }

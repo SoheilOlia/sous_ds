@@ -213,6 +213,60 @@ body {
   50%      { opacity: 0.5; }
 }
 
+/* ---- LiveDot (inline mirror of components/LiveDot.css) -------- */
+.ds-livedot {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+}
+.ds-livedot__mark {
+  width: var(--ds-size-dot);
+  height: var(--ds-size-dot);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-accent-live);
+  flex: none;
+  animation: live-pulse var(--ds-dur-live-pulse) linear infinite;
+}
+.ds-livedot__sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.ds-livedot__label {
+  color: var(--ds-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.ds-livedot__caret {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 2px;
+  background: currentColor;
+  vertical-align: -0.12em;
+  animation: ds-livedot-caret-blink 1000ms steps(2, start) infinite;
+}
+@keyframes ds-livedot-caret-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-livedot__mark,
+  .ds-livedot__caret { animation: none; opacity: 1; }
+}
+
 /* ---- Section cards ---------------------------------------- */
 .grid {
   display: grid;
@@ -2038,9 +2092,10 @@ body {
 
       <div class="component-row">
         <span class="label">Live dot</span>
-        <span style="display:inline-flex; align-items:center; gap:8px; color:var(--ds-text-secondary); font-family:var(--ds-font-mono); font-size:12px">
-          <span class="dot-live" style="display:inline-block; width:6px; height:6px; border-radius:999px; background:var(--ds-accent-live); animation:live-pulse 2000ms linear infinite"></span>
-          STREAMING · <span id="streaming-duration">02:41:17</span>
+        <span class="ds-livedot" data-rotating="true" role="status" id="livedot-demo">
+          <span class="ds-livedot__mark" aria-hidden="true"></span>
+          <span class="ds-livedot__sr" aria-live="polite" id="livedot-demo-sr">Agenting</span>
+          <span class="ds-livedot__label" aria-hidden="true"><span id="livedot-demo-label"></span><span class="ds-livedot__caret" aria-hidden="true"></span></span>
         </span>
       </div>
 
@@ -2624,28 +2679,73 @@ body {
 })();
 
 /* ============================================================
-   Streaming timer — always advancing while the preview is open
+   LiveDot — rotating typewriter agent states (AGENTING, WORKING,
+   THINKING, REASONING). Plain-JS mirror of <LiveDot labels={} />.
+   Type → hold → erase → advance; loops forever. Reduced motion
+   collapses to instant swaps at the hold cadence.
    ============================================================ */
-(function streamingTimer () {
-  const el = document.getElementById('streaming-duration');
-  if (!el) return;
+(function liveDotRotating () {
+  const label = document.getElementById('livedot-demo-label');
+  const sr    = document.getElementById('livedot-demo-sr');
+  if (!label || !sr) return;
 
-  let elapsed = (2 * 60 * 60) + (41 * 60) + 17;
+  const labels = ['AGENTING', 'WORKING', 'THINKING', 'REASONING'];
+  const step = 50;    // per-char interval (type + erase)
+  const hold = 2000;  // ms at full label before erasing
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function formatDuration(totalSeconds) {
-    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-    const seconds = String(totalSeconds % 60).padStart(2, '0');
-    return hours + ':' + minutes + ':' + seconds;
+  let index = 0;
+  let visible = '';
+  let phase = 'typing'; // typing | holding | erasing
+
+  function render () {
+    label.textContent = visible;
+    sr.textContent = labels[index];
   }
 
-  function tick() {
-    el.textContent = formatDuration(elapsed);
-    elapsed += 1;
+  function tick () {
+    const current = labels[index];
+
+    if (reduced) {
+      visible = current;
+      render();
+      window.setTimeout(() => {
+        index = (index + 1) % labels.length;
+        visible = '';
+        render();
+        tick();
+      }, hold);
+      return;
+    }
+
+    if (phase === 'typing') {
+      if (visible.length < current.length) {
+        visible = current.slice(0, visible.length + 1);
+        render();
+        window.setTimeout(tick, step);
+      } else {
+        phase = 'holding';
+        window.setTimeout(tick, hold);
+      }
+    } else if (phase === 'holding') {
+      phase = 'erasing';
+      tick();
+    } else if (phase === 'erasing') {
+      if (visible.length > 0) {
+        visible = visible.slice(0, -1);
+        render();
+        window.setTimeout(tick, step);
+      } else {
+        index = (index + 1) % labels.length;
+        phase = 'typing';
+        render();
+        tick();
+      }
+    }
   }
 
+  render();
   tick();
-  window.setInterval(tick, 1000);
 })();
 </script>
 
