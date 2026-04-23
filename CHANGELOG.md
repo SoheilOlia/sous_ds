@@ -4,6 +4,35 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.2.8] — 2026-04-23
+
+Preview voice alignment + live revenue counter.
+
+### Changed
+- **§10 variant descriptions now use the system's manifesto body voice.**
+  `.variant__note` was 15px Geist sans — functional but generic. Now
+  matches `.site-copy` (§01 manifesto), the only long-form body copy
+  actually applied elsewhere on the page: Cash Sans display (Geist
+  fallback), 22px, 1.2 line-height, -0.0075em tracking, secondary ink.
+  Reads editorial. Inline `<code>` inside keeps Geist Mono at 0.82em
+  so token names like `accent-live` still read as identifiers.
+
+### Added
+- **§09 revenue counter auto-cycles.** Every 1500ms the stat picks a
+  new target (biased positive ~70%, with occasional down-quarter reads)
+  and counts from the current value to the new target over 680ms using
+  the existing ease-out cubic. Sign prefix flips `+` ↔ `−` (U+2212,
+  same visual width as `+` in mono) and `data-tone` flips
+  `success` ↔ `attention` so the value color tracks the sign:
+  `accent-success` green for up-reads, `accent-live` red for down.
+  Tone and prefix are set upfront to the destination value so color
+  doesn't flash mid-count. Click the stat to restart 0 → +326 and
+  resume auto. `prefers-reduced-motion` pins at +326 green with no
+  cycling. New CSS: `data-tone="attention"` on `.chart-stat-trigger`
+  maps `.value` color to `--ds-accent-live`, completing the pair.
+
+---
+
 ## [0.2.7] — 2026-04-23
 
 Second Emil-pass on the Data Motif row. Subgrid alignment + organic

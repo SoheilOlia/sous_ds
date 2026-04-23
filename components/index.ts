@@ -1,5 +1,5 @@
 /**
- * sous-ds component suite · v0.2.7
+ * sous-ds component suite · v0.2.8
  *
  * Every component is a reference implementation of the rules in DESIGN.md.
  * Components should prefer tokens and documented system values over ad hoc
