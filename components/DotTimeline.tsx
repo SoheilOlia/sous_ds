@@ -36,8 +36,6 @@ export type TimelineEvent = {
   state: BucketState;
 };
 
-export type DotTimelineDensity = "standard" | "compact";
-
 export type DotTimelineProps = {
   /** Pre-bucketed data. If provided, `events`/`window`/`bucketSize` are ignored. */
   buckets?: Bucket[];
@@ -49,14 +47,6 @@ export type DotTimelineProps = {
   bucketSize?: number;
   /** Tallest column renders this many dots; others scale proportionally. */
   maxDots?: number;
-  /**
-   * Visual density.
-   * - "standard" (default): per-bucket vertical dot stack; direct sibling of <DottedChart>.
-   * - "compact": per-bucket thin bar whose height encodes count. Preferred at
-   *   full container width or for high-rate streams where dot stacks would
-   *   otherwise overlap.
-   */
-  density?: DotTimelineDensity;
   /** aria-label prefix. Default "Activity". */
   label?: string;
   /** Show the "{window} ago · now" axis row. Default true. */
@@ -107,7 +97,6 @@ export function DotTimeline(props: DotTimelineProps) {
     window: windowMs = 60_000,
     bucketSize = 2_500,
     maxDots = 10,
-    density = "standard",
     label = "Activity",
     showAxis = true,
     className,
@@ -142,40 +131,24 @@ export function DotTimeline(props: DotTimelineProps) {
   const cls = className ? `ds-dot-timeline ${className}` : "ds-dot-timeline";
 
   return (
-    <div className={cls} role="img" aria-label={summary} data-density={density}>
+    <div className={cls} role="img" aria-label={summary}>
       <div className="ds-dot-timeline__track">
         {resolved.map((bucket) => {
           const isEmpty = bucket.count === 0;
-          const colProps = {
-            className: "ds-dot-timeline__col",
-            "data-state": bucket.state,
-            "data-empty": isEmpty ? "true" : undefined,
-            tabIndex: 0,
-            "aria-label": `${formatTime(bucket.ts)}, ${bucket.count} event${
-              bucket.count === 1 ? "" : "s"
-            }, ${bucket.state}`,
-          } as const;
-
-          if (density === "compact") {
-            const heightPct = isEmpty
-              ? 0
-              : Math.max(12, (bucket.count / maxCount) * 100);
-            return (
-              <div key={bucket.ts} {...colProps}>
-                <span
-                  className="ds-dot-timeline__b"
-                  style={{ height: `${heightPct}%` }}
-                  aria-hidden="true"
-                />
-              </div>
-            );
-          }
-
           const dotCount = isEmpty
             ? 1
             : Math.max(1, Math.round((bucket.count / maxCount) * maxDots));
           return (
-            <div key={bucket.ts} {...colProps}>
+            <div
+              key={bucket.ts}
+              className="ds-dot-timeline__col"
+              data-state={bucket.state}
+              data-empty={isEmpty ? "true" : undefined}
+              tabIndex={0}
+              aria-label={`${formatTime(bucket.ts)}, ${bucket.count} event${
+                bucket.count === 1 ? "" : "s"
+              }, ${bucket.state}`}
+            >
               {Array.from({ length: dotCount }, (_, i) => (
                 <span
                   key={i}

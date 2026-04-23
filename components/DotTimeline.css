@@ -87,51 +87,6 @@
   50%      { opacity: 0.55; }
 }
 
-/* ---- Compact density: per-bucket thin bar instead of dot stack ---- */
-/* Used at full container width or for high-rate streams where dot stacks
-   would overlap. Same state colors and pulse cadence as the standard mode. */
-
-.ds-dot-timeline[data-density="compact"] .ds-dot-timeline__track {
-  grid-auto-columns: 1fr;
-  gap: var(--ds-space-1);
-}
-
-.ds-dot-timeline[data-density="compact"] .ds-dot-timeline__col {
-  width: auto;
-  justify-content: flex-end;
-}
-
-.ds-dot-timeline__b {
-  display: block;
-  width: 100%;
-  height: 0;
-  min-height: 0;
-  background: var(--ds-text-muted);
-  opacity: 0.55;
-  border-radius: var(--ds-radius-xs);
-  transform-origin: bottom center;
-  transition:
-    height var(--ds-dur-standard) var(--ds-ease-out),
-    background-color var(--ds-dur-standard) var(--ds-ease-out),
-    opacity var(--ds-dur-standard) var(--ds-ease-out);
-}
-
-.ds-dot-timeline[data-density="compact"] .ds-dot-timeline__col[data-state="done"] .ds-dot-timeline__b {
-  background: var(--ds-accent-success);
-  opacity: 1;
-}
-
-.ds-dot-timeline[data-density="compact"] .ds-dot-timeline__col[data-state="live"] .ds-dot-timeline__b {
-  background: var(--ds-accent-live);
-  opacity: 1;
-  animation: ds-dot-timeline-pulse var(--ds-dur-live-pulse) linear infinite;
-}
-
-.ds-dot-timeline[data-density="compact"] .ds-dot-timeline__col[data-empty] .ds-dot-timeline__b {
-  height: 2px;
-  opacity: 0.3;
-}
-
 .ds-dot-timeline__axis {
   display: flex;
   justify-content: space-between;
@@ -146,12 +101,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-dot-timeline__d,
-  .ds-dot-timeline__b {
+  .ds-dot-timeline__d {
     transition: none !important;
   }
-  .ds-dot-timeline__col[data-state="live"] .ds-dot-timeline__d,
-  .ds-dot-timeline[data-density="compact"] .ds-dot-timeline__col[data-state="live"] .ds-dot-timeline__b {
+  .ds-dot-timeline__col[data-state="live"] .ds-dot-timeline__d {
     animation: none;
     outline: 1px solid var(--ds-accent-live);
     outline-offset: 0;
