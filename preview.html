@@ -1554,54 +1554,21 @@ body {
    Both built on the 6px dot primitive shared with DottedChart.
    ============================================================ */
 /*
- * Subgrid: .variants defines the three rows (head / chart / axis);
- * each .variant inherits those rows via `grid-template-rows: subgrid`.
- * Consequence: cards align at every row regardless of description
- * length — the short DotTimeline description doesn't push its chart
- * higher than the longer PulseTrail description.
+ * §10 is a single-card live-feed showcase. No more A/B grid.
+ * .variant stacks head / chart / caption / axis vertically.
  */
-.variants {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto 1fr auto;
-  gap: var(--ds-space-7);
-}
-@media (max-width: 880px) {
-  .variants {
-    grid-template-columns: 1fr;
-    grid-template-rows: none;
-    gap: var(--ds-space-8);
-  }
-  .variant { grid-template-rows: auto auto auto; grid-row: auto; }
-}
-
 .variant {
   display: grid;
-  grid-template-rows: subgrid;
-  grid-row: span 3;
   gap: var(--ds-space-5);
   min-width: 0;
 }
+.variant--solo {
+  max-width: 720px;
+}
 
 .variant__head {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--ds-space-4);
-}
-.variant__letter {
-  flex: 0 0 auto;
-  display: inline-grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border-radius: var(--ds-radius-sm);
-  border: 1px solid var(--ds-line-strong);
-  font-family: var(--ds-font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: var(--ds-text-muted);
-  font-weight: 500;
-  text-transform: uppercase;
+  display: grid;
+  gap: var(--ds-space-3);
 }
 .variant__name {
   font-family: var(--ds-font-mono);
@@ -1634,13 +1601,8 @@ body {
   color: var(--ds-text-primary);
 }
 
-/* Chart slot — fixed height so DotTimeline and PulseTrail baselines
-   align at the same Y across both variants, regardless of their own
-   internal track heights. */
 .variant__chart {
-  display: flex;
-  align-items: flex-end;
-  min-height: var(--ds-space-10);
+  display: block;
 }
 .variant__chart > * {
   width: 100%;
@@ -1660,60 +1622,22 @@ body {
   color: var(--ds-text-muted);
 }
 
-/* ---- <DotTimeline> (inline mirror of components/DotTimeline.css) ---- */
-.ds-dot-timeline__track {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: var(--ds-size-dot);
-  align-items: end;
-  gap: var(--ds-space-3);
-  height: var(--ds-space-10);
-  padding: var(--ds-space-2) 0;
-  border-bottom: 1px solid var(--ds-line);
-}
-.ds-dot-timeline__col {
-  position: relative;
-  width: var(--ds-size-dot);
-  height: 100%;
-  display: flex;
-  flex-direction: column-reverse;
+/* Caption row echoes the scrubber caption vocabulary (mark + mono
+   label). Updates in-place as new events arrive so the reader can
+   always see the most recent read. */
+.variant__caption {
+  display: inline-flex;
   align-items: center;
   gap: var(--ds-space-2);
-  outline: none;
-  cursor: default;
-}
-.ds-dot-timeline__col:focus-visible {
-  outline: 2px solid var(--ds-accent-live);
-  outline-offset: 2px;
-  border-radius: var(--ds-radius-xs);
-}
-.ds-dot-timeline__d {
-  flex: 0 0 auto;
-  width: var(--ds-size-dot);
-  height: var(--ds-size-dot);
-  border-radius: 50%;
-  background: var(--ds-text-muted);
-  opacity: 0.55;
-  transition: background-color var(--ds-dur-standard) var(--ds-ease-out),
-              opacity var(--ds-dur-standard) var(--ds-ease-out);
-}
-.ds-dot-timeline__col[data-state="done"] .ds-dot-timeline__d { background: var(--ds-accent-success); opacity: 1; }
-.ds-dot-timeline__col[data-state="live"] .ds-dot-timeline__d {
-  background: var(--ds-accent-live); opacity: 1;
-  animation: ds-dot-timeline-pulse var(--ds-dur-live-pulse) linear infinite;
-}
-.ds-dot-timeline__col[data-empty] .ds-dot-timeline__d { opacity: 0.3; }
-@keyframes ds-dot-timeline-pulse {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.55; }
-}
-
-/* Hover pulse — hover a column to pulse all its dots together at LiveDot cadence. */
-@media (hover: hover) and (pointer: fine) {
-  .ds-dot-timeline__col:hover { cursor: pointer; }
-  .ds-dot-timeline__col:hover .ds-dot-timeline__d {
-    animation: ds-dot-timeline-pulse var(--ds-dur-live-pulse) linear infinite;
-  }
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  font-variant-numeric: tabular-nums;
+  min-height: 16px;
 }
 
 /* ---- <PulseTrail> (inline mirror of components/PulseTrail.css) ---- */
@@ -1776,21 +1700,30 @@ body {
   50%      { opacity: 0.55; }
 }
 
+/*
+ * Bloom — a newly-arriving trail dot expands in from 1.4× with a brief
+ * accent-live halo flash, then settles into its static position. Gives
+ * a visible "new event" signal to couple with the scrubber advance.
+ * One-shot (not infinite); the parent code removes the class when done.
+ */
+.ds-pulse-trail__dot.is-arriving {
+  animation: ds-pulse-trail-bloom var(--ds-dur-standard) var(--ds-ease-out);
+}
+@keyframes ds-pulse-trail-bloom {
+  0%   { transform: translateX(-50%) scale(1.6); box-shadow: 0 0 0 4px rgba(0, 224, 19, 0.22); }
+  60%  { transform: translateX(-50%) scale(1.1); box-shadow: 0 0 0 2px rgba(0, 224, 19, 0.10); }
+  100% { transform: translateX(-50%) scale(1);   box-shadow: 0 0 0 0 rgba(0, 224, 19, 0);     }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .ds-dot-timeline__col[data-state="live"] .ds-dot-timeline__d,
-  .ds-pulse-trail__head { animation: none; }
-  .ds-pulse-trail__head {
-    left: 100%;
-    box-shadow: 0 0 0 3px rgba(255, 46, 22, 0.28);
-  }
-  .ds-dot-timeline__col:hover .ds-dot-timeline__d {
-    animation: none;
-    opacity: 1 !important;
-  }
+  .ds-pulse-trail__head { animation: none; left: 100%; box-shadow: 0 0 0 3px rgba(255, 46, 22, 0.28); }
   .ds-pulse-trail__dot[data-role="trail"]:hover {
     animation: none;
     opacity: 1 !important;
     transform: translateX(-50%) scale(1.15);
+  }
+  .ds-pulse-trail__dot.is-arriving {
+    animation: none;
   }
 }
 
@@ -2297,37 +2230,24 @@ body {
 
     </section>
 
-    <!-- ==== 10 — Data Motif · two new siblings ====================== -->
+    <!-- ==== 10 — Live activity feed ================================= -->
     <section class="section" data-col="12" style="animation-delay:360ms">
       <div class="section-head">
-        <span class="section-num">10<b>/ Data Motif — Two New Siblings</b></span>
-        <span class="section-aside">Same primitive · one quantitative · one qualitative</span>
+        <span class="section-num">10<b>/ Live Activity</b></span>
+        <span class="section-aside">Fed by the scrubber above · motion IS the data</span>
       </div>
 
-      <div class="variants">
-        <div class="variant">
-          <div class="variant__head">
-            <span class="variant__letter">A</span>
-            <div>
-              <div class="variant__name">DotTimeline</div>
-              <div class="variant__note">Quantitative. 24 time buckets over 60s, each a vertical stack of up to 10 dots. Dot count = event density. Column color = bucket state. Hover a column to pulse it; direct sibling of DottedChart with a time axis.</div>
-            </div>
-          </div>
-          <div class="variant__chart"><div id="demo-dot-timeline"></div></div>
-          <div class="variant__axis"><span>60s ago</span><span>now</span></div>
+      <div class="variant variant--solo">
+        <div class="variant__head">
+          <div class="variant__name">PulseTrail</div>
+          <div class="variant__note">A live feed of the scrubber's reads. Every month the read-head above lands on emits a new event here — it blooms in at the right edge and older events fade left across the sixty-second window. The accent-live head sweeps on its own loop; motion IS the data.</div>
         </div>
-
-        <div class="variant">
-          <div class="variant__head">
-            <span class="variant__letter">B</span>
-            <div>
-              <div class="variant__name">PulseTrail</div>
-              <div class="variant__note">Qualitative — Emil-style signature motion. A larger <code>accent-live</code> head dot (8px, with a soft halo) sweeps left→right on a 4s loop while pulsing on the LiveDot cadence; smaller trail dots mark prior events at decaying opacity, and pulse on their own when hovered. Motion IS the data.</div>
-            </div>
-          </div>
-          <div class="variant__chart"><div id="demo-pulse-trail"></div></div>
-          <div class="variant__axis"><span>60s ago</span><span>now</span></div>
+        <div class="variant__chart"><div id="demo-pulse-trail"></div></div>
+        <div class="variant__caption" role="status" aria-live="polite">
+          <span class="bars-scrubber__mark" aria-hidden="true"></span>
+          <span id="trail-latest-text">—</span>
         </div>
+        <div class="variant__axis"><span>60s ago</span><span>now</span></div>
       </div>
     </section>
 
@@ -2554,12 +2474,22 @@ body {
     });
   }
 
+  function emitEvent (idx) {
+    // §10 PulseTrail listens for this to stream in a new trail dot.
+    // Fired on every land — auto-advance AND hover — so the §10 feed
+    // reflects the user's scrub too.
+    window.dispatchEvent(new CustomEvent('scrubber:month', {
+      detail: { label: LABELS[idx], value: getValue(idx), index: idx },
+    }));
+  }
+
   function showMonth (idx, instant) {
     currentIdx = idx;
     highlight(idx);
     // Head drifts on auto-advance; snaps on hover / reduced motion.
     const headP = positionHead(idx, instant ? HOVER_SNAP : HEAD_MOVE);
     const capP = setCaption(idx, instant);
+    emitEvent(idx);
     return Promise.all([headP, capP]);
   }
 
@@ -2619,101 +2549,91 @@ body {
 })();
 
 /* ============================================================
-   Data Motif — inline demos of <DotTimeline> and <PulseTrail>
-   Renderers mirror the React components in components/. All data
-   shared so the two demos read as siblings. Guardrail: R-FAMILY-001.
+   PulseTrail live feed — wired to the scrubber in §09. Each
+   `scrubber:month` event adds a new trail dot at the right edge
+   with a bloom, shifts older events' opacity down, and drops off
+   the oldest once the 10 visible slots are full. The sweeping
+   head keeps its own 4s loop as signature motion.
    ============================================================ */
-(function dataMotifDemos () {
-  const BUCKET_COUNT = 24;
-  const MAX_DOTS = 10;
+(function pulseTrailLive () {
+  const root = document.getElementById('demo-pulse-trail');
+  const latestEl = document.getElementById('trail-latest-text');
+  if (!root) return;
 
-  // Pattern: gentle bell curve peaking mid-window, one small 1-dot cluster
-  // near the right ("now") running live, rest default / queued. Matches the
-  // <DottedChart> read: mostly muted neutrals, a single success peak, a
-  // single attention marker.
-  const counts = [2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 2, 1, 1, 0, 0, 0, 0];
-  const PEAK_INDEX = 8;    // highest column → done (green)
-  const LIVE_INDEX = 19;   // 1-dot column near "now" → live (red)
-  const states = Array.from({ length: BUCKET_COUNT }, (_, i) => {
-    if (i === PEAK_INDEX) return 'done';
-    if (i === LIVE_INDEX) return 'live';
-    return 'queued';
-  });
-  const maxCount = Math.max(...counts, 1);
+  const SLOTS = 10;
+  const canvas = document.createElement('div');
+  canvas.className = 'ds-pulse-trail__canvas';
+  canvas.setAttribute('role', 'img');
+  canvas.setAttribute('aria-label', 'Live event feed from the scrubber above');
 
-  (function renderDotTimeline () {
-    const root = document.getElementById('demo-dot-timeline');
-    if (!root) return;
-    const wrapper = document.createElement('div');
-    wrapper.className = 'ds-dot-timeline';
-    wrapper.setAttribute('role', 'img');
-    wrapper.setAttribute(
-      'aria-label',
-      'DotTimeline: 24 time buckets, each a vertical stack of dots sized to event count.'
-    );
+  // Pre-mount the 10 slot elements. Positions are fixed; opacity and
+  // data-state update as events arrive. Hidden until the queue fills.
+  const slots = [];
+  for (let i = 0; i < SLOTS; i++) {
+    const d = document.createElement('span');
+    d.className = 'ds-pulse-trail__dot';
+    d.setAttribute('data-role', 'trail');
+    const xPct = (i / (SLOTS - 1)) * 94;
+    d.style.left = xPct + '%';
+    d.style.opacity = '0';
+    canvas.appendChild(d);
+    slots.push(d);
+  }
 
-    const track = document.createElement('div');
-    track.className = 'ds-dot-timeline__track';
+  // Head: signature motion (independent of the event stream).
+  const head = document.createElement('span');
+  head.className = 'ds-pulse-trail__dot ds-pulse-trail__head';
+  head.setAttribute('aria-hidden', 'true');
+  canvas.appendChild(head);
 
-    for (let i = 0; i < BUCKET_COUNT; i++) {
-      const col = document.createElement('div');
-      col.className = 'ds-dot-timeline__col';
-      col.setAttribute('data-state', states[i]);
-      col.setAttribute('tabindex', '0');
-      const c = counts[i];
-      if (c === 0) {
-        col.setAttribute('data-empty', 'true');
-        const d = document.createElement('span');
-        d.className = 'ds-dot-timeline__d';
-        col.appendChild(d);
+  root.appendChild(canvas);
+
+  const events = []; // FIFO, events[len-1] is newest, maps to slots[len-1]
+
+  function render () {
+    for (let i = 0; i < SLOTS; i++) {
+      const slot = slots[i];
+      const eventIdx = events.length - (SLOTS - i);
+      if (eventIdx < 0) {
+        slot.style.opacity = '0';
+        slot.removeAttribute('data-state');
       } else {
-        const n = Math.max(1, Math.round((c / maxCount) * MAX_DOTS));
-        for (let k = 0; k < n; k++) {
-          const d = document.createElement('span');
-          d.className = 'ds-dot-timeline__d';
-          col.appendChild(d);
-        }
+        const e = events[eventIdx];
+        slot.setAttribute('data-state', e.state);
+        // Oldest slot (0) dimmest; newest (SLOTS-1) brightest.
+        slot.style.opacity = String(0.15 + (i / (SLOTS - 1)) * 0.8);
       }
-      track.appendChild(col);
     }
-    wrapper.appendChild(track);
-    root.appendChild(wrapper);
-  })();
+  }
 
-  // ---------- <PulseTrail> demo ----------
-  (function renderPulseTrail () {
-    const root = document.getElementById('demo-pulse-trail');
-    if (!root) return;
-    const canvas = document.createElement('div');
-    canvas.className = 'ds-pulse-trail__canvas';
-    canvas.setAttribute('role', 'img');
-    canvas.setAttribute(
-      'aria-label',
-      'PulseTrail: a single accent-live dot sweeps left to right while pulsing, with a fading trail of prior events.'
-    );
+  function bloomNewest () {
+    const newest = slots[SLOTS - 1];
+    newest.classList.remove('is-arriving');
+    void newest.offsetWidth; // force reflow so the animation restarts cleanly
+    newest.classList.add('is-arriving');
+    window.setTimeout(function () {
+      newest.classList.remove('is-arriving');
+    }, 260);
+  }
 
-    // Trail: 10 static positions, mostly done (green), with a couple muted queued.
-    const trailCount = 10;
-    const trailStates = ['done','done','done','done','done','done','done','done','queued','queued'];
-    for (let i = 0; i < trailCount; i++) {
-      const d = document.createElement('span');
-      d.className = 'ds-pulse-trail__dot';
-      d.setAttribute('data-role', 'trail');
-      d.setAttribute('data-state', trailStates[i]);
-      const xPct = (i / (trailCount - 1)) * 94;
-      d.style.left = xPct + '%';
-      d.style.opacity = String(0.15 + (i / (trailCount - 1)) * 0.75);
-      canvas.appendChild(d);
-    }
+  function setLatest (e) {
+    if (!latestEl) return;
+    latestEl.textContent = e.label + ' · ' + e.value;
+  }
 
-    // Head: the sweeping + pulsing accent-live dot.
-    const head = document.createElement('span');
-    head.className = 'ds-pulse-trail__dot ds-pulse-trail__head';
-    head.setAttribute('aria-hidden', 'true');
-    canvas.appendChild(head);
-
-    root.appendChild(canvas);
-  })();
+  window.addEventListener('scrubber:month', function (ev) {
+    const detail = ev.detail || {};
+    const e = {
+      label: detail.label || '—',
+      value: (detail.value !== undefined) ? detail.value : 0,
+      state: 'done',
+    };
+    events.push(e);
+    if (events.length > SLOTS) events.shift();
+    render();
+    bloomNewest();
+    setLatest(e);
+  });
 })();
 
 /* ============================================================
