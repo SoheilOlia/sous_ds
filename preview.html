@@ -1460,33 +1460,37 @@ body {
 .variant__head {
   display: flex;
   align-items: flex-start;
-  gap: var(--ds-space-5);
+  gap: var(--ds-space-4);
 }
 .variant__letter {
   flex: 0 0 auto;
   display: inline-grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: var(--ds-radius-sm);
   border: 1px solid var(--ds-line-strong);
   font-family: var(--ds-font-mono);
-  font-size: 14px;
-  color: var(--ds-text-primary);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ds-text-muted);
   font-weight: 500;
+  text-transform: uppercase;
 }
 .variant__name {
-  font-family: var(--ds-font-display);
-  font-size: 22px;
-  line-height: 1.1;
-  letter-spacing: -0.0075em;
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--ds-text-primary);
-  margin-bottom: var(--ds-space-2);
+  margin-bottom: var(--ds-space-3);
 }
 .variant__note {
   font-family: var(--ds-font-sans);
   font-size: 15px;
-  line-height: 1.4;
+  line-height: 24px;
   color: var(--ds-text-secondary);
   max-width: 60ch;
 }
