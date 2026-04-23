@@ -1356,6 +1356,9 @@ body {
 .chart-stat-trigger[data-tone="success"] .value {
   color: var(--ds-accent-success);
 }
+.chart-stat-trigger[data-tone="attention"] .value {
+  color: var(--ds-accent-live);
+}
 .chart .stat .value .sup { font-size: 0.32em; color: var(--ds-text-muted); vertical-align: top; margin-left: 4px; }
 .chart .stat .delta {
   font-family: var(--ds-font-mono);
@@ -1612,11 +1615,26 @@ body {
   margin-bottom: var(--ds-space-3);
 }
 .variant__note {
-  font-family: var(--ds-font-sans);
-  font-size: 15px;
-  line-height: 24px;
+  /* Matches .site-copy (§01 manifesto) — the system's established body
+     voice. Display face (Cash Sans → Geist fallback), 22px, tight
+     line-height, secondary ink. Reads editorial instead of "generic
+     UI chrome". */
+  font-family: var(--ds-font-display);
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -0.0075em;
   color: var(--ds-text-secondary);
-  max-width: 60ch;
+  max-width: 42ch;
+  margin: 0;
+}
+.variant__note code {
+  /* Inline code stays in Geist Mono so token names like `accent-live`
+     read as identifiers, not prose. Slightly smaller so they sit in
+     the line rhythm of the display-face body. */
+  font-family: var(--ds-font-mono);
+  font-size: 0.82em;
+  color: var(--ds-text-primary);
 }
 
 /* Chart slot — fixed height so DotTimeline and PulseTrail baselines
@@ -2902,52 +2920,102 @@ body {
 })();
 
 /* ============================================================
-   Revenue growth — click to replay the count-up
+   Revenue growth — auto-cycling live readout. Picks a new target
+   every 1500ms, counts from the current displayed value to the new
+   target over ~680ms, and flips the prefix + tone (+ / green vs
+   − / red) so the number reports real up/down movement. Clicking
+   the stat restarts the sequence from 0 → 326. Reduced motion
+   shows a static +326.
    ============================================================ */
-(function revenueDemo () {
+(function revenueAutoCycle () {
   const trigger = document.getElementById('revenue-trigger');
   const valueEl = document.getElementById('revenue-value');
-  if (!trigger || !valueEl) return;
+  const prefixEl = trigger ? trigger.querySelector('.prefix') : null;
+  if (!trigger || !valueEl || !prefixEl) return;
 
-  const target = 326;
-  const duration = 680;
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const CYCLE = 1500;          // ms between target picks
+  const COUNT_DURATION = 680;  // ms for each count animation
+
+  let current = 0;
   let frame = 0;
+  let cycleTimer = 0;
 
-  function render(value) {
-    valueEl.textContent = String(value);
+  function updateTone (value) {
+    if (value >= 0) {
+      trigger.dataset.tone = 'success';
+      prefixEl.textContent = '+';
+    } else {
+      trigger.dataset.tone = 'attention';
+      // Typographic minus (U+2212) — same width as + in mono, visually balanced.
+      prefixEl.textContent = '−';
+    }
   }
 
-  trigger.addEventListener('click', () => {
-    if (reducedMotion) {
-      trigger.dataset.tone = 'success';
-      render(target);
+  function render (v) {
+    valueEl.textContent = String(Math.abs(v));
+  }
+
+  function countTo (targetValue) {
+    if (frame) window.cancelAnimationFrame(frame);
+    const startValue = current;
+    const delta = targetValue - startValue;
+
+    // Tone + sign are set upfront to the destination so the color
+    // doesn't flash during the count. Count value renders unsigned
+    // (Math.abs); the prefix element carries the sign.
+    updateTone(targetValue);
+
+    if (reduced) {
+      current = targetValue;
+      render(current);
       return;
     }
 
-    if (frame) {
-      window.cancelAnimationFrame(frame);
-    }
-
     const start = performance.now();
-    trigger.dataset.tone = 'default';
-
-    function tick(now) {
-      const progress = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      render(Math.round(target * eased));
-
+    function tick (now) {
+      const progress = Math.min(1, (now - start) / COUNT_DURATION);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      current = Math.round(startValue + delta * eased);
+      render(current);
       if (progress < 1) {
         frame = window.requestAnimationFrame(tick);
-      } else {
-        trigger.dataset.tone = 'success';
-        render(target);
       }
     }
-
-    render(0);
     frame = window.requestAnimationFrame(tick);
+  }
+
+  function pickNext () {
+    // Realistic-looking growth report: biased toward positive, occasional
+    // down-quarter. Magnitude roughly 40-480 so the digits stay readable.
+    const positive = Math.random() < 0.7;
+    const magnitude = Math.round(40 + Math.random() * 440);
+    return positive ? magnitude : -magnitude;
+  }
+
+  function scheduleNext () {
+    cycleTimer = window.setTimeout(function () {
+      countTo(pickNext());
+      scheduleNext();
+    }, CYCLE);
+  }
+
+  function startCycle () {
+    // Initial read: count up to +326 (the familiar-looking first frame).
+    countTo(326);
+    if (!reduced) scheduleNext();
+  }
+
+  // Manual click restarts the cycle from 0 → +326 and resumes auto.
+  trigger.addEventListener('click', function () {
+    if (cycleTimer) window.clearTimeout(cycleTimer);
+    current = 0;
+    render(0);
+    startCycle();
   });
+
+  startCycle();
 })();
 
 /* ============================================================
