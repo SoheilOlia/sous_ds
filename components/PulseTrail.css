@@ -47,6 +47,32 @@
 .ds-pulse-trail__dot[data-role="trail"][data-state="live"]   { background: var(--ds-accent-live); }
 .ds-pulse-trail__dot[data-role="trail"][data-state="queued"] { background: var(--ds-text-muted); }
 
+/*
+ * Hover pulse — hovering a trail dot plays a localized pulse on that
+ * specific event marker, a la "this event is being inspected." Uses
+ * the LiveDot cadence (--ds-dur-live-pulse) so the system rhythm stays
+ * consistent. Only on hover-capable pointers — no fake-hover on touch.
+ *
+ * The keyframe combines opacity (matches the live-pulse vocabulary)
+ * with a slight scale bump so the hovered dot reads as "lifted" even
+ * at the trough of the opacity cycle. CSS animations override inline
+ * opacity set by the component, so the dot pulses regardless of its
+ * decay-position opacity.
+ */
+
+@media (hover: hover) and (pointer: fine) {
+  .ds-pulse-trail__dot[data-role="trail"]:hover {
+    animation: ds-pulse-trail-trail-pulse var(--ds-dur-live-pulse) linear infinite;
+    cursor: pointer;
+    z-index: 1;
+  }
+}
+
+@keyframes ds-pulse-trail-trail-pulse {
+  0%, 100% { opacity: 1;    transform: translate(-50%, -50%) scale(1.15); }
+  50%      { opacity: 0.55; transform: translate(-50%, -50%) scale(1.15); }
+}
+
 /* ---------- Head (sweeps left → right + pulses on LiveDot cadence) ---------- */
 /*
  * The head is visually distinct from the trail by:
@@ -110,5 +136,11 @@
   }
   .ds-pulse-trail__dot[data-role="trail"] {
     transition: none;
+  }
+  /* Hover-as-static under reduced motion: lift + full opacity, no pulse. */
+  .ds-pulse-trail__dot[data-role="trail"]:hover {
+    animation: none;
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) scale(1.15);
   }
 }

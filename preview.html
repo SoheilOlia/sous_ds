@@ -1571,6 +1571,19 @@ body {
 .ds-pulse-trail__dot[data-role="trail"][data-state="done"]   { background: var(--ds-accent-success); }
 .ds-pulse-trail__dot[data-role="trail"][data-state="live"]   { background: var(--ds-accent-live); }
 .ds-pulse-trail__dot[data-role="trail"][data-state="queued"] { background: var(--ds-text-muted); }
+
+/* Hover pulse — localized pulse on the hovered event marker, at LiveDot cadence. */
+@media (hover: hover) and (pointer: fine) {
+  .ds-pulse-trail__dot[data-role="trail"]:hover {
+    animation: ds-pulse-trail-trail-pulse var(--ds-dur-live-pulse) linear infinite;
+    cursor: pointer;
+    z-index: 1;
+  }
+}
+@keyframes ds-pulse-trail-trail-pulse {
+  0%, 100% { opacity: 1;    transform: translate(-50%, -50%) scale(1.15); }
+  50%      { opacity: 0.55; transform: translate(-50%, -50%) scale(1.15); }
+}
 .ds-pulse-trail__head {
   background: var(--ds-accent-live);
   width: 8px;
@@ -1598,6 +1611,11 @@ body {
   .ds-pulse-trail__head {
     left: 100%;
     box-shadow: 0 0 0 3px rgba(255, 46, 22, 0.28);
+  }
+  .ds-pulse-trail__dot[data-role="trail"]:hover {
+    animation: none;
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) scale(1.15);
   }
 }
 
@@ -2123,7 +2141,7 @@ body {
             <span class="variant__letter">B</span>
             <div>
               <div class="variant__name">&lt;PulseTrail&gt;</div>
-              <div class="variant__note">Qualitative — Emil-style signature motion. A larger <code>accent-live</code> head dot (8px, with a soft halo) sweeps left→right on a 4s loop while pulsing on the LiveDot cadence; smaller trail dots mark prior events at decaying opacity. Motion IS the data.</div>
+              <div class="variant__note">Qualitative — Emil-style signature motion. A larger <code>accent-live</code> head dot (8px, with a soft halo) sweeps left→right on a 4s loop while pulsing on the LiveDot cadence; smaller trail dots mark prior events at decaying opacity, and pulse on their own when hovered. Motion IS the data.</div>
             </div>
           </div>
           <div id="demo-pulse-trail"></div>
