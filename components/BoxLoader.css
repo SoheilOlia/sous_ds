@@ -1,0 +1,141 @@
+/* ============================================================
+   BoxLoader.css — four iso cubes cycling a 3×2 grid.
+
+   Original snippet pasted only the 4 keyframes and the HTML; the
+   3D face-positioning CSS was missing. Reconstructed here using the
+   standard CSS isometric-cube idiom:
+   - stage has `perspective` so the scene has depth
+   - field has `transform-style: preserve-3d` + the iso rotation
+   - each face is absolute + translateZ / rotate* at half-edge
+   - face colors do the lighting (top=primary, front=secondary,
+     right=muted). Grayscale only; no hues.
+   ============================================================ */
+
+.ds-box-loader {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-5);
+  font-family: var(--ds-font-mono);
+
+  /* Exposed as a custom property so the preview and any downstream
+     consumer can scale the whole loader from one place. */
+  --ds-box-loader-edge: 18px;
+}
+
+/* Stage provides the perspective for the iso projection. Size the
+   stage big enough to contain the tilted 3×2 field without clipping. */
+.ds-box-loader__stage {
+  width: calc(var(--ds-box-loader-edge) * 5);
+  height: calc(var(--ds-box-loader-edge) * 4);
+  perspective: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Field is the iso-projected 3×2 playfield. The keyframes translate
+   each box in units of its own size (translate(100%, 0) = one cell
+   right), so the field width/height aren't strictly needed — but the
+   visible bounding box of the tilted rotation is what determines
+   layout centering inside the stage. */
+.ds-box-loader__field {
+  position: relative;
+  width: var(--ds-box-loader-edge);
+  height: var(--ds-box-loader-edge);
+  transform-style: preserve-3d;
+  transform: rotateX(-30deg) rotateY(-45deg);
+}
+
+.ds-box-loader__box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ds-box-loader-edge);
+  height: var(--ds-box-loader-edge);
+  transform-style: preserve-3d;
+}
+
+.ds-box-loader__face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ds-box-loader-edge);
+  height: var(--ds-box-loader-edge);
+  /* 1px outline in line-strong reinforces the cube silhouette against
+     surface-colored neighbors — without it the faces blur together at
+     small edge lengths. */
+  outline: 1px solid var(--ds-line-strong);
+  outline-offset: -1px;
+}
+
+.ds-box-loader__face--front {
+  background: var(--ds-text-secondary);
+  transform: translateZ(calc(var(--ds-box-loader-edge) / 2));
+}
+.ds-box-loader__face--back {
+  background: var(--ds-text-muted);
+  transform: rotateY(180deg) translateZ(calc(var(--ds-box-loader-edge) / 2));
+}
+.ds-box-loader__face--right {
+  background: var(--ds-text-muted);
+  transform: rotateY(90deg) translateZ(calc(var(--ds-box-loader-edge) / 2));
+}
+.ds-box-loader__face--top {
+  background: var(--ds-text-primary);
+  transform: rotateX(90deg) translateZ(calc(var(--ds-box-loader-edge) / 2));
+}
+
+/*
+ * Four boxes cycle through a 3×2 grid on a 2000ms loop. Because the
+ * animation is `infinite`, its duration is exempt from the 300ms UI
+ * ceiling (continuous motion, not a UI state transition).
+ *
+ * Motion curve: ease-in-out — the boxes ease into each new position
+ * and settle, reading as mechanical/percussive rather than fluid.
+ */
+
+.ds-box-loader__box--1 { animation: ds-box-loader-1 2000ms ease-in-out infinite; }
+.ds-box-loader__box--2 { animation: ds-box-loader-2 2000ms ease-in-out infinite; }
+.ds-box-loader__box--3 { animation: ds-box-loader-3 2000ms ease-in-out infinite; }
+.ds-box-loader__box--4 { animation: ds-box-loader-4 2000ms ease-in-out infinite; }
+
+@keyframes ds-box-loader-1 {
+  0%, 50% { transform: translate(100%, 0); }
+  100%    { transform: translate(200%, 0); }
+}
+@keyframes ds-box-loader-2 {
+  0%   { transform: translate(0, 100%); }
+  50%  { transform: translate(0, 0); }
+  100% { transform: translate(100%, 0); }
+}
+@keyframes ds-box-loader-3 {
+  0%, 50% { transform: translate(100%, 100%); }
+  100%    { transform: translate(0, 100%); }
+}
+@keyframes ds-box-loader-4 {
+  0%   { transform: translate(200%, 0); }
+  50%  { transform: translate(200%, 100%); }
+  100% { transform: translate(100%, 100%); }
+}
+
+.ds-box-loader__label {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-box-loader__box { animation: none; }
+  /* Park the four boxes at their starting cells so the iso shape
+     still reads as a composed figure instead of a pile at origin. */
+  .ds-box-loader__box--1 { transform: translate(100%, 0); }
+  .ds-box-loader__box--2 { transform: translate(0, 100%); }
+  .ds-box-loader__box--3 { transform: translate(100%, 100%); }
+  .ds-box-loader__box--4 { transform: translate(200%, 0); }
+}

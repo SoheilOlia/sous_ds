@@ -4,6 +4,37 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.3.2] — 2026-04-24
+
+Second loader — **BoxLoader**.
+
+### Added
+- **`<BoxLoader>`** — four CSS-3D isometric cubes cycle through a 3×2
+  grid on a 2-second infinite `ease-in-out` loop. Stage uses
+  `perspective: 400px` + `transform-style: preserve-3d`. Each cube
+  has four faces; the three visible ones (top, front, right) are
+  shaded in three grays (`text-primary` top, `text-secondary` front,
+  `text-muted` right) so the cubes read three-dimensional without
+  introducing any hue. Grayscale lighting, no gradients.
+- **§11 Loaders** gains a second row for the BoxLoader demo next to
+  the existing TetrisLoader. `.loader-row` now has a 1px top divider
+  between siblings.
+- Adapted from a community Tailwind snippet. The original paste
+  omitted the 3D face-positioning CSS (only provided HTML + four
+  keyframes); reconstructed here using the standard CSS isometric-
+  cube idiom so the cubes actually render as cubes.
+
+### Decision log
+- Kept the exact keyframe math from the upstream snippet so the
+  cyclic-rotation logic (each cube moves into another's cell each
+  loop) matches the original. Only the face-positioning, coloring,
+  stage perspective, and reduced-motion fallback are new.
+- No `interactive` / size / speed props this round — BoxLoader is
+  intentionally simpler than TetrisLoader. If we add variants later,
+  they'd follow the same `data-size="sm|md|lg"` pattern.
+
+---
+
 ## [0.3.1] — 2026-04-23
 
 Tetris becomes playable, PulseTrail carries data vertically, and the

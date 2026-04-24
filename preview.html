@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>sous-ds / v0.3.1</title>
+<title>sous-ds / v0.3.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1741,6 +1741,12 @@ body {
   grid-template-columns: auto 1fr;
   gap: var(--ds-space-7);
   align-items: center;
+  padding: var(--ds-space-6) 0;
+  border-top: 1px solid var(--ds-line);
+}
+.loader-row:first-of-type {
+  padding-top: 0;
+  border-top: 0;
 }
 @media (max-width: 760px) {
   .loader-row { grid-template-columns: 1fr; }
@@ -1836,6 +1842,91 @@ body {
   .ds-tetris-loader__cell[data-clearing] { animation: none; box-shadow: none; }
 }
 
+/* ---- BoxLoader (inline mirror of components/BoxLoader.css) ---- */
+.ds-box-loader {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-5);
+  font-family: var(--ds-font-mono);
+  --ds-box-loader-edge: 18px;
+}
+.ds-box-loader__stage {
+  width: calc(var(--ds-box-loader-edge) * 5);
+  height: calc(var(--ds-box-loader-edge) * 4);
+  perspective: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ds-box-loader__field {
+  position: relative;
+  width: var(--ds-box-loader-edge);
+  height: var(--ds-box-loader-edge);
+  transform-style: preserve-3d;
+  transform: rotateX(-30deg) rotateY(-45deg);
+}
+.ds-box-loader__box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ds-box-loader-edge);
+  height: var(--ds-box-loader-edge);
+  transform-style: preserve-3d;
+}
+.ds-box-loader__face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ds-box-loader-edge);
+  height: var(--ds-box-loader-edge);
+  outline: 1px solid var(--ds-line-strong);
+  outline-offset: -1px;
+}
+.ds-box-loader__face--front { background: var(--ds-text-secondary); transform: translateZ(calc(var(--ds-box-loader-edge) / 2)); }
+.ds-box-loader__face--back  { background: var(--ds-text-muted);     transform: rotateY(180deg) translateZ(calc(var(--ds-box-loader-edge) / 2)); }
+.ds-box-loader__face--right { background: var(--ds-text-muted);     transform: rotateY(90deg)  translateZ(calc(var(--ds-box-loader-edge) / 2)); }
+.ds-box-loader__face--top   { background: var(--ds-text-primary);   transform: rotateX(90deg)  translateZ(calc(var(--ds-box-loader-edge) / 2)); }
+.ds-box-loader__box--1 { animation: ds-box-loader-1 2000ms ease-in-out infinite; }
+.ds-box-loader__box--2 { animation: ds-box-loader-2 2000ms ease-in-out infinite; }
+.ds-box-loader__box--3 { animation: ds-box-loader-3 2000ms ease-in-out infinite; }
+.ds-box-loader__box--4 { animation: ds-box-loader-4 2000ms ease-in-out infinite; }
+@keyframes ds-box-loader-1 {
+  0%, 50% { transform: translate(100%, 0); }
+  100%    { transform: translate(200%, 0); }
+}
+@keyframes ds-box-loader-2 {
+  0%   { transform: translate(0, 100%); }
+  50%  { transform: translate(0, 0); }
+  100% { transform: translate(100%, 0); }
+}
+@keyframes ds-box-loader-3 {
+  0%, 50% { transform: translate(100%, 100%); }
+  100%    { transform: translate(0, 100%); }
+}
+@keyframes ds-box-loader-4 {
+  0%   { transform: translate(200%, 0); }
+  50%  { transform: translate(200%, 100%); }
+  100% { transform: translate(100%, 100%); }
+}
+.ds-box-loader__label {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-box-loader__box { animation: none; }
+  .ds-box-loader__box--1 { transform: translate(100%, 0); }
+  .ds-box-loader__box--2 { transform: translate(0, 100%); }
+  .ds-box-loader__box--3 { transform: translate(100%, 100%); }
+  .ds-box-loader__box--4 { transform: translate(200%, 0); }
+}
+
 
 /* ============================================================
    §12 — Do & Don't
@@ -1899,7 +1990,7 @@ body {
         <i class="dim"></i><i></i><i></i><i class="dim"></i>
         <i></i><i></i><i class="dim"></i><i></i>
       </div>
-      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.3.1</span></h1>
+      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.3.2</span></h1>
     </div>
     <div class="status">
       <span class="clock" id="clock">00:00:00</span>
@@ -2385,6 +2476,48 @@ body {
           </div>
         </div>
       </div>
+
+      <div class="loader-row">
+        <div class="loader-row__item">
+          <div class="ds-box-loader" role="status" aria-label="Loading">
+            <div class="ds-box-loader__stage" aria-hidden="true">
+              <div class="ds-box-loader__field">
+                <div class="ds-box-loader__box ds-box-loader__box--1">
+                  <span class="ds-box-loader__face ds-box-loader__face--top"></span>
+                  <span class="ds-box-loader__face ds-box-loader__face--front"></span>
+                  <span class="ds-box-loader__face ds-box-loader__face--right"></span>
+                  <span class="ds-box-loader__face ds-box-loader__face--back"></span>
+                </div>
+                <div class="ds-box-loader__box ds-box-loader__box--2">
+                  <span class="ds-box-loader__face ds-box-loader__face--top"></span>
+                  <span class="ds-box-loader__face ds-box-loader__face--front"></span>
+                  <span class="ds-box-loader__face ds-box-loader__face--right"></span>
+                  <span class="ds-box-loader__face ds-box-loader__face--back"></span>
+                </div>
+                <div class="ds-box-loader__box ds-box-loader__box--3">
+                  <span class="ds-box-loader__face ds-box-loader__face--top"></span>
+                  <span class="ds-box-loader__face ds-box-loader__face--front"></span>
+                  <span class="ds-box-loader__face ds-box-loader__face--right"></span>
+                  <span class="ds-box-loader__face ds-box-loader__face--back"></span>
+                </div>
+                <div class="ds-box-loader__box ds-box-loader__box--4">
+                  <span class="ds-box-loader__face ds-box-loader__face--top"></span>
+                  <span class="ds-box-loader__face ds-box-loader__face--front"></span>
+                  <span class="ds-box-loader__face ds-box-loader__face--right"></span>
+                  <span class="ds-box-loader__face ds-box-loader__face--back"></span>
+                </div>
+              </div>
+            </div>
+            <div class="ds-box-loader__label" aria-hidden="true">[Loading…]</div>
+          </div>
+        </div>
+        <div class="loader-row__note">
+          <div class="loader-row__name">BoxLoader</div>
+          <div class="loader-row__controls">
+            <span>4 iso cubes · 2s loop · grayscale lighting</span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ==== 12 — Do & Don't ========================================= -->
@@ -2431,7 +2564,7 @@ body {
   </div>
 
   <footer class="foot">
-    <span>sous-ds · v0.3.1 · 2026-04-23</span>
+    <span>sous-ds · v0.3.2 · 2026-04-24</span>
     <span><a href="./DESIGN.md">DESIGN.md</a> · <a href="./AGENTS.md">AGENTS.md</a> · <a href="./TASTE_LOG.md">TASTE_LOG.md</a></span>
   </footer>
 
