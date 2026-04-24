@@ -4,6 +4,30 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.3.6] — 2026-04-24
+
+`<SquareLoader>` resize + un-rotation pass.
+
+### Changed
+- **`<SquareLoader>` no longer rotates 45°.** The diamond silhouette
+  read as off-style next to the axis-aligned siblings in §11; un-
+  rotated, the loader now reads as a plain box. The
+  rotation-bounding-box `* 1.45` stage scale is gone since there's
+  nothing to expand for.
+- **Default cell shrunk from 28px to 24px.** With the 4px gap, the
+  whole grid lands at 84px outer (was 96px) — matches the visual
+  scale of `<TetrisLoader>` / `<BoxLoader>` / `<DotLoader>`.
+- §11 caption updated: "diamond rotation" → "staggered chase".
+- DESIGN.md `<SquareLoader>` bullet rewritten to drop diamond
+  references and document the 8-position path explicitly.
+
+Tunables (`--ds-square-loader-cell` / `--ds-square-loader-gap`) work
+unchanged — consumers who want the diamond-rotated look back can
+re-add `transform: rotate(45deg)` on `.ds-square-loader__grid` from
+their own CSS.
+
+---
+
 ## [0.3.5] — 2026-04-24
 
 Reverts the §08 LiveDot→ThinkingCube swap from v0.3.4 (the red pulse

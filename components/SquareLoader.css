@@ -26,30 +26,31 @@
   gap: var(--ds-space-6);
   font-family: var(--ds-font-mono);
 
-  /* Tunables — consumers can override to scale the loader. */
-  --ds-square-loader-cell: 28px;
+  /* Tunables — consumers can override to scale the loader. Cell drops
+     to 24px so the whole grid lands at 84px outer, matching the scale
+     of the other §11 loaders (Tetris, Box, Dot). */
+  --ds-square-loader-cell: 24px;
   --ds-square-loader-gap: 4px;
   --ds-square-loader-step: calc(
     var(--ds-square-loader-cell) + var(--ds-square-loader-gap)
   );
 }
 
-/* The stage's bounding box after the 45° rotation is (size * √2),
-   so reserve that much room around the grid so the rotated diamond
-   doesn't clip or overlap neighbors. */
+/* No 45° rotation: the silhouette stays axis-aligned (a box, not a
+   diamond). Stage matches the grid size exactly — no bounding-box
+   expansion required since there's no rotation. */
 .ds-square-loader__stage {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(var(--ds-square-loader-step) * 3 * 1.45);
-  height: calc(var(--ds-square-loader-step) * 3 * 1.45);
+  width: calc(var(--ds-square-loader-step) * 3);
+  height: calc(var(--ds-square-loader-step) * 3);
 }
 
 .ds-square-loader__grid {
   position: relative;
   width: calc(var(--ds-square-loader-step) * 3);
   height: calc(var(--ds-square-loader-step) * 3);
-  transform: rotate(45deg);
 }
 
 .ds-square-loader__square {

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>sous-ds / v0.3.5</title>
+<title>sous-ds / v0.3.6</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1958,7 +1958,7 @@ body {
   align-items: center;
   gap: var(--ds-space-6);
   font-family: var(--ds-font-mono);
-  --ds-square-loader-cell: 28px;
+  --ds-square-loader-cell: 24px;
   --ds-square-loader-gap: 4px;
   --ds-square-loader-step: calc(var(--ds-square-loader-cell) + var(--ds-square-loader-gap));
 }
@@ -1966,14 +1966,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(var(--ds-square-loader-step) * 3 * 1.45);
-  height: calc(var(--ds-square-loader-step) * 3 * 1.45);
+  width: calc(var(--ds-square-loader-step) * 3);
+  height: calc(var(--ds-square-loader-step) * 3);
 }
 .ds-square-loader__grid {
   position: relative;
   width: calc(var(--ds-square-loader-step) * 3);
   height: calc(var(--ds-square-loader-step) * 3);
-  transform: rotate(45deg);
 }
 .ds-square-loader__square {
   position: absolute;
@@ -2086,7 +2085,7 @@ body {
         <i class="dim"></i><i></i><i></i><i class="dim"></i>
         <i></i><i></i><i class="dim"></i><i></i>
       </div>
-      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.3.5</span></h1>
+      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.3.6</span></h1>
     </div>
     <div class="status">
       <span class="clock" id="clock">00:00:00</span>
@@ -2650,7 +2649,7 @@ body {
         <div class="loader-row__note">
           <div class="loader-row__name">SquareLoader</div>
           <div class="loader-row__meta">
-            <span>7 squares · 3×3 path · diamond rotation · 10s loop</span>
+            <span>7 squares · 3×3 path · staggered chase · 10s loop</span>
           </div>
         </div>
       </div>
@@ -2700,7 +2699,7 @@ body {
   </div>
 
   <footer class="foot">
-    <span>sous-ds · v0.3.5 · 2026-04-24</span>
+    <span>sous-ds · v0.3.6 · 2026-04-24</span>
     <span><a href="./DESIGN.md">DESIGN.md</a> · <a href="./AGENTS.md">AGENTS.md</a> · <a href="./TASTE_LOG.md">TASTE_LOG.md</a></span>
   </footer>
 
