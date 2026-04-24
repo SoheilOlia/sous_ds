@@ -1,5 +1,5 @@
 /**
- * sous-ds component suite · v0.2.10
+ * sous-ds component suite · v0.2.11
  *
  * Every component is a reference implementation of the rules in DESIGN.md.
  * Components should prefer tokens and documented system values over ad hoc
@@ -9,7 +9,11 @@
  *   import {
  *     Button, Card, Pill, LiveDot, InlineStatus, MetricStat, ToolCall,
  *     ToastProvider, useToast, DottedChart, DotTimeline, PulseTrail,
+ *     tween, typewriter, rotateLabels, stagger, easings, prefersReducedMotion,
  *   } from "sous-ds";
+ *
+ *   // Tree-shakeable motion subpath:
+ *   import { tween } from "sous-ds/motion";
  */
 
 export { Button } from "./Button";
@@ -49,3 +53,21 @@ export type { MetricStatProps } from "./MetricStat";
 
 export { ToolCall } from "./ToolCall";
 export type { ToolCallProps } from "./ToolCall";
+
+// Motion primitive — zero-dep animation vocabulary shared across
+// components and consumers. See components/motion.ts for the rationale.
+export {
+  tween,
+  typewriter,
+  rotateLabels,
+  stagger,
+  easings,
+  prefersReducedMotion,
+} from "./motion";
+export type {
+  TweenOptions,
+  TypewriterOptions,
+  RotateLabelsOptions,
+  StaggerOptions,
+  EasingFn,
+} from "./motion";

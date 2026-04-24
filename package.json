@@ -20,7 +20,8 @@
     "./tokens": "./design-tokens.json",
     "./refusals": "./refusals.json",
     "./skill": "./SKILL.md",
-    "./components": "./components/index.ts"
+    "./components": "./components/index.ts",
+    "./motion": "./components/motion.ts"
   },
   "files": [
     "SKILL.md",

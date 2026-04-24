@@ -409,6 +409,31 @@ Background `surface-raised`, radius `md`, elevation level 2, 32px padding. Max-w
 
 Background `surface-raised`, radius `md`, elevation 1, 12px × 16px padding. Stack bottom-right. Enter from below (translateY 8px, opacity 0 → 1, 220ms `ease-out`). Dismiss on swipe or timeout. Live region for screen readers. Credit: Emil Kowalski's Sonner.
 
+### Motion primitive (`sous-ds/motion`)
+
+A small first-party motion module that every component and every consumer pulls from. **Zero runtime dependencies** — we deliberately did not take a dependency on Framer Motion or any other animation library. Reasons:
+
+1. The system ships into projects of every shape (Next.js, Vite, Astro, RSC, plain HTML, Figma Make). A React-only motion library locks the whole design system to a single runtime and version matrix. CSS plus a ~200-line RAF primitive is universal.
+2. Taste propagates by being drop-in. Zero deps mean zero version conflicts; the system installs frictionlessly in every future project.
+3. A design-system API surface that invites `whileHover={anything}` invites deviation. Tokenized helpers (`tween`, `typewriter`, `rotateLabels`, `stagger`) enforce the system's cadence at the API boundary instead of relying on convention.
+4. "AI-native" means tools generate UIs in multiple frameworks. CSS primitives and small RAF helpers are emittable by any generation tool; a Framer Motion API is React-specific dead weight for every other target.
+
+The vocabulary:
+
+- **`tween({ from, to, duration, easing, onUpdate, signal })`** — RAF-driven numeric interpolation, returns a cancellable `Promise<void>`. Used for count-ups, position drift, any "X to Y" motion.
+- **`typewriter({ text, step, onUpdate, signal })`** — character-by-character reveal at `step` ms/char.
+- **`rotateLabels({ labels, step, hold, onUpdate, onLabelComplete, signal })`** — LiveDot-style forever loop: type, hold, erase, advance. Used by `<LiveDot labels={[...]} />`.
+- **`stagger({ count, step, onStep, signal })`** — for JS-driven staggered sequences where CSS `animation-delay` doesn't apply.
+- **`easings`** — named easing functions (`easeOutCubic`, `easeInOutSine`, `easeOutStrong`, `easeInOutStrong`) that approximate the CSS `var(--ds-ease-*)` tokens.
+- **`prefersReducedMotion()`** — plain function returning the media-query result; every animator above short-circuits internally when true so callers don't need to branch.
+
+Invariants the module enforces on every call site:
+- GPU-accelerated properties only (`transform`, `opacity`).
+- `prefers-reduced-motion` short-circuits to the terminal frame.
+- Every animator is cancellable via `AbortSignal` so in-flight sequences can be interrupted cleanly (e.g., user hovers while auto-scrub is mid-drift).
+
+Consume via `import { tween } from "sous-ds"` or tree-shake via `import { tween } from "sous-ds/motion"`.
+
 ### Data motif: dotted bar chart
 
 The system's signature data visualization. Bars are rendered as columns of dots rather than solid rectangles. Dot count = bar value. Active column uses `text-primary` dots; inactive columns use `text-muted`. `accent-success` is reserved for a closed positive endpoint or highlighted good result; `accent-live` may appear sparingly on a negative or attention-worthy outlier. Neutral tone should still do most of the work. See `preview.html` for a working implementation.
