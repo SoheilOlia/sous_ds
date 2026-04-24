@@ -1,0 +1,109 @@
+/* ============================================================
+   SquareLoader.css — 7 squares chasing around a 3×3 path, rotated
+   45° into a diamond silhouette.
+
+   Path visits 8 positions on a 3×3 grid (top-left, top-mid, top-right,
+   mid-right, CENTER, bottom-mid, bottom-left, mid-left, back to
+   top-left). Every square uses the same ten-second keyframe, staggered
+   by one-seventh of the cycle per square, so the seven of them form
+   a moving trail around the loop.
+
+   Motion rules:
+   - transform: translate() rather than layout left/top keeps the
+     motion GPU-accelerated.
+   - The animation is `infinite`, so its duration is exempt from the
+     system's 300ms ceiling (continuous motion, not a UI transition).
+   - Grayscale only — no hues. Squares paint in --ds-text-primary
+     against whatever surface the host provides.
+   - prefers-reduced-motion: each square is parked at its "home" cell
+     on the path so the diamond silhouette still reads, minus motion.
+   ============================================================ */
+
+.ds-square-loader {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-6);
+  font-family: var(--ds-font-mono);
+
+  /* Tunables — consumers can override to scale the loader. */
+  --ds-square-loader-cell: 28px;
+  --ds-square-loader-gap: 4px;
+  --ds-square-loader-step: calc(
+    var(--ds-square-loader-cell) + var(--ds-square-loader-gap)
+  );
+}
+
+/* The stage's bounding box after the 45° rotation is (size * √2),
+   so reserve that much room around the grid so the rotated diamond
+   doesn't clip or overlap neighbors. */
+.ds-square-loader__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--ds-square-loader-step) * 3 * 1.45);
+  height: calc(var(--ds-square-loader-step) * 3 * 1.45);
+}
+
+.ds-square-loader__grid {
+  position: relative;
+  width: calc(var(--ds-square-loader-step) * 3);
+  height: calc(var(--ds-square-loader-step) * 3);
+  transform: rotate(45deg);
+}
+
+.ds-square-loader__square {
+  position: absolute;
+  top: calc(var(--ds-square-loader-gap) / 2);
+  left: calc(var(--ds-square-loader-gap) / 2);
+  width: var(--ds-square-loader-cell);
+  height: var(--ds-square-loader-cell);
+  background: var(--ds-text-primary);
+  animation: ds-square-loader-path 10000ms ease-in-out infinite both;
+}
+
+/* Stagger each square by an even slice of the cycle — negative delay
+   per square = −(cycle / 7), which starts each one already in the
+   loop so there's no cold-start gap; at t=0 the full trail is
+   already visible. */
+.ds-square-loader__square--1 { animation-delay:    0s; }
+.ds-square-loader__square--2 { animation-delay: -1.4285714286s; }
+.ds-square-loader__square--3 { animation-delay: -2.8571428571s; }
+.ds-square-loader__square--4 { animation-delay: -4.2857142857s; }
+.ds-square-loader__square--5 { animation-delay: -5.7142857143s; }
+.ds-square-loader__square--6 { animation-delay: -7.1428571429s; }
+.ds-square-loader__square--7 { animation-delay: -8.5714285714s; }
+
+@keyframes ds-square-loader-path {
+  0%,   10.5% { transform: translate(0,                                              0); }
+  12.5%, 23%  { transform: translate(var(--ds-square-loader-step),                   0); }
+  25%,  35.5% { transform: translate(calc(var(--ds-square-loader-step) * 2),         0); }
+  37.5%, 48%  { transform: translate(calc(var(--ds-square-loader-step) * 2),         var(--ds-square-loader-step)); }
+  50%,  60.5% { transform: translate(var(--ds-square-loader-step),                   var(--ds-square-loader-step)); }
+  62.5%, 73%  { transform: translate(var(--ds-square-loader-step),                   calc(var(--ds-square-loader-step) * 2)); }
+  75%,  85.5% { transform: translate(0,                                              calc(var(--ds-square-loader-step) * 2)); }
+  87.5%, 98%  { transform: translate(0,                                              var(--ds-square-loader-step)); }
+  100%        { transform: translate(0,                                              0); }
+}
+
+.ds-square-loader__label {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-square-loader__square { animation: none; }
+  .ds-square-loader__square--1 { transform: translate(0, 0); }
+  .ds-square-loader__square--2 { transform: translate(var(--ds-square-loader-step), 0); }
+  .ds-square-loader__square--3 { transform: translate(calc(var(--ds-square-loader-step) * 2), 0); }
+  .ds-square-loader__square--4 { transform: translate(calc(var(--ds-square-loader-step) * 2), var(--ds-square-loader-step)); }
+  .ds-square-loader__square--5 { transform: translate(var(--ds-square-loader-step), var(--ds-square-loader-step)); }
+  .ds-square-loader__square--6 { transform: translate(var(--ds-square-loader-step), calc(var(--ds-square-loader-step) * 2)); }
+  .ds-square-loader__square--7 { transform: translate(0, calc(var(--ds-square-loader-step) * 2)); }
+}

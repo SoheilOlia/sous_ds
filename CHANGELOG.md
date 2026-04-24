@@ -4,6 +4,47 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.3.5] — 2026-04-24
+
+Reverts the §08 LiveDot→ThinkingCube swap from v0.3.4 (the red pulse
+is back where it belongs) and adds **`<SquareLoader>`** as the fourth
+loader in §11.
+
+### Added
+- **`<SquareLoader>`** — seven white squares chasing each other around
+  an eight-position path on a 3×3 grid, with the grid rotated 45° so
+  the silhouette reads as a diamond. Every square runs the identical
+  keyframe with a per-square stagger (negative delay = -(cycle / 7))
+  so the seven of them form an evenly-spaced trail at any frame.
+  Default ten-second cycle, `infinite` (exempt from the 300ms ceiling).
+  `transform: translate()` keyframes — GPU-accelerated. Grayscale
+  only: squares paint in `--ds-text-primary`. Tunable cell / gap via
+  `--ds-square-loader-*` custom properties. `prefers-reduced-motion`
+  parks each square at its home cell so the diamond silhouette still
+  reads minus the motion.
+- §11 Loaders gains a fourth row alongside Tetris / Box / Dot.
+- Adapted from a community Tailwind snippet. Logic preserved (8-
+  position path, 7-square stagger, ease-in-out cycle); only the
+  styling rewritten to vanilla CSS against `--ds-*` tokens. The
+  upstream demo's dark/light toggle harness and dot-grid background
+  were stripped — those are host-level concerns, not part of the
+  loader.
+
+### Changed
+- **§08 Components row reverted to `<LiveDot>`.** v0.3.4 had swapped
+  the red-pulse indicator for `<ThinkingCube>`; that wasn't the right
+  call for the canonical agent-thinking row. LiveDot with rotating
+  AGENTING / WORKING / THINKING / REASONING labels is back. Same
+  typewriter mechanics, same IDs (`livedot-demo*`).
+- DESIGN.md `<ThinkingCube>` entry softened from "canonical" to
+  "alternative indicator" — `<LiveDot labels={...}>` is the canonical
+  agent-thinking surface; `<ThinkingCube>` ships as the dimensional
+  alternative for callers who want it.
+- Removed the now-unused ThinkingCube inline CSS mirror from
+  preview.html. The component itself still ships from `sous-ds`.
+
+---
+
 ## [0.3.4] — 2026-04-24
 
 New `<ThinkingCube>` agent-thinking indicator + §11 row alignment fix.
