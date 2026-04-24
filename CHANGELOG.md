@@ -4,6 +4,54 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.3.1] — 2026-04-23
+
+Tetris becomes playable, PulseTrail carries data vertically, and the
+chart stops looking like a marketing pitch.
+
+### Added
+- **`<TetrisLoader interactive>`** is now keyboard-steerable on focus.
+  `←` / `→` move the falling piece, `↑` rotates, `↓` soft-drops, `Space`
+  hard-drops. Auto-fall continues at the base cadence while the user
+  steers horizontally/rotation — the loader just becomes responsive to
+  player intent. Focus ring on the frame. Reduced-motion users don't
+  get a game loop, so they don't get keyboard steering either.
+  `interactive` defaults to `true`; pass `interactive={false}` for
+  pure loader mode.
+- **Tri-shade piece palette.** Seven tetrominoes are now distributed
+  across three grayscale tiers: `I` and `O` paint in `--ds-text-primary`
+  (near-white hero pieces), `T`/`L`/`J` in `--ds-text-secondary`,
+  `S`/`Z` in `--ds-text-muted`. Grayscale only — no decorative hues.
+  Line-clear flash still overrides to `--ds-accent-success` regardless
+  of the original shade.
+- **`<PulseTrail valueMax={n}>`** + optional `value` field on
+  `TrailEvent`. When both are set, each dot's `bottom` is derived from
+  `value / valueMax` so the trail reads as a silhouette of recent
+  reads instead of a flat baseline. Omit `valueMax` and dots continue
+  to sit flush at the baseline (presence-only surfaces).
+
+### Changed
+- **§09 DottedChart monthly data** replaced the monotonic ramp
+  `[4,5,5,6,7,6,8,9,10,11,12,14]` with a real walk
+  `[6,4,7,9,5,3,8,11,7,10,6,14]` — some months dip, Jun still reads as
+  the low-attention month, Dec recovers to the peak. Not a marketing
+  graph anymore.
+- **§09 revenue counter bias** dropped from 70% positive to 50/50.
+  Down-quarters are now as common as up-quarters; the stat reads as a
+  real quarterly swing.
+- **§10 PulseTrail** dots now float at Y positions derived from the
+  scrubber's emitted value (max = 14). Trail forms a silhouette of
+  recent reads. `bottom` transitions at `--ds-dur-standard` so slot
+  reassignments glide.
+- **§10 + §11 body copy trimmed.** The long paragraph descriptions in
+  the Live Activity and Loaders sections were outliers — the rest of
+  the page lets components speak for themselves. §10 drops its prose
+  note entirely; §11 swaps the prose for a mono `← → move / ↑ rotate
+  / ↓ drop / space hard-drop` controls caption that also advertises
+  the new keyboard affordance.
+
+---
+
 ## [0.3.0] — 2026-04-23
 
 New component surface — the first of the "Loaders" section. Motion

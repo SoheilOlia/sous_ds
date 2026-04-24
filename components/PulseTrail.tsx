@@ -29,6 +29,12 @@ export type TrailEventState = "done" | "live" | "queued";
 export type TrailEvent = {
   ts: number;
   state: TrailEventState;
+  /**
+   * Optional magnitude for this event. When present and `valueMax`
+   * is set on the parent, the dot floats higher for larger values —
+   * the trail reads as a silhouette of the data, not a flat baseline.
+   */
+  value?: number;
 };
 
 export type PulseTrailProps = {
@@ -38,6 +44,12 @@ export type PulseTrailProps = {
   trailLength?: number;
   /** Visible time window in ms. Default 60_000. */
   window?: number;
+  /**
+   * Upper bound for `event.value` → Y-position mapping. When unset or
+   * when events don't carry `value`, dots sit flush at the baseline.
+   * When set, `value / valueMax` maps 0 → baseline, 1 → near-top.
+   */
+  valueMax?: number;
   /** Head sweep cycle duration in ms. Default 4_000 (tight enough that motion is obvious on first glance). */
   loopDuration?: number;
   /** aria-label prefix. Default "Agent activity". */
@@ -56,6 +68,7 @@ export function PulseTrail(props: PulseTrailProps) {
     events = [],
     trailLength = 10,
     window: windowMs = 60_000,
+    valueMax,
     loopDuration = 4_000,
     label = "Agent activity",
     showAxis = true,
@@ -66,6 +79,11 @@ export function PulseTrail(props: PulseTrailProps) {
    * Take up to trailLength most-recent events, sort oldest → newest, and
    * position each at an x% derived from how recent it is relative to now.
    * Older = further left (closer to 0%); most recent = further right.
+   *
+   * Y-position: if the parent passes `valueMax` and events carry `value`,
+   * map value/valueMax into canvas height (0 → baseline, 1 → near-top).
+   * Without valueMax, dots sit flush at the baseline — silhouette mode
+   * is opt-in so callers with pure presence data don't get noise.
    */
   const trail = React.useMemo(() => {
     const now = Date.now();
@@ -74,16 +92,20 @@ export function PulseTrail(props: PulseTrailProps) {
       .slice(0, trailLength)
       .reverse(); // now oldest → newest
     return recent.map((e, i) => {
-      // xPct based on age within the window; clamp to [0, 94%] to leave room
-      // for the sweeping head at the right edge.
       const age = Math.max(0, Math.min(windowMs, now - e.ts));
       const xPct = (1 - age / windowMs) * 94;
-      // Opacity decays from 0.15 (oldest) to 1 (newest)
       const position = recent.length > 1 ? i / (recent.length - 1) : 1;
       const opacity = 0.15 + position * 0.75;
-      return { key: `${e.ts}-${i}`, xPct, opacity, state: e.state };
+      // Y in px from canvas bottom. Canvas is 48px; leave 4px baseline
+      // padding and cap dot center at 36px from bottom (so a 6px dot
+      // fits with 6px top clearance).
+      const bottomPx =
+        valueMax && e.value !== undefined
+          ? 4 + Math.max(0, Math.min(1, e.value / valueMax)) * 32
+          : 4;
+      return { key: `${e.ts}-${i}`, xPct, bottomPx, opacity, state: e.state };
     });
-  }, [events, trailLength, windowMs]);
+  }, [events, trailLength, windowMs, valueMax]);
 
   const summary = `${label}, last ${formatWindow(windowMs)}. ${trail.length} event${
     trail.length === 1 ? "" : "s"
@@ -105,7 +127,11 @@ export function PulseTrail(props: PulseTrailProps) {
             className="ds-pulse-trail__dot"
             data-role="trail"
             data-state={d.state}
-            style={{ left: `${d.xPct}%`, opacity: d.opacity }}
+            style={{
+              left: `${d.xPct}%`,
+              bottom: `${d.bottomPx}px`,
+              opacity: d.opacity,
+            }}
             aria-hidden="true"
           />
         ))}

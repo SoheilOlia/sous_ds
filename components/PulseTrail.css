@@ -28,16 +28,20 @@
 
 .ds-pulse-trail__dot {
   position: absolute;
-  /* Bottom-aligned so dots sit on a visual baseline that reads as a
-     sibling of other chart primitives (e.g., <DotTimeline>) when the
-     components are displayed together. */
+  /* `bottom` is driven per-dot by JS/inline style from the event's
+     value — the trail reads as a silhouette of recent reads. Default
+     seeds the empty state. Transition so slot reassignments glide. */
   bottom: 4px;
   width: var(--ds-size-dot);
   height: var(--ds-size-dot);
   border-radius: 50%;
   transform: translateX(-50%);
-  will-change: opacity;
+  will-change: opacity, bottom;
   background: var(--ds-text-muted);
+  transition:
+    bottom var(--ds-dur-standard) var(--ds-ease-out),
+    opacity var(--ds-dur-standard) var(--ds-ease-out),
+    background var(--ds-dur-standard) var(--ds-ease-out);
 }
 
 /* ---------- Trail dots (static positions, opacity set via inline style) ---------- */

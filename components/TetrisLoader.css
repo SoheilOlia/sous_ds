@@ -49,11 +49,32 @@
 .ds-tetris-loader[data-size="md"] .ds-tetris-loader__cell { width: 12px; height: 12px; }
 .ds-tetris-loader[data-size="lg"] .ds-tetris-loader__cell { width: 16px; height: 16px; }
 
-/* Filled cell — solid block in primary text color. Border matches
-   background so the cell reads as a unit, not a framed square. */
+/* Filled cell — solid block. `data-filled` carries the piece's shade:
+   "primary" (near-white, hero pieces), "secondary" (mid gray,
+   supporting pieces), or "muted" (quietest gray). Grayscale only — no
+   decorative hues. Border matches background so each cell reads as a
+   unit, not a framed square. */
 .ds-tetris-loader__cell[data-filled] {
   background: var(--ds-text-primary);
   border-color: var(--ds-text-primary);
+}
+.ds-tetris-loader__cell[data-filled="secondary"] {
+  background: var(--ds-text-secondary);
+  border-color: var(--ds-text-secondary);
+}
+.ds-tetris-loader__cell[data-filled="muted"] {
+  background: var(--ds-text-muted);
+  border-color: var(--ds-text-muted);
+}
+
+/* Focus ring — the loader is keyboard-interactive. When focused,
+   arrow keys steer the falling piece (see the component source). */
+.ds-tetris-loader:focus-visible {
+  outline: none;
+}
+.ds-tetris-loader:focus-visible .ds-tetris-loader__frame {
+  border-color: var(--ds-text-primary);
+  box-shadow: 0 0 0 2px var(--ds-line-strong);
 }
 
 /* Line-clear flash — the rows about to be removed glow accent-success

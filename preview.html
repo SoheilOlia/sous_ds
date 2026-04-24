@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>sous-ds / v0.3.0</title>
+<title>sous-ds / v0.3.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1648,16 +1648,20 @@ body {
 }
 .ds-pulse-trail__dot {
   position: absolute;
-  /* Bottom-aligned so dots sit on the same visual baseline as
-     <DotTimeline>'s bottom-row dots when the two components are
-     displayed side-by-side. */
+  /* Bottom is driven per-dot by JS from the event's value — the trail
+     reads as a silhouette of the scrubber's recent reads. Default 4px
+     just seeds the empty state. */
   bottom: 4px;
   width: var(--ds-size-dot);
   height: var(--ds-size-dot);
   border-radius: 50%;
   transform: translateX(-50%);
   background: var(--ds-text-muted);
-  will-change: opacity;
+  will-change: opacity, bottom;
+  transition:
+    bottom var(--ds-dur-standard) var(--ds-ease-out),
+    opacity var(--ds-dur-standard) var(--ds-ease-out),
+    background var(--ds-dur-standard) var(--ds-ease-out);
 }
 .ds-pulse-trail__dot[data-role="trail"][data-state="done"]   { background: var(--ds-accent-success); }
 .ds-pulse-trail__dot[data-role="trail"][data-state="live"]   { background: var(--ds-accent-live); }
@@ -1751,14 +1755,16 @@ body {
   color: var(--ds-text-primary);
   margin-bottom: var(--ds-space-3);
 }
-.loader-row__prose {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-size: 22px;
-  line-height: 1.1;
-  font-weight: 400;
-  letter-spacing: -0.0075em;
-  color: var(--ds-text-secondary);
+.loader-row__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3) var(--ds-space-5);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-muted);
 }
 
 .ds-tetris-loader {
@@ -1792,6 +1798,19 @@ body {
 .ds-tetris-loader__cell[data-filled] {
   background: var(--ds-text-primary);
   border-color: var(--ds-text-primary);
+}
+.ds-tetris-loader__cell[data-filled="secondary"] {
+  background: var(--ds-text-secondary);
+  border-color: var(--ds-text-secondary);
+}
+.ds-tetris-loader__cell[data-filled="muted"] {
+  background: var(--ds-text-muted);
+  border-color: var(--ds-text-muted);
+}
+.ds-tetris-loader:focus-visible { outline: none; }
+.ds-tetris-loader:focus-visible .ds-tetris-loader__frame {
+  border-color: var(--ds-text-primary);
+  box-shadow: 0 0 0 2px var(--ds-line-strong);
 }
 .ds-tetris-loader__cell[data-clearing] {
   background: var(--ds-accent-success);
@@ -1880,7 +1899,7 @@ body {
         <i class="dim"></i><i></i><i></i><i class="dim"></i>
         <i></i><i></i><i class="dim"></i><i></i>
       </div>
-      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.3.0</span></h1>
+      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.3.1</span></h1>
     </div>
     <div class="status">
       <span class="clock" id="clock">00:00:00</span>
@@ -2330,7 +2349,6 @@ body {
       <div class="variant variant--solo">
         <div class="variant__head">
           <div class="variant__name">PulseTrail</div>
-          <div class="variant__note">A live feed of the scrubber's reads. Every month the read-head above lands on emits a new event here — it blooms in at the right edge and older events fade left across the sixty-second window. The accent-live head sweeps on its own loop; motion IS the data.</div>
         </div>
         <div class="variant__chart"><div id="demo-pulse-trail"></div></div>
         <div class="variant__caption" role="status" aria-live="polite">
@@ -2350,7 +2368,7 @@ body {
 
       <div class="loader-row">
         <div class="loader-row__item">
-          <div class="ds-tetris-loader" data-size="sm" id="tetris-demo" role="status" aria-label="Loading">
+          <div class="ds-tetris-loader" data-size="sm" id="tetris-demo" role="status" tabindex="0" aria-label="Loading — focus and use arrow keys to steer">
             <div class="ds-tetris-loader__frame" aria-hidden="true">
               <!-- rows/cells inserted by JS -->
             </div>
@@ -2359,7 +2377,12 @@ body {
         </div>
         <div class="loader-row__note">
           <div class="loader-row__name">TetrisLoader</div>
-          <p class="loader-row__prose">Seven tetrominoes fall on a fixed cadence, lock into the grid, clear full rows with a brief accent-success flash, and reset when the stack threatens the ceiling. Every motion is stepped — no continuous rotation, no springs, no placeholder pulse. The loader reads as an instrument.</p>
+          <div class="loader-row__controls">
+            <span>← → move</span>
+            <span>↑ rotate</span>
+            <span>↓ drop</span>
+            <span>space hard-drop</span>
+          </div>
         </div>
       </div>
     </section>
@@ -2408,7 +2431,7 @@ body {
   </div>
 
   <footer class="foot">
-    <span>sous-ds · v0.3.0 · 2026-04-23</span>
+    <span>sous-ds · v0.3.1 · 2026-04-23</span>
     <span><a href="./DESIGN.md">DESIGN.md</a> · <a href="./AGENTS.md">AGENTS.md</a> · <a href="./TASTE_LOG.md">TASTE_LOG.md</a></span>
   </footer>
 
@@ -2450,8 +2473,10 @@ body {
   const root = document.getElementById('bars');
   if (!root) return;
 
-  // Count of dots per column (0-14). Roughly an upward trend ending at peak.
-  const values  = [4, 5, 5, 6, 7, 6, 8, 9, 10, 11, 12, 14];
+  // Monthly counts with real up-and-down. Some months decline; June
+  // is an attention dip; September and November slide before December
+  // recovers to peak. No monotonic ramp — that read as fake.
+  const values  = [6, 4, 7, 9, 5, 3, 8, 11, 7, 10, 6, 14];
   const current = values.length - 1;
   const success = values.length - 1;
   const attention = 5;
@@ -2703,18 +2728,31 @@ body {
 
   const events = []; // FIFO, events[len-1] is newest, maps to slots[len-1]
 
+  // Map an event's numeric value to a vertical position inside the
+  // 48px canvas. Higher value ⇒ higher Y ⇒ dot floats further above
+  // the baseline. This is what makes the trail into a silhouette of
+  // the scrubber's reads instead of a flat row.
+  // Domain 0-14 matches the DottedChart values above; clamped for safety.
+  function bottomForValue (value) {
+    const ratio = Math.max(0, Math.min(1, (value || 0) / 14));
+    return 4 + ratio * 32; // 4px (min) → 36px (max) inside a 48px canvas
+  }
+
   function render () {
     for (let i = 0; i < SLOTS; i++) {
       const slot = slots[i];
       const eventIdx = events.length - (SLOTS - i);
       if (eventIdx < 0) {
         slot.style.opacity = '0';
+        slot.style.bottom = '4px';
         slot.removeAttribute('data-state');
       } else {
         const e = events[eventIdx];
         slot.setAttribute('data-state', e.state);
         // Oldest slot (0) dimmest; newest (SLOTS-1) brightest.
         slot.style.opacity = String(0.15 + (i / (SLOTS - 1)) * 0.8);
+        // Y position follows the event's value — silhouette, not flat line.
+        slot.style.bottom = bottomForValue(e.value) + 'px';
       }
     }
   }
@@ -3057,9 +3095,10 @@ body {
   }
 
   function pickNext () {
-    // Realistic-looking growth report: biased toward positive, occasional
-    // down-quarter. Magnitude roughly 40-480 so the digits stay readable.
-    const positive = Math.random() < 0.7;
+    // 50/50 up/down — the stat reads as a real quarterly swing, not
+    // a marketing always-up graph. Magnitude 40-480 so digits stay
+    // readable in the 72px mono.
+    const positive = Math.random() < 0.5;
     const magnitude = Math.round(40 + Math.random() * 440);
     return positive ? magnitude : -magnitude;
   }
@@ -3178,14 +3217,17 @@ body {
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // Each piece carries one of three grayscale shades so the grid
+  // reads varied without introducing color. I/O are "hero" (primary),
+  // T/L/J are supporting (secondary), S/Z are quietest (muted).
   const PIECES = [
-    [[1,1,1,1]],
-    [[1,1],[1,1]],
-    [[0,1,0],[1,1,1]],
-    [[1,0],[1,0],[1,1]],
-    [[0,1,1],[1,1,0]],
-    [[1,1,0],[0,1,1]],
-    [[0,1],[0,1],[1,1]],
+    { shape: [[1,1,1,1]],             shade: 'primary'   }, // I
+    { shape: [[1,1],[1,1]],           shade: 'primary'   }, // O
+    { shape: [[0,1,0],[1,1,1]],       shade: 'secondary' }, // T
+    { shape: [[1,0],[1,0],[1,1]],     shade: 'secondary' }, // L
+    { shape: [[0,1],[0,1],[1,1]],     shade: 'secondary' }, // J
+    { shape: [[0,1,1],[1,1,0]],       shade: 'muted'     }, // S
+    { shape: [[1,1,0],[0,1,1]],       shade: 'muted'     }, // Z
   ];
 
   function rotate(shape) {
@@ -3202,7 +3244,7 @@ body {
 
   function makeEmpty() {
     return Array.from({ length: ROWS }, () =>
-      Array.from({ length: COLS }, () => ({ filled: false, clearing: false }))
+      Array.from({ length: COLS }, () => ({ filled: false, shade: null, clearing: false }))
     );
   }
 
@@ -3231,12 +3273,13 @@ body {
 
   function makePiece() {
     const base = PIECES[Math.floor(Math.random() * PIECES.length)];
-    let shape = base;
+    let shape = base.shape;
     const r = Math.floor(Math.random() * 4);
     for (let i = 0; i < r; i++) shape = rotate(shape);
     const maxX = COLS - shape[0].length;
     return {
       shape,
+      shade: base.shade,
       x: Math.floor(Math.random() * (maxX + 1)),
       y: -shape.length,
     };
@@ -3263,6 +3306,7 @@ body {
         const gy = p.y + r;
         if (gy >= 0 && gy < ROWS && gx >= 0 && gx < COLS) {
           grid[gy][gx].filled = true;
+          grid[gy][gx].shade = p.shade;
         }
       }
     }
@@ -3282,7 +3326,7 @@ body {
     window.setTimeout(() => {
       const remaining = grid.filter((_, i) => !fullRows.includes(i));
       const empties = Array.from({ length: fullRows.length }, () =>
-        Array.from({ length: COLS }, () => ({ filled: false, clearing: false }))
+        Array.from({ length: COLS }, () => ({ filled: false, shade: null, clearing: false }))
       );
       grid = empties.concat(remaining);
       clearing = false;
@@ -3309,6 +3353,7 @@ body {
       for (let c = 0; c < COLS; c++) {
         const cell = cells[r][c];
         let filled = grid[r][c].filled;
+        let shade = grid[r][c].shade;
         let flash = grid[r][c].clearing;
         if (piece && !clearing) {
           const pr = r - piece.y;
@@ -3319,9 +3364,10 @@ body {
             piece.shape[pr][pc]
           ) {
             filled = true;
+            shade = piece.shade;
           }
         }
-        if (filled) cell.setAttribute('data-filled', 'true');
+        if (filled) cell.setAttribute('data-filled', shade || 'primary');
         else cell.removeAttribute('data-filled');
         if (flash) cell.setAttribute('data-clearing', 'true');
         else cell.removeAttribute('data-clearing');
@@ -3350,6 +3396,53 @@ body {
     }
     rafId = window.requestAnimationFrame(loop);
   }
+
+  // Keyboard steering. When the grid is focused (tab or click),
+  // arrow keys move/rotate the falling piece and Space hard-drops.
+  // Auto-fall keeps running at base cadence — keyboard overrides
+  // horizontal / rotation / drop only. Reduced-motion users don't
+  // get a game loop, so they don't get keyboard steering either.
+  root.addEventListener('keydown', function (e) {
+    if (reduced || !piece || clearing) return;
+    switch (e.key) {
+      case 'ArrowLeft':
+        e.preventDefault();
+        if (canPlace(piece, piece.x - 1, piece.y)) piece.x -= 1;
+        renderGrid();
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        if (canPlace(piece, piece.x + 1, piece.y)) piece.x += 1;
+        renderGrid();
+        break;
+      case 'ArrowUp': {
+        e.preventDefault();
+        const rotated = rotate(piece.shape);
+        const prev = piece.shape;
+        piece.shape = rotated;
+        if (!canPlace(piece, piece.x, piece.y)) piece.shape = prev;
+        renderGrid();
+        break;
+      }
+      case 'ArrowDown':
+        e.preventDefault();
+        if (canPlace(piece, piece.x, piece.y + 1)) piece.y += 1;
+        renderGrid();
+        break;
+      case ' ':
+      case 'Spacebar': {
+        e.preventDefault();
+        while (canPlace(piece, piece.x, piece.y + 1)) piece.y += 1;
+        placePiece(piece);
+        piece = makePiece();
+        window.setTimeout(clearFullLines, 50);
+        renderGrid();
+        break;
+      }
+      default:
+        break;
+    }
+  });
 
   renderGrid();
   if (!reduced) rafId = window.requestAnimationFrame(loop);

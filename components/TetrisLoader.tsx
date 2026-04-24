@@ -22,40 +22,29 @@ import "./TetrisLoader.css";
 import { prefersReducedMotion } from "./motion";
 
 type Shape = number[][];
+type Shade = "primary" | "secondary" | "muted";
 
-// Seven canonical tetrominoes — I, O, T, L, S, Z, J.
-const PIECES: Shape[] = [
-  [[1, 1, 1, 1]],
-  [
-    [1, 1],
-    [1, 1],
-  ],
-  [
-    [0, 1, 0],
-    [1, 1, 1],
-  ],
-  [
-    [1, 0],
-    [1, 0],
-    [1, 1],
-  ],
-  [
-    [0, 1, 1],
-    [1, 1, 0],
-  ],
-  [
-    [1, 1, 0],
-    [0, 1, 1],
-  ],
-  [
-    [0, 1],
-    [0, 1],
-    [1, 1],
-  ],
+/*
+ * Seven canonical tetrominoes, each mapped to one of three grayscale
+ * tiers so the grid gets visual variety without introducing color.
+ * I/O are "hero" pieces (primary = near-white), T/L/J are supporting
+ * (secondary), S/Z are quietest (muted). No accent hues — the system's
+ * two accents stay reserved for live and success.
+ */
+type PieceDef = { shape: Shape; shade: Shade };
+
+const PIECES: PieceDef[] = [
+  { shape: [[1, 1, 1, 1]], shade: "primary" },             // I
+  { shape: [[1, 1], [1, 1]], shade: "primary" },           // O
+  { shape: [[0, 1, 0], [1, 1, 1]], shade: "secondary" },   // T
+  { shape: [[1, 0], [1, 0], [1, 1]], shade: "secondary" }, // L
+  { shape: [[0, 1], [0, 1], [1, 1]], shade: "secondary" }, // J
+  { shape: [[0, 1, 1], [1, 1, 0]], shade: "muted" },       // S
+  { shape: [[1, 1, 0], [0, 1, 1]], shade: "muted" },       // Z
 ];
 
-type Cell = { filled: boolean; clearing?: boolean };
-type FallingPiece = { shape: Shape; x: number; y: number; id: string };
+type Cell = { filled: boolean; shade?: Shade; clearing?: boolean };
+type FallingPiece = { shape: Shape; shade: Shade; x: number; y: number; id: string };
 
 export type TetrisLoaderSize = "sm" | "md" | "lg";
 export type TetrisLoaderSpeed = "slow" | "normal" | "fast";
@@ -76,6 +65,13 @@ export interface TetrisLoaderProps
   label?: string;
   /** Accessibility announcement. Default mirrors `label`. */
   "aria-label"?: string;
+  /**
+   * When true, the loader becomes keyboard-interactive on focus.
+   * Arrow keys move/rotate the falling piece; Space hard-drops.
+   * Auto-fall still runs at the base cadence — keyboard just steers
+   * the current piece. Default true. Set false for pure-loader mode.
+   */
+  interactive?: boolean;
 }
 
 const SIZE_CONFIG: Record<TetrisLoaderSize, { cols: number; rows: number }> = {
@@ -120,6 +116,7 @@ export function TetrisLoader(props: TetrisLoaderProps) {
     speed = "normal",
     showLabel = true,
     label = "Loading",
+    interactive = true,
     className,
     "aria-label": ariaLabel,
     ...rest
@@ -141,12 +138,13 @@ export function TetrisLoader(props: TetrisLoaderProps) {
 
   const makePiece = React.useCallback((): FallingPiece => {
     const base = PIECES[Math.floor(Math.random() * PIECES.length)];
-    let shape = base;
+    let shape = base.shape;
     const r = Math.floor(Math.random() * 4);
     for (let i = 0; i < r; i++) shape = rotate(shape);
     const maxX = cols - shape[0].length;
     return {
       shape,
+      shade: base.shade,
       x: Math.floor(Math.random() * (maxX + 1)),
       y: -shape.length,
       id: randomId(),
@@ -179,7 +177,7 @@ export function TetrisLoader(props: TetrisLoaderProps) {
             const gx = p.x + c;
             const gy = p.y + r;
             if (gy >= 0 && gy < rows && gx >= 0 && gx < cols) {
-              next[gy][gx] = { filled: true };
+              next[gy][gx] = { filled: true, shade: p.shade };
             }
           }
         }
@@ -286,13 +284,63 @@ export function TetrisLoader(props: TetrisLoaderProps) {
           const gx = piece.x + c;
           const gy = piece.y + r;
           if (gy >= 0 && gy < rows && gx >= 0 && gx < cols) {
-            copy[gy][gx] = { filled: true };
+            copy[gy][gx] = { filled: true, shade: piece.shade };
           }
         }
       }
     }
     return copy;
   }, [grid, piece, clearing, rows, cols]);
+
+  // Keyboard steering: on focus, arrow keys + space move/rotate/drop
+  // the current falling piece. Auto-fall continues at its base cadence;
+  // keyboard just overrides horizontal/rotation/drop. When nothing is
+  // pressed, the loader plays itself (status). No mode switch needed.
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (!interactive || reduced) return;
+      setPiece((prev) => {
+        if (!prev || clearing) return prev;
+        switch (e.key) {
+          case "ArrowLeft":
+            e.preventDefault();
+            return canPlace(prev, prev.x - 1, prev.y)
+              ? { ...prev, x: prev.x - 1 }
+              : prev;
+          case "ArrowRight":
+            e.preventDefault();
+            return canPlace(prev, prev.x + 1, prev.y)
+              ? { ...prev, x: prev.x + 1 }
+              : prev;
+          case "ArrowUp": {
+            e.preventDefault();
+            const rotated = rotate(prev.shape);
+            const test = { ...prev, shape: rotated };
+            return canPlace(test, test.x, test.y) ? test : prev;
+          }
+          case "ArrowDown":
+            e.preventDefault();
+            return canPlace(prev, prev.x, prev.y + 1)
+              ? { ...prev, y: prev.y + 1 }
+              : prev;
+          case " ":
+          case "Spacebar": {
+            e.preventDefault();
+            // Hard drop: advance y until it can't fall further.
+            let ny = prev.y;
+            while (canPlace(prev, prev.x, ny + 1)) ny++;
+            const landed = { ...prev, y: ny };
+            placePiece(landed);
+            window.setTimeout(clearFullLines, 50);
+            return makePiece();
+          }
+          default:
+            return prev;
+        }
+      });
+    },
+    [interactive, reduced, clearing, canPlace, placePiece, clearFullLines, makePiece],
+  );
 
   const rootClassName = ["ds-tetris-loader", className]
     .filter(Boolean)
@@ -305,6 +353,8 @@ export function TetrisLoader(props: TetrisLoaderProps) {
       data-size={size}
       role="status"
       aria-label={ariaLabel ?? label}
+      tabIndex={interactive ? 0 : undefined}
+      onKeyDown={interactive ? handleKeyDown : undefined}
     >
       <div className="ds-tetris-loader__frame" aria-hidden="true">
         {display.map((row, r) => (
@@ -313,7 +363,7 @@ export function TetrisLoader(props: TetrisLoaderProps) {
               <span
                 key={c}
                 className="ds-tetris-loader__cell"
-                data-filled={cell.filled || undefined}
+                data-filled={cell.filled ? cell.shade ?? "primary" : undefined}
                 data-clearing={cell.clearing || undefined}
               />
             ))}
