@@ -4,6 +4,18 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.3.7] — 2026-04-24
+
+### Changed
+- **`<SquareLoader>` default cell: 24px → 12px.** Whole grid now
+  48px outer (was 84px). Keeps the 4px gap; step drops from 28px
+  to 16px. At this scale the loader sits inline with mono body
+  copy or in a toolbar slot. The keyframe math is driven by the
+  custom properties so it scales automatically — no keyframe
+  changes needed. DESIGN.md bullet updated.
+
+---
+
 ## [0.3.6] — 2026-04-24
 
 `<SquareLoader>` resize + un-rotation pass.

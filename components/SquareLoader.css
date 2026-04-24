@@ -26,10 +26,10 @@
   gap: var(--ds-space-6);
   font-family: var(--ds-font-mono);
 
-  /* Tunables — consumers can override to scale the loader. Cell drops
-     to 24px so the whole grid lands at 84px outer, matching the scale
-     of the other §11 loaders (Tetris, Box, Dot). */
-  --ds-square-loader-cell: 24px;
+  /* Tunables — consumers can override to scale the loader. Default
+     cell 12px puts the whole grid at 48px outer — compact enough to
+     sit inline with mono body copy or in a toolbar slot. */
+  --ds-square-loader-cell: 12px;
   --ds-square-loader-gap: 4px;
   --ds-square-loader-step: calc(
     var(--ds-square-loader-cell) + var(--ds-square-loader-gap)
