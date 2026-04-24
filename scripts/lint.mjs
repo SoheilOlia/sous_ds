@@ -280,6 +280,7 @@ function ruleCL07_accentCarrier(src, file) {
       token: "--ds-accent-live",
       allowed: [
         "components/LiveDot.css",
+        "components/LiveCube.css",
         "components/InlineStatus.css",
         "components/Pill.css",
         "components/Toast.css",
@@ -292,8 +293,8 @@ function ruleCL07_accentCarrier(src, file) {
         "refusals.json",
         "SKILL.md",
       ],
-      message: "--ds-accent-live used outside sanctioned attention carriers (LiveDot, InlineStatus, Pill, Toast, DottedChart anomalies, DotTimeline live columns, PulseTrail head).",
-      suggestion: "Carry attention semantics via <LiveDot>, <InlineStatus tone=\"live\">, <Pill live>, <Toast tone=\"live\">, a sparse anomaly point in <DottedChart>, a running column in <DotTimeline>, or the head of <PulseTrail>. See DESIGN.md 'Accent discipline'.",
+      message: "--ds-accent-live used outside sanctioned attention carriers (LiveDot, LiveCube, InlineStatus, Pill, Toast, DottedChart anomalies, DotTimeline live columns, PulseTrail head).",
+      suggestion: "Carry attention semantics via <LiveDot>, <LiveCube>, <InlineStatus tone=\"live\">, <Pill live>, <Toast tone=\"live\">, a sparse anomaly point in <DottedChart>, a running column in <DotTimeline>, or the head of <PulseTrail>. See DESIGN.md 'Accent discipline'.",
     },
     {
       token: "--ds-accent-success",

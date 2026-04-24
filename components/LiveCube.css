@@ -1,0 +1,117 @@
+/* ============================================================
+   LiveCube.css — 4×4 accent-live 3D cube, parallel to <LiveDot>.
+
+   Typography / layout mirror <LiveDot> exactly (inline-flex row,
+   mono 12px uppercase secondary ink, space-3 gap) so the two can
+   be swapped surface-for-surface without upstream layout drift.
+
+   Color:
+   - All faces paint in --ds-accent-live.
+   - Per-face opacity gives a soft 3D lighting read at this tiny
+     size: top brightest, front/back mid, left/right/bottom shadowed.
+     No hue shift — just the same red at different alphas.
+   - The whole cube pulses on the system's live-pulse cadence
+     (--ds-dur-live-pulse = 2000ms) via opacity. Parent opacity
+     compounds with per-face opacity, so the cube brightens/dims
+     as a unit while preserving its 3D shading.
+   ============================================================ */
+
+.ds-livecube {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+
+  --ds-livecube-edge: 4px;
+}
+
+/* Stage provides a little extra room around the rotated cube so the
+   tilted geometry doesn't clip against neighbors. Small perspective
+   so the depth is present but subtle at this scale. */
+.ds-livecube__stage {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--ds-livecube-edge) * 2);
+  height: calc(var(--ds-livecube-edge) * 2);
+  perspective: 40px;
+  flex: none;
+}
+
+.ds-livecube__cube {
+  position: relative;
+  width: var(--ds-livecube-edge);
+  height: var(--ds-livecube-edge);
+  transform-style: preserve-3d;
+  transform: rotateX(-22deg) rotateY(-28deg);
+  animation: live-pulse var(--ds-dur-live-pulse) linear infinite;
+}
+
+.ds-livecube[data-static] .ds-livecube__cube {
+  animation: none;
+}
+
+.ds-livecube__face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ds-livecube-edge);
+  height: var(--ds-livecube-edge);
+  background: var(--ds-accent-live);
+}
+
+/* Per-face opacity tiers simulate lighting without hue variation.
+   Top catches the most light, front/back take the mid tone, the
+   vertical-side + bottom faces sit in shadow. */
+.ds-livecube__face--front  { transform: translateZ(calc(var(--ds-livecube-edge) / 2)); opacity: 0.9; }
+.ds-livecube__face--back   { transform: rotateY(180deg) translateZ(calc(var(--ds-livecube-edge) / 2)); opacity: 0.85; }
+.ds-livecube__face--right  { transform: rotateY(90deg)  translateZ(calc(var(--ds-livecube-edge) / 2)); opacity: 0.65; }
+.ds-livecube__face--left   { transform: rotateY(-90deg) translateZ(calc(var(--ds-livecube-edge) / 2)); opacity: 0.65; }
+.ds-livecube__face--top    { transform: rotateX(90deg)  translateZ(calc(var(--ds-livecube-edge) / 2)); opacity: 1; }
+.ds-livecube__face--bottom { transform: rotateX(-90deg) translateZ(calc(var(--ds-livecube-edge) / 2)); opacity: 0.55; }
+
+/* Screen-reader-only announcement; mirrors LiveDot's sr pattern. */
+.ds-livecube__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ds-livecube__label {
+  color: var(--ds-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-livecube__caret {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 2px;
+  background: currentColor;
+  vertical-align: -0.12em;
+  animation: ds-livecube-caret-blink 1000ms steps(2, start) infinite;
+}
+
+@keyframes ds-livecube-caret-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-livecube__cube { animation: none; opacity: 1; }
+  .ds-livecube__caret { animation: none; opacity: 1; }
+}

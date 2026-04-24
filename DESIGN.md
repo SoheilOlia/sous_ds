@@ -224,7 +224,7 @@ The accent pair is semantic, not decorative:
 - `✓` `accent-success` for positive emphasis, completion, committed state, or a deliberately spotlighted good outcome
 - `✓` `accent-live` for alert, anomaly, error, negative variance, or urgent live-now state
 - `✓` Sanctioned success carriers: `SegmentedBar` when `value === total`, `DottedChart` endpoint marked as a closed positive result, a `DotTimeline` column in `done` state, a `TetrisLoader` row flash on line-clear, or another explicitly documented completion state
-- `✓` Sanctioned attention carriers: `LiveDot`, `InlineStatus` in `tone="live"`, a live-pill prefix, a live-tone toast marker, a sparse `DottedChart` point marking anomaly/attention, a `DotTimeline` column in `live` state, or the head dot of `PulseTrail`
+- `✓` Sanctioned attention carriers: `LiveDot`, `LiveCube`, `InlineStatus` in `tone="live"`, a live-pill prefix, a live-tone toast marker, a sparse `DottedChart` point marking anomaly/attention, a `DotTimeline` column in `live` state, or the head dot of `PulseTrail`
 - **`PulseTrail` note:** `PulseTrail` is the canonical carrier for the "live now" agent-activity feel — a single accent-live dot sweeping left→right with a fading trail of prior events. Other components should compose `<PulseTrail>` rather than recreate the trailing-dot pattern.
 - **`DotTimeline` note:** This is one of two components (alongside `PulseTrail`) permitted to carry both accents simultaneously. Each column holds a single state, so the two accents never overlap within one column; the component enforces state priority `live > done > queued` at bucketization time
 - `✗` Primary CTA button color
@@ -380,6 +380,10 @@ Two variants, mapped to status hierarchy:
 ### Dot (live indicator)
 
 6px circle, `accent-live` fill, radius `pill`. Optionally pulses opacity `1 → 0.5 → 1` on a 2000ms linear loop. Never scale, never color change. The primary carrier is `LiveDot`; the same accent may also appear in `InlineStatus tone="live"`, a live-pill prefix, or a live-tone toast marker when every visible accent instance expresses the same semantic state.
+
+### Cube (dimensional live indicator)
+
+`<LiveCube>` is the sibling of `<LiveDot>` for surfaces that want a dimensional indicator instead of a flat dot. 4×4 CSS 3D cube at a low iso tilt (`rotateX(-22deg) rotateY(-28deg)`); all six faces paint in `--ds-accent-live` with per-face opacity tiers (top 1.0 / front-back 0.85–0.9 / left-right 0.65 / bottom 0.55) so the cube reads three-dimensional without introducing any hue. The whole cube pulses opacity `1 → 0.5 → 1` on the same 2000ms live-pulse cadence as `<LiveDot>`; parent opacity compounds with per-face opacity so lighting is preserved through the pulse. Same inline-flex row layout, same `labels` / `labelStep` / `labelHold` props, same delegation to `rotateLabels()` from the motion primitive — drop-in swap for `<LiveDot labels={...}>`. Use `<LiveDot>` as the default; reach for `<LiveCube>` when the surface warrants a dimensional read (e.g., next to the `<ThinkingCube>` vocabulary, or in toolbars where a single pinpoint cube reads stronger than a dot).
 
 ### Input
 

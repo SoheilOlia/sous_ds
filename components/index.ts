@@ -1,5 +1,5 @@
 /**
- * sous-ds component suite · v0.3.7
+ * sous-ds component suite · v0.3.8
  *
  * Every component is a reference implementation of the rules in DESIGN.md.
  * Components should prefer tokens and documented system values over ad hoc
@@ -27,6 +27,9 @@ export type { PillProps } from "./Pill";
 
 export { LiveDot } from "./LiveDot";
 export type { LiveDotProps } from "./LiveDot";
+
+export { LiveCube } from "./LiveCube";
+export type { LiveCubeProps } from "./LiveCube";
 
 export { ToastProvider, useToast } from "./Toast";
 

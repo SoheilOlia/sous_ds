@@ -4,6 +4,37 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.3.8] — 2026-04-24
+
+New `<LiveCube>` component — dimensional sibling of `<LiveDot>`.
+
+### Added
+- **`<LiveCube>`** — 4×4 CSS 3D cube live indicator. Same inline-flex
+  row layout as `<LiveDot>`, same `labels` / `labelStep` / `labelHold`
+  / `label` / `announce` / `static` API, same delegation to
+  `rotateLabels()` from the motion primitive. Drop-in swap for
+  `<LiveDot labels={...}>` when the surface warrants a dimensional
+  read.
+- All six faces paint in `--ds-accent-live`. Per-face opacity tiers
+  (top 1.0 / front–back 0.85–0.9 / left–right 0.65 / bottom 0.55)
+  produce a soft 3D lighting read at 4×4 without introducing any hue
+  variation. Whole cube pulses opacity `1 → 0.5 → 1` on the system's
+  2000ms live-pulse cadence; parent opacity compounds with per-face
+  opacity so the lighting is preserved through the pulse.
+- §08 Components demo gains a "Live cube" row directly under the
+  existing "Live dot" row, so the two vocabularies sit adjacent for
+  comparison. Same typewriter labels (AGENTING / WORKING / THINKING /
+  REASONING) drive both.
+- `<LiveCube>` added to the `--ds-accent-live` sanctioned carrier
+  allowlist across `scripts/lint.mjs` (CL07 rule), `refusals.json`
+  (R-SEMANTIC-001 `allowedFiles`), `quality-evaluator.md` CL07
+  description, and DESIGN.md `#accent-carriers`.
+- DESIGN.md Components section grows a "Cube (dimensional live
+  indicator)" subsection documenting the component and when to reach
+  for it vs `<LiveDot>`.
+
+---
+
 ## [0.3.7] — 2026-04-24
 
 ### Changed
