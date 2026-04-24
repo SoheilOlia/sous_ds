@@ -4,6 +4,56 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.3.0] — 2026-04-23
+
+New component surface — the first of the "Loaders" section. Motion
+direction: Nothing Phone's percussive, stepped language.
+
+### Added
+- **`<TetrisLoader>`** — mechanical, percussive indeterminate loader.
+  A miniature Tetris self-plays forever: seven canonical tetrominoes
+  fall one row per tick, lock into the grid, full rows flash
+  `accent-success` for one `--ds-dur-standard` beat and drop, the
+  stack resets when its ceiling fills. Every motion is stepped — no
+  continuous rotation, no springs, no opacity-pulse placeholder
+  chrome. Reads as an instrument, not a marquee.
+  - Props: `size: "sm" | "md" | "lg"`, `speed: "slow" | "normal" | "fast"`,
+    `showLabel`, `label`. Default: `md` / `normal` / `Loading`.
+  - Row cadences (ms per fall step): `slow` 300, `normal` 220, `fast` 140.
+    Deliberately slower than game Tetris — this is a loader.
+  - Bracketed mono `[Loading…]` caption under the grid by default, per
+    R-STATE-001's preferred loading vocabulary.
+  - `prefers-reduced-motion`: the game loop is disabled; the `[Loading…]`
+    label alone carries the signal. No residual animation.
+  - Adapted from a community shadcn/Tailwind snippet — game logic
+    preserved, styling layer rewritten to vanilla CSS against `--ds-*`
+    tokens so the component runs in any React environment without
+    Tailwind or a "use client" directive.
+- **§11 / Loaders** section in `preview.html` — first demo shows
+  `<TetrisLoader size="sm" speed="normal">` alongside an editorial
+  description in the manifesto body voice. §12 Do & Don't renumbered.
+- `<TetrisLoader>` added to the `--ds-accent-success` sanctioned
+  carrier allowlist across `scripts/lint.mjs` (CL07 rule),
+  `refusals.json` (R-SEMANTIC-001 `allowedFiles`), `quality-evaluator.md`
+  CL07 description, and DESIGN.md #accent-carriers.
+- New **Loaders** subsection in DESIGN.md under Components,
+  documenting the allowed loading vocabulary (bracketed mono,
+  segmented progress, TetrisLoader) and restating the ban on
+  skeleton/shimmer chrome per R-STATE-001.
+
+### Decision log
+- The upstream snippet targeted a shadcn-cli `components/ui/` path
+  with Tailwind classes. sous-ds is the *source* library (the role
+  shadcn plays for downstream apps), not a consumer; all components
+  live flat in `components/`. Tailwind was not adopted — it would
+  break the zero-dep stance and require migrating every existing
+  component. Instead the component was adapted to the system's own
+  patterns (component + paired `.css`, `--ds-*` tokens, `data-size`
+  attribute for variants, `prefersReducedMotion()` from the motion
+  primitive for a11y). Same visual intent, system-native delivery.
+
+---
+
 ## [0.2.11] — 2026-04-23
 
 First-class motion primitive. The system's animation taste is now a

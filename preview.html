@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>sous-ds / v0.2.11</title>
+<title>sous-ds / v0.3.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1727,9 +1727,99 @@ body {
   }
 }
 
+/* ============================================================
+   §11 — Loaders (TetrisLoader inline mirror)
+   Matches components/TetrisLoader.css. Line-clear uses an outline
+   flash (not opacity pulse), per R-STATE-001 — no placeholder chrome.
+   ============================================================ */
+.loader-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--ds-space-7);
+  align-items: center;
+}
+@media (max-width: 760px) {
+  .loader-row { grid-template-columns: 1fr; }
+}
+.loader-row__note { max-width: 44ch; }
+.loader-row__name {
+  font-family: var(--ds-font-mono);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ds-text-primary);
+  margin-bottom: var(--ds-space-3);
+}
+.loader-row__prose {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: -0.0075em;
+  color: var(--ds-text-secondary);
+}
+
+.ds-tetris-loader {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+}
+.ds-tetris-loader__frame {
+  display: flex;
+  flex-direction: column;
+  padding: var(--ds-space-2);
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line-strong);
+  border-radius: var(--ds-radius-xs);
+}
+.ds-tetris-loader__row { display: flex; }
+.ds-tetris-loader__cell {
+  display: block;
+  box-sizing: border-box;
+  border: 1px solid var(--ds-line);
+  background: transparent;
+  transition:
+    background var(--ds-dur-micro) var(--ds-ease-out),
+    border-color var(--ds-dur-micro) var(--ds-ease-out);
+}
+.ds-tetris-loader[data-size="sm"] .ds-tetris-loader__cell { width: 8px;  height: 8px;  }
+.ds-tetris-loader[data-size="md"] .ds-tetris-loader__cell { width: 12px; height: 12px; }
+.ds-tetris-loader[data-size="lg"] .ds-tetris-loader__cell { width: 16px; height: 16px; }
+.ds-tetris-loader__cell[data-filled] {
+  background: var(--ds-text-primary);
+  border-color: var(--ds-text-primary);
+}
+.ds-tetris-loader__cell[data-clearing] {
+  background: var(--ds-accent-success);
+  border-color: var(--ds-accent-success);
+  animation: ds-tetris-line-flash var(--ds-dur-standard) var(--ds-ease-out) forwards;
+}
+@keyframes ds-tetris-line-flash {
+  0%   { box-shadow: 0 0 0 2px var(--ds-accent-success); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.ds-tetris-loader__label {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-tetris-loader__cell { transition: none; }
+  .ds-tetris-loader__cell[data-clearing] { animation: none; box-shadow: none; }
+}
+
 
 /* ============================================================
-   08 — Do & Don't
+   §12 — Do & Don't
    ============================================================ */
 .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ds-space-7); }
 @media (max-width: 760px) { .do-dont { grid-template-columns: 1fr; } }
@@ -1790,7 +1880,7 @@ body {
         <i class="dim"></i><i></i><i></i><i class="dim"></i>
         <i></i><i></i><i class="dim"></i><i></i>
       </div>
-      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.2.11</span></h1>
+      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.3.0</span></h1>
     </div>
     <div class="status">
       <span class="clock" id="clock">00:00:00</span>
@@ -2251,10 +2341,33 @@ body {
       </div>
     </section>
 
-    <!-- ==== 11 — Do & Don't ========================================= -->
+    <!-- ==== 11 — Loaders ============================================ -->
     <section class="section" data-col="12" style="animation-delay:400ms">
       <div class="section-head">
-        <span class="section-num">11<b>/ Do &amp; Don't</b></span>
+        <span class="section-num">11<b>/ Loaders</b></span>
+        <span class="section-aside">Mechanical, percussive · motion IS the signal</span>
+      </div>
+
+      <div class="loader-row">
+        <div class="loader-row__item">
+          <div class="ds-tetris-loader" data-size="sm" id="tetris-demo" role="status" aria-label="Loading">
+            <div class="ds-tetris-loader__frame" aria-hidden="true">
+              <!-- rows/cells inserted by JS -->
+            </div>
+            <div class="ds-tetris-loader__label" aria-hidden="true">[Loading…]</div>
+          </div>
+        </div>
+        <div class="loader-row__note">
+          <div class="loader-row__name">TetrisLoader</div>
+          <p class="loader-row__prose">Seven tetrominoes fall on a fixed cadence, lock into the grid, clear full rows with a brief accent-success flash, and reset when the stack threatens the ceiling. Every motion is stepped — no continuous rotation, no springs, no placeholder pulse. The loader reads as an instrument.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==== 12 — Do & Don't ========================================= -->
+    <section class="section" data-col="12" style="animation-delay:440ms">
+      <div class="section-head">
+        <span class="section-num">12<b>/ Do &amp; Don't</b></span>
         <span class="section-aside">Enforced by the Quality Evaluator</span>
       </div>
 
@@ -2295,7 +2408,7 @@ body {
   </div>
 
   <footer class="foot">
-    <span>sous-ds · v0.2.11 · 2026-04-23</span>
+    <span>sous-ds · v0.3.0 · 2026-04-23</span>
     <span><a href="./DESIGN.md">DESIGN.md</a> · <a href="./AGENTS.md">AGENTS.md</a> · <a href="./TASTE_LOG.md">TASTE_LOG.md</a></span>
   </footer>
 
@@ -3043,6 +3156,203 @@ body {
 
   render();
   tick();
+})();
+
+/* ============================================================
+   TetrisLoader demo (§11) — vanilla mirror of components/TetrisLoader.tsx.
+   Same game logic, same class names as the inline CSS mirror above so
+   the preview matches what a React consumer sees. Respects
+   prefers-reduced-motion: grid stays empty; the [LOADING…] label
+   alone carries the signal.
+   ============================================================ */
+(function tetrisLoader () {
+  const root = document.getElementById('tetris-demo');
+  if (!root) return;
+  const frame = root.querySelector('.ds-tetris-loader__frame');
+  if (!frame) return;
+
+  const size = root.getAttribute('data-size') || 'sm';
+  const COLS = size === 'sm' ? 8 : 10;
+  const ROWS = size === 'sm' ? 14 : size === 'lg' ? 20 : 18;
+  const STEP_MS = 220; // "normal" cadence
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const PIECES = [
+    [[1,1,1,1]],
+    [[1,1],[1,1]],
+    [[0,1,0],[1,1,1]],
+    [[1,0],[1,0],[1,1]],
+    [[0,1,1],[1,1,0]],
+    [[1,1,0],[0,1,1]],
+    [[0,1],[0,1],[1,1]],
+  ];
+
+  function rotate(shape) {
+    const rows = shape.length;
+    const cols = shape[0].length;
+    const out = Array.from({ length: cols }, () => new Array(rows).fill(0));
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        out[j][rows - 1 - i] = shape[i][j];
+      }
+    }
+    return out;
+  }
+
+  function makeEmpty() {
+    return Array.from({ length: ROWS }, () =>
+      Array.from({ length: COLS }, () => ({ filled: false, clearing: false }))
+    );
+  }
+
+  // Pre-mount the cell DOM so we only mutate attributes on each frame,
+  // never reflow the tree.
+  const cells = [];
+  for (let r = 0; r < ROWS; r++) {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'ds-tetris-loader__row';
+    const rowCells = [];
+    for (let c = 0; c < COLS; c++) {
+      const cell = document.createElement('span');
+      cell.className = 'ds-tetris-loader__cell';
+      rowEl.appendChild(cell);
+      rowCells.push(cell);
+    }
+    frame.appendChild(rowEl);
+    cells.push(rowCells);
+  }
+
+  let grid = makeEmpty();
+  let piece = null;
+  let clearing = false;
+  let lastAt = 0;
+  let rafId = 0;
+
+  function makePiece() {
+    const base = PIECES[Math.floor(Math.random() * PIECES.length)];
+    let shape = base;
+    const r = Math.floor(Math.random() * 4);
+    for (let i = 0; i < r; i++) shape = rotate(shape);
+    const maxX = COLS - shape[0].length;
+    return {
+      shape,
+      x: Math.floor(Math.random() * (maxX + 1)),
+      y: -shape.length,
+    };
+  }
+
+  function canPlace(p, nx, ny) {
+    for (let r = 0; r < p.shape.length; r++) {
+      for (let c = 0; c < p.shape[r].length; c++) {
+        if (!p.shape[r][c]) continue;
+        const gx = nx + c;
+        const gy = ny + r;
+        if (gx < 0 || gx >= COLS || gy >= ROWS) return false;
+        if (gy >= 0 && grid[gy][gx].filled) return false;
+      }
+    }
+    return true;
+  }
+
+  function placePiece(p) {
+    for (let r = 0; r < p.shape.length; r++) {
+      for (let c = 0; c < p.shape[r].length; c++) {
+        if (!p.shape[r][c]) continue;
+        const gx = p.x + c;
+        const gy = p.y + r;
+        if (gy >= 0 && gy < ROWS && gx >= 0 && gx < COLS) {
+          grid[gy][gx].filled = true;
+        }
+      }
+    }
+  }
+
+  function clearFullLines() {
+    const fullRows = [];
+    for (let r = 0; r < ROWS; r++) {
+      if (grid[r].every(c => c.filled)) fullRows.push(r);
+    }
+    if (fullRows.length === 0) return;
+    clearing = true;
+    fullRows.forEach(r => {
+      grid[r].forEach(c => { c.clearing = true; });
+    });
+    renderGrid();
+    window.setTimeout(() => {
+      const remaining = grid.filter((_, i) => !fullRows.includes(i));
+      const empties = Array.from({ length: fullRows.length }, () =>
+        Array.from({ length: COLS }, () => ({ filled: false, clearing: false }))
+      );
+      grid = empties.concat(remaining);
+      clearing = false;
+      renderGrid();
+    }, 220);
+  }
+
+  function checkReset() {
+    const top = grid.slice(0, 4);
+    const tooFull = top.some(row => row.filter(c => c.filled).length > COLS * 0.7);
+    if (!tooFull) return false;
+    clearing = true;
+    window.setTimeout(() => {
+      grid = makeEmpty();
+      piece = null;
+      clearing = false;
+      renderGrid();
+    }, 300);
+    return true;
+  }
+
+  function renderGrid() {
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const cell = cells[r][c];
+        let filled = grid[r][c].filled;
+        let flash = grid[r][c].clearing;
+        if (piece && !clearing) {
+          const pr = r - piece.y;
+          const pc = c - piece.x;
+          if (
+            pr >= 0 && pr < piece.shape.length &&
+            pc >= 0 && pc < piece.shape[0].length &&
+            piece.shape[pr][pc]
+          ) {
+            filled = true;
+          }
+        }
+        if (filled) cell.setAttribute('data-filled', 'true');
+        else cell.removeAttribute('data-filled');
+        if (flash) cell.setAttribute('data-clearing', 'true');
+        else cell.removeAttribute('data-clearing');
+      }
+    }
+  }
+
+  function loop(t) {
+    if (t - lastAt >= STEP_MS) {
+      lastAt = t;
+      if (!clearing && !checkReset()) {
+        if (!piece) {
+          piece = makePiece();
+        } else {
+          const ny = piece.y + 1;
+          if (canPlace(piece, piece.x, ny)) {
+            piece.y = ny;
+          } else {
+            placePiece(piece);
+            piece = makePiece();
+            window.setTimeout(clearFullLines, 50);
+          }
+        }
+        renderGrid();
+      }
+    }
+    rafId = window.requestAnimationFrame(loop);
+  }
+
+  renderGrid();
+  if (!reduced) rafId = window.requestAnimationFrame(loop);
 })();
 </script>
 

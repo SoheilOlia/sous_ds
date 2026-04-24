@@ -223,7 +223,7 @@ The accent pair is semantic, not decorative:
 
 - `✓` `accent-success` for positive emphasis, completion, committed state, or a deliberately spotlighted good outcome
 - `✓` `accent-live` for alert, anomaly, error, negative variance, or urgent live-now state
-- `✓` Sanctioned success carriers: `SegmentedBar` when `value === total`, `DottedChart` endpoint marked as a closed positive result, a `DotTimeline` column in `done` state, or another explicitly documented completion state
+- `✓` Sanctioned success carriers: `SegmentedBar` when `value === total`, `DottedChart` endpoint marked as a closed positive result, a `DotTimeline` column in `done` state, a `TetrisLoader` row flash on line-clear, or another explicitly documented completion state
 - `✓` Sanctioned attention carriers: `LiveDot`, `InlineStatus` in `tone="live"`, a live-pill prefix, a live-tone toast marker, a sparse `DottedChart` point marking anomaly/attention, a `DotTimeline` column in `live` state, or the head dot of `PulseTrail`
 - **`PulseTrail` note:** `PulseTrail` is the canonical carrier for the "live now" agent-activity feel — a single accent-live dot sweeping left→right with a fading trail of prior events. Other components should compose `<PulseTrail>` rather than recreate the trailing-dot pattern.
 - **`DotTimeline` note:** This is one of two components (alongside `PulseTrail`) permitted to carry both accents simultaneously. Each column holds a single state, so the two accents never overlap within one column; the component enforces state priority `live > done > queued` at bucketization time
@@ -408,6 +408,16 @@ Background `surface-raised`, radius `md`, elevation level 2, 32px padding. Max-w
 ### Toast (Sonner pattern)
 
 Background `surface-raised`, radius `md`, elevation 1, 12px × 16px padding. Stack bottom-right. Enter from below (translateY 8px, opacity 0 → 1, 220ms `ease-out`). Dismiss on swipe or timeout. Live region for screen readers. Credit: Emil Kowalski's Sonner.
+
+### Loaders
+
+First-class loading vocabulary — not placeholder chrome. Every loader in the system must be **active, inspectable, and percussive**. No skeleton outlines, no shimmer gradients, no atmospheric blur (forbidden by `R-STATE-001` / `CO06`). Allowed forms:
+
+- **Bracketed mono** — `<InlineStatus tone="active">[LOADING…]</InlineStatus>`. The quietest option; use when the UI already has other motion and the loader is a small status badge.
+- **Segmented progress** — `<SegmentedBar>` with discrete square-ended blocks. Use when `value / total` is known. Signature form from Nothing's motion language — hardware-instrument honesty.
+- **`<TetrisLoader>`** — mechanical, percussive indeterminate loader. A miniature Tetris self-plays: seven tetrominoes fall on a fixed cadence, lock into the grid, full rows flash `accent-success` for one `--ds-dur-standard` beat before clearing, stack resets when the ceiling threatens. Rules it obeys: every motion stepped (no continuous rotation), no springs, no opacity-pulse placeholder chrome. Sizes `sm` / `md` / `lg`; speeds `slow` (300ms/row) / `normal` (220ms/row) / `fast` (140ms/row). Pair with the bracketed `[Loading…]` label below the grid. Under `prefers-reduced-motion` the game loop is disabled — label alone carries the signal.
+
+Loaders categorically don't use `accent-live` unless the loading state is *also* an attention state (user waiting on something that might fail). Keep them in `text-primary` / `accent-success` by default.
 
 ### Motion primitive (`sous-ds/motion`)
 

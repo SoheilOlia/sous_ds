@@ -302,14 +302,15 @@ function ruleCL07_accentCarrier(src, file) {
         "components/DottedChart.css",
         "components/DotTimeline.css",
         "components/PulseTrail.css",
+        "components/TetrisLoader.css",
         "tokens.css",
         "preview.html",
         "examples/slop-vs-system.html",
         "refusals.json",
         "SKILL.md",
       ],
-      message: "--ds-accent-success used outside sanctioned completion carriers (SegmentedBar, DottedChart, DotTimeline completed columns, PulseTrail done trail dots).",
-      suggestion: "Carry 'success' semantics via <SegmentedBar> at full completion, an explicit success endpoint in <DottedChart>, a done column in <DotTimeline>, or a done trail dot in <PulseTrail>. See DESIGN.md 'Accent discipline'.",
+      message: "--ds-accent-success used outside sanctioned completion carriers (SegmentedBar, DottedChart, DotTimeline completed columns, PulseTrail done trail dots, TetrisLoader line-clear flash).",
+      suggestion: "Carry 'success' semantics via <SegmentedBar> at full completion, an explicit success endpoint in <DottedChart>, a done column in <DotTimeline>, a done trail dot in <PulseTrail>, or a cleared line in <TetrisLoader>. See DESIGN.md 'Accent discipline'.",
     },
   ];
   const normalized = file.replace(/\\/g, "/");

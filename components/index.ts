@@ -1,5 +1,5 @@
 /**
- * sous-ds component suite · v0.2.11
+ * sous-ds component suite · v0.3.0
  *
  * Every component is a reference implementation of the rules in DESIGN.md.
  * Components should prefer tokens and documented system values over ad hoc
@@ -53,6 +53,13 @@ export type { MetricStatProps } from "./MetricStat";
 
 export { ToolCall } from "./ToolCall";
 export type { ToolCallProps } from "./ToolCall";
+
+export { TetrisLoader } from "./TetrisLoader";
+export type {
+  TetrisLoaderProps,
+  TetrisLoaderSize,
+  TetrisLoaderSpeed,
+} from "./TetrisLoader";
 
 // Motion primitive — zero-dep animation vocabulary shared across
 // components and consumers. See components/motion.ts for the rationale.

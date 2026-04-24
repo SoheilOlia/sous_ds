@@ -1,0 +1,93 @@
+/* ============================================================
+   TetrisLoader.css — mechanical, percussive loader
+   Adapted from a shadcn/Tailwind original into sous-ds tokens.
+
+   Motion rules:
+   - Cell state changes use --ds-dur-micro so transitions feel like
+     instrument ticks.
+   - Line-clear is a brief outline flash in accent-success. No opacity
+     pulse (opacity-pulse placeholder chrome is forbidden by R-STATE-001).
+   - Reduced motion disables the game loop upstream in the component;
+     this sheet just neutralizes any residual transitions.
+   ============================================================ */
+
+.ds-tetris-loader {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+}
+
+.ds-tetris-loader__frame {
+  display: flex;
+  flex-direction: column;
+  padding: var(--ds-space-2);
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line-strong);
+  border-radius: var(--ds-radius-xs);
+}
+
+.ds-tetris-loader__row {
+  display: flex;
+}
+
+.ds-tetris-loader__cell {
+  display: block;
+  box-sizing: border-box;
+  border: 1px solid var(--ds-line);
+  background: transparent;
+  transition:
+    background var(--ds-dur-micro) var(--ds-ease-out),
+    border-color var(--ds-dur-micro) var(--ds-ease-out);
+}
+
+/* Size variants — cell edge length. Grid dimensions (cols/rows) are
+   driven by the component's `size` prop; this only sets the per-cell
+   pixel count. */
+.ds-tetris-loader[data-size="sm"] .ds-tetris-loader__cell { width: 8px;  height: 8px;  }
+.ds-tetris-loader[data-size="md"] .ds-tetris-loader__cell { width: 12px; height: 12px; }
+.ds-tetris-loader[data-size="lg"] .ds-tetris-loader__cell { width: 16px; height: 16px; }
+
+/* Filled cell — solid block in primary text color. Border matches
+   background so the cell reads as a unit, not a framed square. */
+.ds-tetris-loader__cell[data-filled] {
+  background: var(--ds-text-primary);
+  border-color: var(--ds-text-primary);
+}
+
+/* Line-clear flash — the rows about to be removed glow accent-success
+   for one standard-duration beat before being dropped. Outline spread
+   to 0 over the run so the flash reads as a brief percussive "hit."
+   No opacity oscillation. */
+.ds-tetris-loader__cell[data-clearing] {
+  background: var(--ds-accent-success);
+  border-color: var(--ds-accent-success);
+  animation: ds-tetris-line-flash var(--ds-dur-standard) var(--ds-ease-out) forwards;
+}
+
+@keyframes ds-tetris-line-flash {
+  0%   { box-shadow: 0 0 0 2px var(--ds-accent-success); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.ds-tetris-loader__label {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-tetris-loader__cell {
+    transition: none;
+  }
+  .ds-tetris-loader__cell[data-clearing] {
+    animation: none;
+    box-shadow: none;
+  }
+}
