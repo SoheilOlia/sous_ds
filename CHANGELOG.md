@@ -4,6 +4,59 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.2.11] — 2026-04-23
+
+First-class motion primitive. The system's animation taste is now a
+named, zero-dep module instead of patterns scattered across components.
+
+### Added
+- **`sous-ds/motion`** subpath (`./components/motion.ts`) — a ~200-line
+  zero-dependency motion primitive that every component and every
+  downstream consumer pulls from. Exports:
+  - `tween({ from, to, duration, easing, onUpdate, signal })` — RAF
+    numeric interpolation, cancellable via `AbortSignal`.
+  - `typewriter({ text, step, onUpdate, signal })` — character reveal.
+  - `rotateLabels({ labels, step, hold, onUpdate, onLabelComplete,
+    signal })` — LiveDot-style type-hold-erase-advance loop.
+  - `stagger({ count, step, onStep, signal })` — JS-driven staggered
+    sequences.
+  - `easings` — named curves approximating the system's CSS
+    cubic-beziers (`easeOutCubic`, `easeOutStrong`, `easeInOutSine`,
+    `easeInOutStrong`).
+  - `prefersReducedMotion()` — plain function; every animator short-
+    circuits internally when true.
+- Consumers can import from the convenience barrel
+  (`import { tween } from "sous-ds"`) or the tree-shakeable subpath
+  (`import { tween } from "sous-ds/motion"`).
+- New "Motion primitive" subsection in `DESIGN.md` documenting the
+  vocabulary + the rationale for not taking a framer-motion
+  dependency (system ethos of "restraint-led ... motion under 300ms",
+  runtime-agnostic AI-native generation, zero-deps-for-propagation).
+
+### Changed
+- `<LiveDot>` now delegates its typewriter rotation loop to
+  `rotateLabels()` from the motion primitive. Removed the three-phase
+  state machine (typing / holding / erasing) — one `useEffect` +
+  `AbortController` replaces ~40 lines of imperative state juggling,
+  and the rotation cadence matches exactly what any consumer gets when
+  they call `rotateLabels()` directly.
+
+### Decision log
+- Evaluated `framer-motion` as a dependency for "upgrade all animations
+  and micro-interactions." Rejected in favor of the first-party motion
+  primitive. Leverage reasoning: a zero-dep system installs in any
+  environment (Next.js, Vite, RSC, plain HTML, Astro, Figma Make), a
+  React-only library locks the whole design system to a single runtime
+  and version matrix. Taste propagation comes from tokenized helpers
+  (`tween`, `typewriter`) enforcing cadence at the API boundary, not
+  from an imperative `whileHover={anything}` escape hatch. And "AI-
+  native" generation tools emit UIs in multiple frameworks — CSS +
+  small RAF helpers are universal, framer-motion is dead weight
+  everywhere except React. See DESIGN.md "Motion primitive" for the
+  full rationale.
+
+---
+
 ## [0.2.10] — 2026-04-23
 
 §10 redesigned as a live activity feed coupled to the §09 scrubber.
