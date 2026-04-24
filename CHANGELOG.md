@@ -4,6 +4,45 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.3.4] — 2026-04-24
+
+New `<ThinkingCube>` agent-thinking indicator + §11 row alignment fix.
+
+### Added
+- **`<ThinkingCube>`** — single 16×16 CSS 3D cube paired with a
+  rotating mono label. Replaces the red-dot `<LiveDot labels={...}>`
+  pattern as the canonical agent-thinking indicator. The cube ticks
+  through discrete 90° face-flips on a 2000ms loop (stepped keyframes
+  — percussive, not smooth-spin) while labels type through
+  `["AGENTING", "WORKING", "THINKING", "REASONING"]` via
+  `rotateLabels()` from the motion primitive. Shares the typewriter
+  cadence with `<LiveDot>` verbatim.
+- Low iso tilt (`-8deg` X, `-12deg` Y base) — cube reads as a cube,
+  not the diamond-silhouette full iso view that `<BoxLoader>` uses.
+  Grayscale face shading matches the rest of the system
+  (top=`text-primary`, front=`text-secondary`, side/back/bottom
+  =`text-muted`). No hues.
+- `prefers-reduced-motion`: cube freezes at its base angle; labels
+  snap between states at the hold interval.
+- Exported from `sous-ds` and `sous-ds/components`.
+
+### Changed
+- **§08 Components demo**: the `Live dot` row swapped to
+  `Thinking cube`. Same typewriter labels (AGENTING / WORKING /
+  THINKING / REASONING) drive the new cube indicator. `<LiveDot>` the
+  component still ships — it's just no longer the shown indicator in
+  the preview's agent-state row.
+- **§11 Loaders row alignment**: `.loader-row { align-items: center }`
+  → `align-items: start`. With each loader having a different visual
+  height, centered alignment put name/meta captions at different Y
+  positions across rows, breaking horizontal rhythm. Top-align keeps
+  the three rows in sync.
+- **§11 DotLoader** demo now includes a `[Loading…]` label beneath
+  its grid, matching the Tetris/Box visual structure. Same mono
+  uppercase label vocabulary.
+
+---
+
 ## [0.3.3] — 2026-04-24
 
 Third loader — **DotLoader** — plus a §11 consistency sweep.

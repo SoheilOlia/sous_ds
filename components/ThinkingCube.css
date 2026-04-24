@@ -1,0 +1,136 @@
+/* ============================================================
+   ThinkingCube.css — 16×16 cube indicator + rotating mono labels.
+
+   Layout: inline-flex row so the cube sits flush with the typewriter
+   text and the baseline lines up with the surrounding copy.
+   ============================================================ */
+
+.ds-thinking-cube {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  vertical-align: middle;
+
+  --ds-thinking-cube-edge: 16px;
+}
+
+/* Stage carries perspective so the cube has real depth rather than
+   reading as a flat rotating square. Sized to contain the tilted
+   cube without clipping. */
+.ds-thinking-cube__stage {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--ds-thinking-cube-edge) * 1.5);
+  height: calc(var(--ds-thinking-cube-edge) * 1.5);
+  perspective: 120px;
+  flex: none;
+}
+
+/*
+ * Base orientation: a small iso tilt so a slice of the top face is
+ * visible at rest (reads as "cube, slightly angled"). The animation
+ * below overrides the rotateY for the spin cycle and keeps the X
+ * tilt constant.
+ *
+ * Unlike BoxLoader's full 30/45° iso, here the X is -8deg and the
+ * base Y is -12deg — the silhouette stays box-shaped rather than
+ * diamond-shaped.
+ */
+.ds-thinking-cube__cube {
+  position: relative;
+  width: var(--ds-thinking-cube-edge);
+  height: var(--ds-thinking-cube-edge);
+  transform-style: preserve-3d;
+  animation: ds-thinking-cube-rotate 2000ms linear infinite;
+}
+
+.ds-thinking-cube[data-static] .ds-thinking-cube__cube,
+.ds-thinking-cube__cube[data-paused] {
+  animation: none;
+  transform: rotateX(-8deg) rotateY(-12deg);
+}
+
+.ds-thinking-cube__face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ds-thinking-cube-edge);
+  height: var(--ds-thinking-cube-edge);
+  outline: 1px solid var(--ds-line-strong);
+  outline-offset: -1px;
+}
+
+/* Face shading: top = primary (lit from above), front = secondary,
+   sides/back/bottom = muted. Grayscale only. */
+.ds-thinking-cube__face--front  { background: var(--ds-text-secondary); transform: translateZ(calc(var(--ds-thinking-cube-edge) / 2)); }
+.ds-thinking-cube__face--back   { background: var(--ds-text-muted);     transform: rotateY(180deg) translateZ(calc(var(--ds-thinking-cube-edge) / 2)); }
+.ds-thinking-cube__face--right  { background: var(--ds-text-muted);     transform: rotateY(90deg)  translateZ(calc(var(--ds-thinking-cube-edge) / 2)); }
+.ds-thinking-cube__face--left   { background: var(--ds-text-muted);     transform: rotateY(-90deg) translateZ(calc(var(--ds-thinking-cube-edge) / 2)); }
+.ds-thinking-cube__face--top    { background: var(--ds-text-primary);   transform: rotateX(90deg)  translateZ(calc(var(--ds-thinking-cube-edge) / 2)); }
+.ds-thinking-cube__face--bottom { background: var(--ds-text-muted);     transform: rotateX(-90deg) translateZ(calc(var(--ds-thinking-cube-edge) / 2)); }
+
+/*
+ * Stepped rotation: four 90° face-turns per 2s loop. Each face holds
+ * for ~20% of the cycle (400ms) then flips to the next over ~5%
+ * (100ms). Produces the percussive, mechanical cadence that matches
+ * BoxLoader and the rest of the system's Nothing-aligned motion
+ * vocabulary — not a continuous smooth spin.
+ *
+ * The animation overrides the Y rotation; the X stays fixed at
+ * -8deg so the top face never disappears completely.
+ */
+@keyframes ds-thinking-cube-rotate {
+  0%,  20% { transform: rotateX(-8deg) rotateY(  0deg); }
+  25%, 45% { transform: rotateX(-8deg) rotateY(-90deg); }
+  50%, 70% { transform: rotateX(-8deg) rotateY(-180deg); }
+  75%, 95% { transform: rotateX(-8deg) rotateY(-270deg); }
+  100%     { transform: rotateX(-8deg) rotateY(-360deg); }
+}
+
+/* Screen-reader-only announcement; mirrors the LiveDot pattern. */
+.ds-thinking-cube__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ds-thinking-cube__label {
+  color: var(--ds-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-thinking-cube__caret {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 2px;
+  background: currentColor;
+  vertical-align: -0.12em;
+  animation: ds-thinking-cube-caret-blink 1000ms steps(2, start) infinite;
+}
+
+@keyframes ds-thinking-cube-caret-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-thinking-cube__cube { animation: none; transform: rotateX(-8deg) rotateY(-12deg); }
+  .ds-thinking-cube__caret { animation: none; opacity: 1; }
+}
