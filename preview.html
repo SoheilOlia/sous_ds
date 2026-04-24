@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>sous-ds / v0.3.2</title>
+<title>sous-ds / v0.3.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1579,27 +1579,6 @@ body {
   color: var(--ds-text-primary);
   margin-bottom: var(--ds-space-3);
 }
-.variant__note {
-  /* Byte-for-byte match to .site-copy (§01 manifesto) — the system's
-     only established body voice. Any drift (line-height, max-width)
-     makes the two voices read as different families. */
-  margin: 0;
-  max-width: 38ch;
-  color: var(--ds-text-secondary);
-  font-family: var(--ds-font-display);
-  font-size: 22px;
-  line-height: 1.1;
-  font-weight: 400;
-  letter-spacing: -0.0075em;
-}
-.variant__note code {
-  /* Inline code stays in Geist Mono so token names like `accent-live`
-     read as identifiers, not prose. Slightly smaller so they sit in
-     the line rhythm of the display-face body. */
-  font-family: var(--ds-font-mono);
-  font-size: 0.82em;
-  color: var(--ds-text-primary);
-}
 
 .variant__chart {
   display: block;
@@ -1761,7 +1740,7 @@ body {
   color: var(--ds-text-primary);
   margin-bottom: var(--ds-space-3);
 }
-.loader-row__controls {
+.loader-row__meta {
   display: flex;
   flex-wrap: wrap;
   gap: var(--ds-space-3) var(--ds-space-5);
@@ -1927,6 +1906,27 @@ body {
   .ds-box-loader__box--4 { transform: translate(200%, 0); }
 }
 
+/* ---- DotLoader (inline mirror of components/DotLoader.css) ---- */
+.ds-dot-loader {
+  display: grid;
+  grid-template-columns: repeat(7, var(--ds-size-dot));
+  gap: var(--ds-space-1);
+  width: fit-content;
+  font-family: var(--ds-font-mono);
+}
+.ds-dot-loader__dot {
+  width: var(--ds-size-dot);
+  height: var(--ds-size-dot);
+  border-radius: var(--ds-radius-xs);
+  background: var(--ds-line-strong);
+}
+.ds-dot-loader__dot.active {
+  background: var(--ds-text-primary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-dot-loader__dot { transition: none; }
+}
+
 
 /* ============================================================
    §12 — Do & Don't
@@ -1990,7 +1990,7 @@ body {
         <i class="dim"></i><i></i><i></i><i class="dim"></i>
         <i></i><i></i><i class="dim"></i><i></i>
       </div>
-      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.3.2</span></h1>
+      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.3.3</span></h1>
     </div>
     <div class="status">
       <span class="clock" id="clock">00:00:00</span>
@@ -2468,7 +2468,7 @@ body {
         </div>
         <div class="loader-row__note">
           <div class="loader-row__name">TetrisLoader</div>
-          <div class="loader-row__controls">
+          <div class="loader-row__meta">
             <span>← → move</span>
             <span>↑ rotate</span>
             <span>↓ drop</span>
@@ -2513,8 +2513,20 @@ body {
         </div>
         <div class="loader-row__note">
           <div class="loader-row__name">BoxLoader</div>
-          <div class="loader-row__controls">
+          <div class="loader-row__meta">
             <span>4 iso cubes · 2s loop · grayscale lighting</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="loader-row">
+        <div class="loader-row__item">
+          <div class="ds-dot-loader" id="dot-loader-demo" role="status" aria-label="Loading"></div>
+        </div>
+        <div class="loader-row__note">
+          <div class="loader-row__name">DotLoader</div>
+          <div class="loader-row__meta">
+            <span>7×7 grid · frame-driven · 100ms per frame · percussive snap</span>
           </div>
         </div>
       </div>
@@ -2564,7 +2576,7 @@ body {
   </div>
 
   <footer class="foot">
-    <span>sous-ds · v0.3.2 · 2026-04-24</span>
+    <span>sous-ds · v0.3.3 · 2026-04-24</span>
     <span><a href="./DESIGN.md">DESIGN.md</a> · <a href="./AGENTS.md">AGENTS.md</a> · <a href="./TASTE_LOG.md">TASTE_LOG.md</a></span>
   </footer>
 
@@ -3579,6 +3591,67 @@ body {
 
   renderGrid();
   if (!reduced) rafId = window.requestAnimationFrame(loop);
+})();
+
+/* ============================================================
+   DotLoader demo (§11) — vanilla mirror of components/DotLoader.tsx.
+   Each frame is an array of active cell indices (0–48) on a 7×7
+   grid. At `FRAME_MS` per step, the loop walks the frames forever.
+   The included sequence traces a Snake-style path so the loader
+   reads as an active game, not a marquee. Percussive — no CSS
+   transition; active cells just snap on and off.
+   ============================================================ */
+(function dotLoader () {
+  const root = document.getElementById('dot-loader-demo');
+  if (!root) return;
+
+  const GRID_SIZE = 49; // 7 × 7
+  const FRAME_MS = 100;
+  const frames = [
+    [14, 7, 0, 8, 6, 13, 20],
+    [14, 7, 13, 20, 16, 27, 21],
+    [14, 20, 27, 21, 34, 24, 28],
+    [27, 21, 34, 28, 41, 32, 35],
+    [34, 28, 41, 35, 48, 40, 42],
+    [34, 28, 41, 35, 48, 42, 46],
+    [34, 28, 41, 35, 48, 42, 38],
+    [34, 28, 41, 35, 48, 30, 21],
+    [34, 28, 41, 48, 21, 22, 14],
+    [34, 28, 41, 21, 14, 16, 27],
+    [34, 28, 21, 14, 10, 20, 27],
+    [28, 21, 14,  4, 13, 20, 27],
+    [28, 21, 14, 12,  6, 13, 20],
+    [28, 21, 14,  6, 13, 20, 11],
+    [28, 21, 14,  6, 13, 20, 10],
+    [14,  6, 13, 20,  9,  7, 21],
+  ];
+
+  // Mount the 49 dots once; the driver only toggles their .active class.
+  const dots = [];
+  for (let i = 0; i < GRID_SIZE; i++) {
+    const d = document.createElement('div');
+    d.className = 'ds-dot-loader__dot';
+    root.appendChild(d);
+    dots.push(d);
+  }
+
+  let idx = 0;
+  function applyFrame (i) {
+    const frame = frames[i];
+    if (!frame) return;
+    for (let n = 0; n < GRID_SIZE; n++) {
+      dots[n].classList.toggle('active', frame.indexOf(n) !== -1);
+    }
+  }
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  applyFrame(0);
+  if (!reduced) {
+    window.setInterval(function () {
+      idx = (idx + 1) % frames.length;
+      applyFrame(idx);
+    }, FRAME_MS);
+  }
 })();
 </script>
 

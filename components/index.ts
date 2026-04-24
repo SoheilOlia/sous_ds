@@ -1,5 +1,5 @@
 /**
- * sous-ds component suite · v0.3.2
+ * sous-ds component suite · v0.3.3
  *
  * Every component is a reference implementation of the rules in DESIGN.md.
  * Components should prefer tokens and documented system values over ad hoc
@@ -63,6 +63,9 @@ export type {
 
 export { BoxLoader } from "./BoxLoader";
 export type { BoxLoaderProps } from "./BoxLoader";
+
+export { DotLoader } from "./DotLoader";
+export type { DotLoaderProps } from "./DotLoader";
 
 // Motion primitive — zero-dep animation vocabulary shared across
 // components and consumers. See components/motion.ts for the rationale.

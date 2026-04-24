@@ -1,0 +1,43 @@
+/* ============================================================
+   DotLoader.css — 7×7 frame-driven dot grid.
+
+   No CSS transition between active/inactive: each frame change
+   snaps. That's the percussive frame-accurate feel the upstream
+   component was going for, and it matches Nothing's "click, not
+   swoosh" motion language the rest of the system follows.
+
+   Colors:
+   - inactive dot → --ds-line-strong (the same 14% white used for
+     stronger-than-hairline separators; reads as a ghosted dot)
+   - active dot   → --ds-text-primary
+   No hues; grayscale only.
+   ============================================================ */
+
+.ds-dot-loader {
+  display: grid;
+  grid-template-columns: repeat(7, var(--ds-size-dot));
+  gap: var(--ds-space-1);
+  width: fit-content;
+  font-family: var(--ds-font-mono);
+}
+
+.ds-dot-loader__dot {
+  width: var(--ds-size-dot);
+  height: var(--ds-size-dot);
+  border-radius: var(--ds-radius-xs);
+  background: var(--ds-line-strong);
+}
+
+.ds-dot-loader__dot.active {
+  background: var(--ds-text-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The React component's interval doesn't pause under reduced motion
+     (by design — the frame metaphor is what communicates "loading").
+     The CSS here simply ensures no transitions creep in, so whichever
+     frame is current reads cleanly and snaps if the loop is still
+     running. Hosts that want a fully-static loader should set the
+     `isPlaying={false}` prop. */
+  .ds-dot-loader__dot { transition: none; }
+}

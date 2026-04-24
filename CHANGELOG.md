@@ -4,6 +4,41 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.3.3] — 2026-04-24
+
+Third loader — **DotLoader** — plus a §11 consistency sweep.
+
+### Added
+- **`<DotLoader>`** — 7×7 dot grid driven by a frame list. Required
+  prop `frames: number[][]`; each frame is an array of active cell
+  indices (0–48). Advances through frames at `duration` ms per step
+  (default 100). Inactive dots paint in `--ds-line-strong` (ghosted);
+  active dots in `--ds-text-primary`. **No CSS transition between
+  states** — each frame snaps, preserving the percussive frame-
+  accurate feel the upstream snippet was going for (and matching
+  Nothing's "click, not swoosh" motion language the rest of the
+  system follows). Supports `isPlaying`, `repeatCount` (`-1` = loop
+  forever, default), and `onComplete` callback.
+- §11 Loaders gains a third row: `<DotLoader>` showing a 16-frame
+  Snake-style sequence (the demo-game data from the upstream
+  snippet), seeded from vanilla JS in the preview so the rendering
+  path matches what React consumers get.
+- Adapted from a community Tailwind / `cn` snippet. Logic preserved
+  verbatim; only the styling layer rewritten to vanilla CSS against
+  `--ds-*` tokens so the component runs without Tailwind or a
+  classnames utility.
+
+### Changed
+- **Consistency sweep.** `.loader-row__controls` renamed to
+  `.loader-row__meta` — only TetrisLoader has actual controls; the
+  same slot under Box/Dot carries a description. Generic name fits
+  both uses. Both rows updated to the new class.
+- Removed orphaned `.variant__note` and `.variant__note code` CSS
+  rules left over from the v0.3.1 §10 prose trim. No HTML referenced
+  them anymore.
+
+---
+
 ## [0.3.2] — 2026-04-24
 
 Second loader — **BoxLoader**.
