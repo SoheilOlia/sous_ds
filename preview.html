@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>sous-ds / v0.3.8</title>
+<title>sous-ds / v0.3.9</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -278,7 +278,7 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ds-text-secondary);
-  --ds-livecube-edge: 4px;
+  --ds-livecube-edge: 8px;
 }
 .ds-livecube__stage {
   display: inline-flex;
@@ -286,7 +286,7 @@ body {
   justify-content: center;
   width: calc(var(--ds-livecube-edge) * 2);
   height: calc(var(--ds-livecube-edge) * 2);
-  perspective: 40px;
+  perspective: calc(var(--ds-livecube-edge) * 10);
   flex: none;
 }
 .ds-livecube__cube {
@@ -1796,13 +1796,12 @@ body {
    ============================================================ */
 .loader-row {
   display: grid;
-  grid-template-columns: auto 1fr;
+  /* Fixed-width left column so all four loader visuals share a
+     common horizontal axis. Without this, BoxLoader's rotated iso
+     bounding box pushed it off-center relative to the axis-aligned
+     Tetris / Dot / Square above and below. */
+  grid-template-columns: 160px 1fr;
   gap: var(--ds-space-7);
-  /* align-items: start so the name + meta on the right always line up
-     at the top of the row, regardless of how tall/short the loader
-     visual on the left is. With `center`, each row's text landed at a
-     different Y relative to the row's top — inconsistent rhythm across
-     the three rows. */
   align-items: start;
   padding: var(--ds-space-6) 0;
   border-top: 1px solid var(--ds-line);
@@ -1813,6 +1812,15 @@ body {
 }
 @media (max-width: 760px) {
   .loader-row { grid-template-columns: 1fr; }
+}
+.loader-row__item {
+  /* Center the loader visual horizontally within the fixed column so
+     varied loader widths all read as centered on the same vertical
+     axis. */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-4);
 }
 .loader-row__note { max-width: 44ch; }
 .loader-row__name {
@@ -1834,6 +1842,39 @@ body {
   letter-spacing: var(--ds-type-label-track);
   text-transform: uppercase;
   color: var(--ds-text-muted);
+}
+
+/* Typewriter [LOADING_] caption shared by all four §11 loader
+   demos — matches the <LiveDot> caption voice (12px mono uppercase
+   with blinking caret) instead of the quieter 11px label voice. The
+   text span's content is driven by JS; the rest is static chrome. */
+.loader-typewriter {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--ds-font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.loader-typewriter__caret {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 2px;
+  background: currentColor;
+  vertical-align: -0.12em;
+  animation: loader-typewriter-caret-blink 1000ms steps(2, start) infinite;
+}
+@keyframes loader-typewriter-caret-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loader-typewriter__caret { animation: none; opacity: 1; }
 }
 
 .ds-tetris-loader {
@@ -2011,25 +2052,6 @@ body {
   .ds-dot-loader__dot { transition: none; }
 }
 
-/* Preview wrapper: grid + [Loading…] label, mirroring Tetris/Box
-   structure so the three §11 loaders share visual composition. */
-.ds-dot-loader-demo {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--ds-space-4);
-}
-.ds-dot-loader-demo__label {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-type-label-size);
-  line-height: var(--ds-type-label-lh);
-  letter-spacing: var(--ds-type-label-track);
-  text-transform: uppercase;
-  color: var(--ds-text-secondary);
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-}
-
 /* ---- SquareLoader (inline mirror of components/SquareLoader.css) ---- */
 .ds-square-loader {
   display: inline-flex;
@@ -2164,7 +2186,7 @@ body {
         <i class="dim"></i><i></i><i></i><i class="dim"></i>
         <i></i><i></i><i class="dim"></i><i></i>
       </div>
-      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.3.8</span></h1>
+      <h1>sous-ds<span class="sep">/</span><span class="ver">v0.3.9</span></h1>
     </div>
     <div class="status">
       <span class="clock" id="clock">00:00:00</span>
@@ -2581,7 +2603,7 @@ body {
               <span class="ds-livecube__face ds-livecube__face--bottom"></span>
             </span>
           </span>
-          <span class="ds-livecube__sr" aria-live="polite" id="livecube-demo-sr">Working</span>
+          <span class="ds-livecube__sr" aria-live="polite" id="livecube-demo-sr">Analyzing</span>
           <span class="ds-livecube__label" aria-hidden="true"><span id="livecube-demo-label"></span><span class="ds-livecube__caret" aria-hidden="true"></span></span>
         </span>
       </div>
@@ -2655,8 +2677,8 @@ body {
             <div class="ds-tetris-loader__frame" aria-hidden="true">
               <!-- rows/cells inserted by JS -->
             </div>
-            <div class="ds-tetris-loader__label" aria-hidden="true">[Loading…]</div>
           </div>
+          <div class="loader-typewriter" aria-hidden="true">[<span class="loader-typewriter__text"></span><span class="loader-typewriter__caret"></span>]</div>
         </div>
         <div class="loader-row__note">
           <div class="loader-row__name">TetrisLoader</div>
@@ -2700,8 +2722,8 @@ body {
                 </div>
               </div>
             </div>
-            <div class="ds-box-loader__label" aria-hidden="true">[Loading…]</div>
           </div>
+          <div class="loader-typewriter" aria-hidden="true">[<span class="loader-typewriter__text"></span><span class="loader-typewriter__caret"></span>]</div>
         </div>
         <div class="loader-row__note">
           <div class="loader-row__name">BoxLoader</div>
@@ -2713,10 +2735,8 @@ body {
 
       <div class="loader-row">
         <div class="loader-row__item">
-          <div class="ds-dot-loader-demo">
-            <div class="ds-dot-loader" id="dot-loader-demo" role="status" aria-label="Loading"></div>
-            <div class="ds-dot-loader-demo__label" aria-hidden="true">[Loading…]</div>
-          </div>
+          <div class="ds-dot-loader" id="dot-loader-demo" role="status" aria-label="Loading"></div>
+          <div class="loader-typewriter" aria-hidden="true">[<span class="loader-typewriter__text"></span><span class="loader-typewriter__caret"></span>]</div>
         </div>
         <div class="loader-row__note">
           <div class="loader-row__name">DotLoader</div>
@@ -2740,8 +2760,8 @@ body {
                 <span class="ds-square-loader__square ds-square-loader__square--7"></span>
               </div>
             </div>
-            <div class="ds-square-loader__label" aria-hidden="true">[Loading…]</div>
           </div>
+          <div class="loader-typewriter" aria-hidden="true">[<span class="loader-typewriter__text"></span><span class="loader-typewriter__caret"></span>]</div>
         </div>
         <div class="loader-row__note">
           <div class="loader-row__name">SquareLoader</div>
@@ -2796,7 +2816,7 @@ body {
   </div>
 
   <footer class="foot">
-    <span>sous-ds · v0.3.8 · 2026-04-24</span>
+    <span>sous-ds · v0.3.9 · 2026-04-24</span>
     <span><a href="./DESIGN.md">DESIGN.md</a> · <a href="./AGENTS.md">AGENTS.md</a> · <a href="./TASTE_LOG.md">TASTE_LOG.md</a></span>
   </footer>
 
@@ -3563,17 +3583,18 @@ body {
 })();
 
 /* ============================================================
-   LiveCube — same rotating-typewriter as LiveDot, targeting the
-   livecube-demo-* elements in the row below. Factored as a sibling
-   IIFE rather than a shared function so each row stays self-
-   contained and can be lifted into another surface if needed.
+   LiveCube — same rotating-typewriter mechanics as LiveDot, but
+   targeting a disjoint label set so the two rows are never showing
+   the same word at the same time. LiveDot cycles the
+   AGENTING/WORKING/THINKING/REASONING set; LiveCube cycles
+   ANALYZING/PROCESSING/COMPOSING/PLANNING.
    ============================================================ */
 (function liveCubeRotating () {
   const label = document.getElementById('livecube-demo-label');
   const sr    = document.getElementById('livecube-demo-sr');
   if (!label || !sr) return;
 
-  const labels = ['AGENTING', 'WORKING', 'THINKING', 'REASONING'];
+  const labels = ['ANALYZING', 'PROCESSING', 'COMPOSING', 'PLANNING'];
   const step = 50;
   const hold = 2000;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -3628,6 +3649,58 @@ body {
 
   render();
   tick();
+})();
+
+/* ============================================================
+   Loader typewriter captions (§11) — types LOADING forever on
+   each .loader-typewriter__text. Staggered 280ms per instance
+   so the four loaders don't all tick in lockstep.
+   ============================================================ */
+(function loaderTypewriters () {
+  const targets = document.querySelectorAll('.loader-typewriter__text');
+  if (!targets.length) return;
+  const WORD = 'LOADING';
+  const STEP = 50;
+  const HOLD = 2000;
+  const CASCADE = 280;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  targets.forEach(function (target, i) {
+    if (reduced) {
+      target.textContent = WORD;
+      return;
+    }
+    let visible = '';
+    let phase = 'typing';
+
+    function tick () {
+      if (phase === 'typing') {
+        if (visible.length < WORD.length) {
+          visible = WORD.slice(0, visible.length + 1);
+          target.textContent = visible;
+          window.setTimeout(tick, STEP);
+        } else {
+          phase = 'holding';
+          window.setTimeout(tick, HOLD);
+        }
+      } else if (phase === 'holding') {
+        phase = 'erasing';
+        tick();
+      } else if (phase === 'erasing') {
+        if (visible.length > 0) {
+          visible = visible.slice(0, -1);
+          target.textContent = visible;
+          window.setTimeout(tick, STEP);
+        } else {
+          phase = 'typing';
+          tick();
+        }
+      }
+    }
+
+    // Staggered start so the four captions don't tick together.
+    window.setTimeout(tick, i * CASCADE);
+  });
 })();
 
 /* ============================================================

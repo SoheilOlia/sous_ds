@@ -4,6 +4,44 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.3.9] — 2026-04-24
+
+Three polish items across §08 and §11.
+
+### Changed
+- **§11 loader alignment.** `.loader-row` switched from
+  `grid-template-columns: auto 1fr` to a fixed 160px left column so
+  all four loaders share a common horizontal axis. `.loader-row__item`
+  is now a centered flex column, eliminating the off-center read
+  where `<BoxLoader>`'s rotated iso bounding box sat asymmetrically
+  next to the axis-aligned siblings.
+- **§11 loader captions are now animated.** The static
+  `[Loading…]` labels on Tetris / Box / Dot / Square are replaced
+  with a typewriter treatment: mono 12px (matching the `<LiveDot>`
+  caption voice, up from the quieter 11px label voice), types
+  `LOADING` character-by-character, holds, erases, retypes forever.
+  A blinking caret sits after the last character. The four captions
+  are staggered 280ms apart so they don't tick in lockstep.
+  `prefers-reduced-motion` shows a static `[LOADING]` with the caret
+  frozen.
+- **`<LiveCube>` edge 4px → 8px.** The 4px rendering was too small
+  for the 3D form to read. Default `--ds-livecube-edge` is now 8px.
+  Stage dimensions and perspective both scale off the edge
+  (`perspective: calc(var(--ds-livecube-edge) * 10)`) so consumers
+  overriding the edge keep the same 3D feel.
+- **`<LiveDot>` and `<LiveCube>` now cycle disjoint label sets in
+  the preview.** LiveDot continues on the original
+  `AGENTING / WORKING / THINKING / REASONING` cycle; LiveCube moves
+  to `ANALYZING / PROCESSING / COMPOSING / PLANNING`. The two rows
+  never show the same word at the same time.
+
+### Removed
+- Orphaned `.ds-dot-loader-demo` + `.ds-dot-loader-demo__label` CSS
+  in `preview.html` (the DotLoader row was flattened as part of this
+  pass — the wrapper is no longer used).
+
+---
+
 ## [0.3.8] — 2026-04-24
 
 New `<LiveCube>` component — dimensional sibling of `<LiveDot>`.

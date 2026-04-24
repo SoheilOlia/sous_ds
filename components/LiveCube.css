@@ -27,19 +27,20 @@
   text-transform: uppercase;
   color: var(--ds-text-secondary);
 
-  --ds-livecube-edge: 4px;
+  --ds-livecube-edge: 8px;
 }
 
 /* Stage provides a little extra room around the rotated cube so the
-   tilted geometry doesn't clip against neighbors. Small perspective
-   so the depth is present but subtle at this scale. */
+   tilted geometry doesn't clip against neighbors. Perspective scales
+   with edge length (edge × 10) so the 3D feel stays consistent when
+   consumers override --ds-livecube-edge to a different size. */
 .ds-livecube__stage {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: calc(var(--ds-livecube-edge) * 2);
   height: calc(var(--ds-livecube-edge) * 2);
-  perspective: 40px;
+  perspective: calc(var(--ds-livecube-edge) * 10);
   flex: none;
 }
 
