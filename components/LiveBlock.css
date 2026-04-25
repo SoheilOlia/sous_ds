@@ -1,0 +1,136 @@
+/* ============================================================
+   LiveBlock.css — inline chasing-blocks live indicator, parallel to
+   <LiveDot>. Same animation as <BlockLoader> (7 blocks chasing an
+   8-position 3×3 path on a ten-second loop) but shrunk to a 12px
+   footprint so it sits inline with mono body copy.
+
+   Typography / layout mirror <LiveDot> exactly (inline-flex row,
+   mono 12px uppercase secondary ink, space-3 gap) so the two can
+   be swapped surface-for-surface without upstream layout drift.
+
+   Color: blocks paint in --ds-text-primary, not --ds-accent-live.
+   <LiveDot> earns the red because a single static dot needs hue to
+   carry "live"; here the chasing motion already carries the signal,
+   so color stays neutral. No additional opacity pulse on top —
+   would compete with the movement and read as noise.
+   ============================================================ */
+
+.ds-liveblock {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+
+  /* Tunables — consumers can override to scale the indicator.
+     Default: cell 3px, gap 1px → step 4px → 12px outer. Compact
+     enough to align with the mono 12px label x-height. */
+  --ds-liveblock-cell: 3px;
+  --ds-liveblock-gap: 1px;
+  --ds-liveblock-step: calc(
+    var(--ds-liveblock-cell) + var(--ds-liveblock-gap)
+  );
+}
+
+.ds-liveblock__stage {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--ds-liveblock-step) * 3);
+  height: calc(var(--ds-liveblock-step) * 3);
+  flex: none;
+}
+
+.ds-liveblock__grid {
+  position: relative;
+  width: calc(var(--ds-liveblock-step) * 3);
+  height: calc(var(--ds-liveblock-step) * 3);
+}
+
+.ds-liveblock__block {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ds-liveblock-cell);
+  height: var(--ds-liveblock-cell);
+  background: var(--ds-text-primary);
+  animation: ds-liveblock-path 10000ms ease-in-out infinite both;
+}
+
+.ds-liveblock[data-static] .ds-liveblock__block {
+  animation: none;
+}
+
+/* Stagger each block by an even slice of the cycle — matches the
+   <BlockLoader> stagger pattern. */
+.ds-liveblock__block--1 { animation-delay:    0s; }
+.ds-liveblock__block--2 { animation-delay: -1.4285714286s; }
+.ds-liveblock__block--3 { animation-delay: -2.8571428571s; }
+.ds-liveblock__block--4 { animation-delay: -4.2857142857s; }
+.ds-liveblock__block--5 { animation-delay: -5.7142857143s; }
+.ds-liveblock__block--6 { animation-delay: -7.1428571429s; }
+.ds-liveblock__block--7 { animation-delay: -8.5714285714s; }
+
+@keyframes ds-liveblock-path {
+  0%,   10.5% { transform: translate(0,                                          0); }
+  12.5%, 23%  { transform: translate(var(--ds-liveblock-step),                   0); }
+  25%,  35.5% { transform: translate(calc(var(--ds-liveblock-step) * 2),         0); }
+  37.5%, 48%  { transform: translate(calc(var(--ds-liveblock-step) * 2),         var(--ds-liveblock-step)); }
+  50%,  60.5% { transform: translate(var(--ds-liveblock-step),                   var(--ds-liveblock-step)); }
+  62.5%, 73%  { transform: translate(var(--ds-liveblock-step),                   calc(var(--ds-liveblock-step) * 2)); }
+  75%,  85.5% { transform: translate(0,                                          calc(var(--ds-liveblock-step) * 2)); }
+  87.5%, 98%  { transform: translate(0,                                          var(--ds-liveblock-step)); }
+  100%        { transform: translate(0,                                          0); }
+}
+
+/* Screen-reader-only announcement; mirrors LiveDot's sr pattern. */
+.ds-liveblock__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ds-liveblock__label {
+  color: var(--ds-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-liveblock__caret {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 2px;
+  background: currentColor;
+  vertical-align: -0.12em;
+  animation: ds-liveblock-caret-blink 1000ms steps(2, start) infinite;
+}
+
+@keyframes ds-liveblock-caret-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-liveblock__block { animation: none; }
+  .ds-liveblock__block--1 { transform: translate(0, 0); }
+  .ds-liveblock__block--2 { transform: translate(var(--ds-liveblock-step), 0); }
+  .ds-liveblock__block--3 { transform: translate(calc(var(--ds-liveblock-step) * 2), 0); }
+  .ds-liveblock__block--4 { transform: translate(calc(var(--ds-liveblock-step) * 2), var(--ds-liveblock-step)); }
+  .ds-liveblock__block--5 { transform: translate(var(--ds-liveblock-step), var(--ds-liveblock-step)); }
+  .ds-liveblock__block--6 { transform: translate(var(--ds-liveblock-step), calc(var(--ds-liveblock-step) * 2)); }
+  .ds-liveblock__block--7 { transform: translate(0, calc(var(--ds-liveblock-step) * 2)); }
+  .ds-liveblock__caret { animation: none; opacity: 1; }
+}

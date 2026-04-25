@@ -1,0 +1,110 @@
+/* ============================================================
+   BlockLoader.css — 7 blocks chasing around a 3×3 path.
+
+   Path visits 8 positions on a 3×3 grid (top-left, top-mid, top-right,
+   mid-right, CENTER, bottom-mid, bottom-left, mid-left, back to
+   top-left). Every block uses the same ten-second keyframe, staggered
+   by one-seventh of the cycle per block, so the seven of them form
+   a moving trail around the loop.
+
+   Motion rules:
+   - transform: translate() rather than layout left/top keeps the
+     motion GPU-accelerated.
+   - The animation is `infinite`, so its duration is exempt from the
+     system's 300ms ceiling (continuous motion, not a UI transition).
+   - Grayscale only — no hues. Blocks paint in --ds-text-primary
+     against whatever surface the host provides.
+   - prefers-reduced-motion: each block is parked at its "home" cell
+     on the path so the silhouette still reads, minus motion.
+
+   Renamed from `.ds-square-loader` in v0.4.0 (see BlockLoader.tsx).
+   ============================================================ */
+
+.ds-block-loader {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-6);
+  font-family: var(--ds-font-mono);
+
+  /* Tunables — consumers can override to scale the loader. Default
+     cell 12px puts the whole grid at 48px outer — compact enough to
+     sit inline with mono body copy or in a toolbar slot. */
+  --ds-block-loader-cell: 12px;
+  --ds-block-loader-gap: 4px;
+  --ds-block-loader-step: calc(
+    var(--ds-block-loader-cell) + var(--ds-block-loader-gap)
+  );
+}
+
+/* Stage matches the grid size exactly — no bounding-box expansion
+   required since there's no rotation. */
+.ds-block-loader__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--ds-block-loader-step) * 3);
+  height: calc(var(--ds-block-loader-step) * 3);
+}
+
+.ds-block-loader__grid {
+  position: relative;
+  width: calc(var(--ds-block-loader-step) * 3);
+  height: calc(var(--ds-block-loader-step) * 3);
+}
+
+.ds-block-loader__block {
+  position: absolute;
+  top: calc(var(--ds-block-loader-gap) / 2);
+  left: calc(var(--ds-block-loader-gap) / 2);
+  width: var(--ds-block-loader-cell);
+  height: var(--ds-block-loader-cell);
+  background: var(--ds-text-primary);
+  animation: ds-block-loader-path 10000ms ease-in-out infinite both;
+}
+
+/* Stagger each block by an even slice of the cycle — negative delay
+   per block = −(cycle / 7), which starts each one already in the
+   loop so there's no cold-start gap; at t=0 the full trail is
+   already visible. */
+.ds-block-loader__block--1 { animation-delay:    0s; }
+.ds-block-loader__block--2 { animation-delay: -1.4285714286s; }
+.ds-block-loader__block--3 { animation-delay: -2.8571428571s; }
+.ds-block-loader__block--4 { animation-delay: -4.2857142857s; }
+.ds-block-loader__block--5 { animation-delay: -5.7142857143s; }
+.ds-block-loader__block--6 { animation-delay: -7.1428571429s; }
+.ds-block-loader__block--7 { animation-delay: -8.5714285714s; }
+
+@keyframes ds-block-loader-path {
+  0%,   10.5% { transform: translate(0,                                              0); }
+  12.5%, 23%  { transform: translate(var(--ds-block-loader-step),                    0); }
+  25%,  35.5% { transform: translate(calc(var(--ds-block-loader-step) * 2),          0); }
+  37.5%, 48%  { transform: translate(calc(var(--ds-block-loader-step) * 2),          var(--ds-block-loader-step)); }
+  50%,  60.5% { transform: translate(var(--ds-block-loader-step),                    var(--ds-block-loader-step)); }
+  62.5%, 73%  { transform: translate(var(--ds-block-loader-step),                    calc(var(--ds-block-loader-step) * 2)); }
+  75%,  85.5% { transform: translate(0,                                              calc(var(--ds-block-loader-step) * 2)); }
+  87.5%, 98%  { transform: translate(0,                                              var(--ds-block-loader-step)); }
+  100%        { transform: translate(0,                                              0); }
+}
+
+.ds-block-loader__label {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  line-height: var(--ds-type-label-lh);
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-block-loader__block { animation: none; }
+  .ds-block-loader__block--1 { transform: translate(0, 0); }
+  .ds-block-loader__block--2 { transform: translate(var(--ds-block-loader-step), 0); }
+  .ds-block-loader__block--3 { transform: translate(calc(var(--ds-block-loader-step) * 2), 0); }
+  .ds-block-loader__block--4 { transform: translate(calc(var(--ds-block-loader-step) * 2), var(--ds-block-loader-step)); }
+  .ds-block-loader__block--5 { transform: translate(var(--ds-block-loader-step), var(--ds-block-loader-step)); }
+  .ds-block-loader__block--6 { transform: translate(var(--ds-block-loader-step), calc(var(--ds-block-loader-step) * 2)); }
+  .ds-block-loader__block--7 { transform: translate(0, calc(var(--ds-block-loader-step) * 2)); }
+}

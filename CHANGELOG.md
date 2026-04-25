@@ -4,6 +4,61 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.4.0] — 2026-04-24
+
+Two follow-ups on the v0.3.9 polish: a centering fix on `<BoxLoader>`
+and a naming/animation pass that unifies the live-indicator and the
+loader vocabulary into a single "block" family.
+
+### Fixed
+- **`<BoxLoader>` centered.** `.ds-box-loader__field` was sized to a
+  single cell (`edge × edge`) while its absolutely-positioned boxes
+  translated up to (200%, 100%) — the visible content extended right
+  and down from the field's origin, so flex-centering the 18px field
+  inside the stage left the iso playfield drifting right of axis.
+  Field is now sized to the full playfield (`edge × 3` by `edge × 2`)
+  so its geometric center coincides with the visual center of the
+  cubes. Inline mirror in `preview.html` updated to match.
+
+### Changed (breaking renames)
+- **`<LiveCube>` → `<LiveBlock>`.** The component is renamed and the
+  3D-cube indicator is replaced with the same chasing-blocks
+  animation used by `<BlockLoader>` (below), shrunk to a 12px
+  footprint so the live signal and the loader read as one motion
+  family. Blocks paint in `--ds-text-primary` (white), not
+  `--ds-accent-live`: `<LiveDot>` earns the red because a single
+  static dot needs hue to carry "live", but here the chasing motion
+  already carries the signal, so the color stays neutral. No extra
+  opacity pulse layered on top (that would compete with the chase).
+  Same inline-flex row, same `labels` / `labelStep` / `labelHold`
+  props, same delegation to `rotateLabels()`. Tunable via
+  `--ds-liveblock-cell` / `--ds-liveblock-gap` / `--ds-liveblock-step`.
+  CSS class names switched from `.ds-livecube*` to `.ds-liveblock*`.
+  `<LiveBlock>` is consequently dropped from the `accent-live`
+  sanctioned-carrier allowlist (it no longer references the token).
+- **`<SquareLoader>` → `<BlockLoader>`.** Renamed for lexical
+  adjacency to `<LiveBlock>` (the two share the same animation, just
+  at different scales and color carriers). Animation, default cell
+  size (12px), stagger pattern, and reduced-motion handling are
+  unchanged. CSS class names switched from `.ds-square-loader*` to
+  `.ds-block-loader*`; CSS variables switched from
+  `--ds-square-loader-*` to `--ds-block-loader-*`.
+
+### Migration
+- `<LiveCube>` → `<LiveBlock>`; `<SquareLoader>` → `<BlockLoader>`.
+- `.ds-livecube*` → `.ds-liveblock*`; `.ds-square-loader*` →
+  `.ds-block-loader*`.
+- `--ds-livecube-edge` → `--ds-liveblock-cell` /
+  `--ds-liveblock-gap` (the indicator no longer takes a single edge
+  size; it scales via cell + gap, mirroring `<BlockLoader>`).
+- `--ds-square-loader-cell` / `--ds-square-loader-gap` /
+  `--ds-square-loader-step` → `--ds-block-loader-*` equivalents.
+- Sanctioned-carrier allowlists in `DESIGN.md`, `refusals.json`,
+  `quality-evaluator.md`, and `scripts/lint.mjs` swapped
+  `LiveCube` for `LiveBlock`.
+
+---
+
 ## [0.3.9] — 2026-04-24
 
 Three polish items across §08 and §11.

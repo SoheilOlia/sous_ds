@@ -1,5 +1,5 @@
 /**
- * sous-ds component suite · v0.3.9
+ * sous-ds component suite · v0.4.0
  *
  * Every component is a reference implementation of the rules in DESIGN.md.
  * Components should prefer tokens and documented system values over ad hoc
@@ -28,8 +28,8 @@ export type { PillProps } from "./Pill";
 export { LiveDot } from "./LiveDot";
 export type { LiveDotProps } from "./LiveDot";
 
-export { LiveCube } from "./LiveCube";
-export type { LiveCubeProps } from "./LiveCube";
+export { LiveBlock } from "./LiveBlock";
+export type { LiveBlockProps } from "./LiveBlock";
 
 export { ToastProvider, useToast } from "./Toast";
 
@@ -73,8 +73,8 @@ export type { DotLoaderProps } from "./DotLoader";
 export { ThinkingCube } from "./ThinkingCube";
 export type { ThinkingCubeProps } from "./ThinkingCube";
 
-export { SquareLoader } from "./SquareLoader";
-export type { SquareLoaderProps } from "./SquareLoader";
+export { BlockLoader } from "./BlockLoader";
+export type { BlockLoaderProps } from "./BlockLoader";
 
 // Motion primitive — zero-dep animation vocabulary shared across
 // components and consumers. See components/motion.ts for the rationale.

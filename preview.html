@@ -267,8 +267,12 @@ body {
   .ds-livedot__caret { animation: none; opacity: 1; }
 }
 
-/* ---- LiveCube (inline mirror of components/LiveCube.css) ------ */
-.ds-livecube {
+/* ---- LiveBlock (inline mirror of components/LiveBlock.css) ----
+   Inline 7-block chasing animation in --ds-text-primary. Same path as
+   <BlockLoader>, scaled to a 12px footprint so it sits with mono
+   body copy. The motion itself is the live signal — color stays
+   neutral, no extra opacity pulse on top. */
+.ds-liveblock {
   display: inline-flex;
   align-items: center;
   gap: var(--ds-space-3);
@@ -278,41 +282,52 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ds-text-secondary);
-  --ds-livecube-edge: 8px;
+  --ds-liveblock-cell: 3px;
+  --ds-liveblock-gap: 1px;
+  --ds-liveblock-step: calc(var(--ds-liveblock-cell) + var(--ds-liveblock-gap));
 }
-.ds-livecube__stage {
+.ds-liveblock__stage {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: calc(var(--ds-livecube-edge) * 2);
-  height: calc(var(--ds-livecube-edge) * 2);
-  perspective: calc(var(--ds-livecube-edge) * 10);
+  width: calc(var(--ds-liveblock-step) * 3);
+  height: calc(var(--ds-liveblock-step) * 3);
   flex: none;
 }
-.ds-livecube__cube {
+.ds-liveblock__grid {
   position: relative;
-  width: var(--ds-livecube-edge);
-  height: var(--ds-livecube-edge);
-  transform-style: preserve-3d;
-  transform: rotateX(-22deg) rotateY(-28deg);
-  animation: live-pulse var(--ds-dur-live-pulse) linear infinite;
+  width: calc(var(--ds-liveblock-step) * 3);
+  height: calc(var(--ds-liveblock-step) * 3);
 }
-.ds-livecube[data-static] .ds-livecube__cube { animation: none; }
-.ds-livecube__face {
+.ds-liveblock__block {
   position: absolute;
   top: 0;
   left: 0;
-  width: var(--ds-livecube-edge);
-  height: var(--ds-livecube-edge);
-  background: var(--ds-accent-live);
+  width: var(--ds-liveblock-cell);
+  height: var(--ds-liveblock-cell);
+  background: var(--ds-text-primary);
+  animation: ds-liveblock-path 10000ms ease-in-out infinite both;
 }
-.ds-livecube__face--front  { transform: translateZ(calc(var(--ds-livecube-edge) / 2)); opacity: 0.9; }
-.ds-livecube__face--back   { transform: rotateY(180deg) translateZ(calc(var(--ds-livecube-edge) / 2)); opacity: 0.85; }
-.ds-livecube__face--right  { transform: rotateY(90deg)  translateZ(calc(var(--ds-livecube-edge) / 2)); opacity: 0.65; }
-.ds-livecube__face--left   { transform: rotateY(-90deg) translateZ(calc(var(--ds-livecube-edge) / 2)); opacity: 0.65; }
-.ds-livecube__face--top    { transform: rotateX(90deg)  translateZ(calc(var(--ds-livecube-edge) / 2)); opacity: 1; }
-.ds-livecube__face--bottom { transform: rotateX(-90deg) translateZ(calc(var(--ds-livecube-edge) / 2)); opacity: 0.55; }
-.ds-livecube__sr {
+.ds-liveblock[data-static] .ds-liveblock__block { animation: none; }
+.ds-liveblock__block--1 { animation-delay:    0s; }
+.ds-liveblock__block--2 { animation-delay: -1.4285714286s; }
+.ds-liveblock__block--3 { animation-delay: -2.8571428571s; }
+.ds-liveblock__block--4 { animation-delay: -4.2857142857s; }
+.ds-liveblock__block--5 { animation-delay: -5.7142857143s; }
+.ds-liveblock__block--6 { animation-delay: -7.1428571429s; }
+.ds-liveblock__block--7 { animation-delay: -8.5714285714s; }
+@keyframes ds-liveblock-path {
+  0%,   10.5% { transform: translate(0,                                          0); }
+  12.5%, 23%  { transform: translate(var(--ds-liveblock-step),                   0); }
+  25%,  35.5% { transform: translate(calc(var(--ds-liveblock-step) * 2),         0); }
+  37.5%, 48%  { transform: translate(calc(var(--ds-liveblock-step) * 2),         var(--ds-liveblock-step)); }
+  50%,  60.5% { transform: translate(var(--ds-liveblock-step),                   var(--ds-liveblock-step)); }
+  62.5%, 73%  { transform: translate(var(--ds-liveblock-step),                   calc(var(--ds-liveblock-step) * 2)); }
+  75%,  85.5% { transform: translate(0,                                          calc(var(--ds-liveblock-step) * 2)); }
+  87.5%, 98%  { transform: translate(0,                                          var(--ds-liveblock-step)); }
+  100%        { transform: translate(0,                                          0); }
+}
+.ds-liveblock__sr {
   position: absolute;
   width: 1px; height: 1px;
   padding: 0; margin: -1px;
@@ -321,29 +336,36 @@ body {
   white-space: nowrap;
   border: 0;
 }
-.ds-livecube__label {
+.ds-liveblock__label {
   color: var(--ds-text-secondary);
   display: inline-flex;
   align-items: center;
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
 }
-.ds-livecube__caret {
+.ds-liveblock__caret {
   display: inline-block;
   width: 1px;
   height: 1em;
   margin-left: 2px;
   background: currentColor;
   vertical-align: -0.12em;
-  animation: ds-livecube-caret-blink 1000ms steps(2, start) infinite;
+  animation: ds-liveblock-caret-blink 1000ms steps(2, start) infinite;
 }
-@keyframes ds-livecube-caret-blink {
+@keyframes ds-liveblock-caret-blink {
   0%, 49%   { opacity: 1; }
   50%, 100% { opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ds-livecube__cube { animation: none; opacity: 1; }
-  .ds-livecube__caret { animation: none; opacity: 1; }
+  .ds-liveblock__block { animation: none; }
+  .ds-liveblock__block--1 { transform: translate(0, 0); }
+  .ds-liveblock__block--2 { transform: translate(var(--ds-liveblock-step), 0); }
+  .ds-liveblock__block--3 { transform: translate(calc(var(--ds-liveblock-step) * 2), 0); }
+  .ds-liveblock__block--4 { transform: translate(calc(var(--ds-liveblock-step) * 2), var(--ds-liveblock-step)); }
+  .ds-liveblock__block--5 { transform: translate(var(--ds-liveblock-step), var(--ds-liveblock-step)); }
+  .ds-liveblock__block--6 { transform: translate(var(--ds-liveblock-step), calc(var(--ds-liveblock-step) * 2)); }
+  .ds-liveblock__block--7 { transform: translate(0, calc(var(--ds-liveblock-step) * 2)); }
+  .ds-liveblock__caret { animation: none; opacity: 1; }
 }
 
 /* ---- Section cards ---------------------------------------- */
@@ -1965,8 +1987,8 @@ body {
 }
 .ds-box-loader__field {
   position: relative;
-  width: var(--ds-box-loader-edge);
-  height: var(--ds-box-loader-edge);
+  width: calc(var(--ds-box-loader-edge) * 3);
+  height: calc(var(--ds-box-loader-edge) * 2);
   transform-style: preserve-3d;
   transform: rotateX(-30deg) rotateY(-45deg);
 }
@@ -2052,57 +2074,57 @@ body {
   .ds-dot-loader__dot { transition: none; }
 }
 
-/* ---- SquareLoader (inline mirror of components/SquareLoader.css) ---- */
-.ds-square-loader {
+/* ---- BlockLoader (inline mirror of components/BlockLoader.css) ---- */
+.ds-block-loader {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   gap: var(--ds-space-6);
   font-family: var(--ds-font-mono);
-  --ds-square-loader-cell: 12px;
-  --ds-square-loader-gap: 4px;
-  --ds-square-loader-step: calc(var(--ds-square-loader-cell) + var(--ds-square-loader-gap));
+  --ds-block-loader-cell: 12px;
+  --ds-block-loader-gap: 4px;
+  --ds-block-loader-step: calc(var(--ds-block-loader-cell) + var(--ds-block-loader-gap));
 }
-.ds-square-loader__stage {
+.ds-block-loader__stage {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(var(--ds-square-loader-step) * 3);
-  height: calc(var(--ds-square-loader-step) * 3);
+  width: calc(var(--ds-block-loader-step) * 3);
+  height: calc(var(--ds-block-loader-step) * 3);
 }
-.ds-square-loader__grid {
+.ds-block-loader__grid {
   position: relative;
-  width: calc(var(--ds-square-loader-step) * 3);
-  height: calc(var(--ds-square-loader-step) * 3);
+  width: calc(var(--ds-block-loader-step) * 3);
+  height: calc(var(--ds-block-loader-step) * 3);
 }
-.ds-square-loader__square {
+.ds-block-loader__block {
   position: absolute;
-  top: calc(var(--ds-square-loader-gap) / 2);
-  left: calc(var(--ds-square-loader-gap) / 2);
-  width: var(--ds-square-loader-cell);
-  height: var(--ds-square-loader-cell);
+  top: calc(var(--ds-block-loader-gap) / 2);
+  left: calc(var(--ds-block-loader-gap) / 2);
+  width: var(--ds-block-loader-cell);
+  height: var(--ds-block-loader-cell);
   background: var(--ds-text-primary);
-  animation: ds-square-loader-path 10000ms ease-in-out infinite both;
+  animation: ds-block-loader-path 10000ms ease-in-out infinite both;
 }
-.ds-square-loader__square--1 { animation-delay:    0s; }
-.ds-square-loader__square--2 { animation-delay: -1.4285714286s; }
-.ds-square-loader__square--3 { animation-delay: -2.8571428571s; }
-.ds-square-loader__square--4 { animation-delay: -4.2857142857s; }
-.ds-square-loader__square--5 { animation-delay: -5.7142857143s; }
-.ds-square-loader__square--6 { animation-delay: -7.1428571429s; }
-.ds-square-loader__square--7 { animation-delay: -8.5714285714s; }
-@keyframes ds-square-loader-path {
+.ds-block-loader__block--1 { animation-delay:    0s; }
+.ds-block-loader__block--2 { animation-delay: -1.4285714286s; }
+.ds-block-loader__block--3 { animation-delay: -2.8571428571s; }
+.ds-block-loader__block--4 { animation-delay: -4.2857142857s; }
+.ds-block-loader__block--5 { animation-delay: -5.7142857143s; }
+.ds-block-loader__block--6 { animation-delay: -7.1428571429s; }
+.ds-block-loader__block--7 { animation-delay: -8.5714285714s; }
+@keyframes ds-block-loader-path {
   0%,   10.5% { transform: translate(0, 0); }
-  12.5%, 23%  { transform: translate(var(--ds-square-loader-step), 0); }
-  25%,  35.5% { transform: translate(calc(var(--ds-square-loader-step) * 2), 0); }
-  37.5%, 48%  { transform: translate(calc(var(--ds-square-loader-step) * 2), var(--ds-square-loader-step)); }
-  50%,  60.5% { transform: translate(var(--ds-square-loader-step), var(--ds-square-loader-step)); }
-  62.5%, 73%  { transform: translate(var(--ds-square-loader-step), calc(var(--ds-square-loader-step) * 2)); }
-  75%,  85.5% { transform: translate(0, calc(var(--ds-square-loader-step) * 2)); }
-  87.5%, 98%  { transform: translate(0, var(--ds-square-loader-step)); }
+  12.5%, 23%  { transform: translate(var(--ds-block-loader-step), 0); }
+  25%,  35.5% { transform: translate(calc(var(--ds-block-loader-step) * 2), 0); }
+  37.5%, 48%  { transform: translate(calc(var(--ds-block-loader-step) * 2), var(--ds-block-loader-step)); }
+  50%,  60.5% { transform: translate(var(--ds-block-loader-step), var(--ds-block-loader-step)); }
+  62.5%, 73%  { transform: translate(var(--ds-block-loader-step), calc(var(--ds-block-loader-step) * 2)); }
+  75%,  85.5% { transform: translate(0, calc(var(--ds-block-loader-step) * 2)); }
+  87.5%, 98%  { transform: translate(0, var(--ds-block-loader-step)); }
   100%        { transform: translate(0, 0); }
 }
-.ds-square-loader__label {
+.ds-block-loader__label {
   font-family: var(--ds-font-mono);
   font-size: var(--ds-type-label-size);
   line-height: var(--ds-type-label-lh);
@@ -2113,14 +2135,14 @@ body {
   font-variant-numeric: tabular-nums;
 }
 @media (prefers-reduced-motion: reduce) {
-  .ds-square-loader__square { animation: none; }
-  .ds-square-loader__square--1 { transform: translate(0, 0); }
-  .ds-square-loader__square--2 { transform: translate(var(--ds-square-loader-step), 0); }
-  .ds-square-loader__square--3 { transform: translate(calc(var(--ds-square-loader-step) * 2), 0); }
-  .ds-square-loader__square--4 { transform: translate(calc(var(--ds-square-loader-step) * 2), var(--ds-square-loader-step)); }
-  .ds-square-loader__square--5 { transform: translate(var(--ds-square-loader-step), var(--ds-square-loader-step)); }
-  .ds-square-loader__square--6 { transform: translate(var(--ds-square-loader-step), calc(var(--ds-square-loader-step) * 2)); }
-  .ds-square-loader__square--7 { transform: translate(0, calc(var(--ds-square-loader-step) * 2)); }
+  .ds-block-loader__block { animation: none; }
+  .ds-block-loader__block--1 { transform: translate(0, 0); }
+  .ds-block-loader__block--2 { transform: translate(var(--ds-block-loader-step), 0); }
+  .ds-block-loader__block--3 { transform: translate(calc(var(--ds-block-loader-step) * 2), 0); }
+  .ds-block-loader__block--4 { transform: translate(calc(var(--ds-block-loader-step) * 2), var(--ds-block-loader-step)); }
+  .ds-block-loader__block--5 { transform: translate(var(--ds-block-loader-step), var(--ds-block-loader-step)); }
+  .ds-block-loader__block--6 { transform: translate(var(--ds-block-loader-step), calc(var(--ds-block-loader-step) * 2)); }
+  .ds-block-loader__block--7 { transform: translate(0, calc(var(--ds-block-loader-step) * 2)); }
 }
 
 
@@ -2591,20 +2613,21 @@ body {
       </div>
 
       <div class="component-row">
-        <span class="label">Live cube</span>
-        <span class="ds-livecube" data-rotating="true" role="status" id="livecube-demo">
-          <span class="ds-livecube__stage" aria-hidden="true">
-            <span class="ds-livecube__cube">
-              <span class="ds-livecube__face ds-livecube__face--front"></span>
-              <span class="ds-livecube__face ds-livecube__face--right"></span>
-              <span class="ds-livecube__face ds-livecube__face--top"></span>
-              <span class="ds-livecube__face ds-livecube__face--back"></span>
-              <span class="ds-livecube__face ds-livecube__face--left"></span>
-              <span class="ds-livecube__face ds-livecube__face--bottom"></span>
+        <span class="label">Live block</span>
+        <span class="ds-liveblock" data-rotating="true" role="status" id="liveblock-demo">
+          <span class="ds-liveblock__stage" aria-hidden="true">
+            <span class="ds-liveblock__grid">
+              <span class="ds-liveblock__block ds-liveblock__block--1"></span>
+              <span class="ds-liveblock__block ds-liveblock__block--2"></span>
+              <span class="ds-liveblock__block ds-liveblock__block--3"></span>
+              <span class="ds-liveblock__block ds-liveblock__block--4"></span>
+              <span class="ds-liveblock__block ds-liveblock__block--5"></span>
+              <span class="ds-liveblock__block ds-liveblock__block--6"></span>
+              <span class="ds-liveblock__block ds-liveblock__block--7"></span>
             </span>
           </span>
-          <span class="ds-livecube__sr" aria-live="polite" id="livecube-demo-sr">Analyzing</span>
-          <span class="ds-livecube__label" aria-hidden="true"><span id="livecube-demo-label"></span><span class="ds-livecube__caret" aria-hidden="true"></span></span>
+          <span class="ds-liveblock__sr" aria-live="polite" id="liveblock-demo-sr">Analyzing</span>
+          <span class="ds-liveblock__label" aria-hidden="true"><span id="liveblock-demo-label"></span><span class="ds-liveblock__caret" aria-hidden="true"></span></span>
         </span>
       </div>
 
@@ -2748,25 +2771,25 @@ body {
 
       <div class="loader-row">
         <div class="loader-row__item">
-          <div class="ds-square-loader" role="status" aria-label="Loading">
-            <div class="ds-square-loader__stage" aria-hidden="true">
-              <div class="ds-square-loader__grid">
-                <span class="ds-square-loader__square ds-square-loader__square--1"></span>
-                <span class="ds-square-loader__square ds-square-loader__square--2"></span>
-                <span class="ds-square-loader__square ds-square-loader__square--3"></span>
-                <span class="ds-square-loader__square ds-square-loader__square--4"></span>
-                <span class="ds-square-loader__square ds-square-loader__square--5"></span>
-                <span class="ds-square-loader__square ds-square-loader__square--6"></span>
-                <span class="ds-square-loader__square ds-square-loader__square--7"></span>
+          <div class="ds-block-loader" role="status" aria-label="Loading">
+            <div class="ds-block-loader__stage" aria-hidden="true">
+              <div class="ds-block-loader__grid">
+                <span class="ds-block-loader__block ds-block-loader__block--1"></span>
+                <span class="ds-block-loader__block ds-block-loader__block--2"></span>
+                <span class="ds-block-loader__block ds-block-loader__block--3"></span>
+                <span class="ds-block-loader__block ds-block-loader__block--4"></span>
+                <span class="ds-block-loader__block ds-block-loader__block--5"></span>
+                <span class="ds-block-loader__block ds-block-loader__block--6"></span>
+                <span class="ds-block-loader__block ds-block-loader__block--7"></span>
               </div>
             </div>
           </div>
           <div class="loader-typewriter" aria-hidden="true">[<span class="loader-typewriter__text"></span><span class="loader-typewriter__caret"></span>]</div>
         </div>
         <div class="loader-row__note">
-          <div class="loader-row__name">SquareLoader</div>
+          <div class="loader-row__name">BlockLoader</div>
           <div class="loader-row__meta">
-            <span>7 squares · 3×3 path · staggered chase · 10s loop</span>
+            <span>7 blocks · 3×3 path · staggered chase · 10s loop</span>
           </div>
         </div>
       </div>
@@ -3583,15 +3606,15 @@ body {
 })();
 
 /* ============================================================
-   LiveCube — same rotating-typewriter mechanics as LiveDot, but
+   LiveBlock — same rotating-typewriter mechanics as LiveDot, but
    targeting a disjoint label set so the two rows are never showing
    the same word at the same time. LiveDot cycles the
-   AGENTING/WORKING/THINKING/REASONING set; LiveCube cycles
+   AGENTING/WORKING/THINKING/REASONING set; LiveBlock cycles
    ANALYZING/PROCESSING/COMPOSING/PLANNING.
    ============================================================ */
-(function liveCubeRotating () {
-  const label = document.getElementById('livecube-demo-label');
-  const sr    = document.getElementById('livecube-demo-sr');
+(function liveBlockRotating () {
+  const label = document.getElementById('liveblock-demo-label');
+  const sr    = document.getElementById('liveblock-demo-sr');
   if (!label || !sr) return;
 
   const labels = ['ANALYZING', 'PROCESSING', 'COMPOSING', 'PLANNING'];

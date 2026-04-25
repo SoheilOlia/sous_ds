@@ -1,28 +1,31 @@
 /*
- * LiveCube · sous-ds
+ * LiveBlock · sous-ds
  *
  * A live indicator — sibling of <LiveDot>. Same inline layout, same
- * mono label voice, same rotating-typewriter mechanics. Only the
- * indicator shape is different: where <LiveDot> shows a 6px
- * `accent-live` dot that pulses, <LiveCube> shows a 4×4 CSS 3D
- * cube whose faces are all `accent-live`, with per-face opacity
- * tiers giving the cube a subtle 3D read at that tiny size.
+ * mono label voice, same rotating-typewriter mechanics. Where
+ * <LiveDot> shows a 6px `accent-live` dot that pulses, <LiveBlock>
+ * shows a tiny chasing-blocks animation — the same path used by the
+ * full-size <BlockLoader>, scaled down for inline use. Blocks paint
+ * neutral (`--ds-text-primary`), not `accent-live`: <LiveDot> earns
+ * the red because a single static dot needs hue to carry "live", but
+ * here the chasing motion already carries the signal, so the color
+ * stays neutral. No extra opacity pulse on top.
  *
- * Use when you want the "attention / live / now" semantic carried by
- * a dimensional indicator instead of a flat dot. Same accent-live
- * carrier role; just a different glyph.
+ * Renamed from `<LiveCube>` in v0.4.0 — the new indicator is a
+ * dimensional grid of moving blocks rather than a single 3D cube,
+ * and the name keeps it lexically adjacent to `<BlockLoader>`.
  *
  * Label rotation delegates to `rotateLabels()` from `./motion`, so
  * the typewriter cadence is identical to <LiveDot labels={...}>.
  */
 
 import * as React from "react";
-import "./LiveCube.css";
+import "./LiveBlock.css";
 import { rotateLabels } from "./motion";
 
-export interface LiveCubeProps
+export interface LiveBlockProps
   extends React.HTMLAttributes<HTMLSpanElement> {
-  /** Single static label rendered beside the cube. Ignored if `labels` is provided. */
+  /** Single static label rendered beside the indicator. Ignored if `labels` is provided. */
   label?: string;
   /**
    * Rotating labels with typewriter animation — cycles through the
@@ -36,12 +39,12 @@ export interface LiveCubeProps
   labelHold?: number;
   /** Accessibility announcement. Default "Live". */
   announce?: string;
-  /** Disable the cube's live pulse. Use when many indicators would create noise. */
+  /** Disable the chasing motion. Use when many indicators would create noise. */
   static?: boolean;
 }
 
-export const LiveCube = React.forwardRef<HTMLSpanElement, LiveCubeProps>(
-  function LiveCube(
+export const LiveBlock = React.forwardRef<HTMLSpanElement, LiveBlockProps>(
+  function LiveBlock(
     {
       label,
       labels,
@@ -86,29 +89,30 @@ export const LiveCube = React.forwardRef<HTMLSpanElement, LiveCubeProps>(
         role="status"
         data-static={isStatic || undefined}
         data-rotating={rotating || undefined}
-        className={["ds-livecube", className].filter(Boolean).join(" ")}
+        className={["ds-liveblock", className].filter(Boolean).join(" ")}
       >
-        <span className="ds-livecube__stage" aria-hidden="true">
-          <span className="ds-livecube__cube">
-            <span className="ds-livecube__face ds-livecube__face--front" />
-            <span className="ds-livecube__face ds-livecube__face--right" />
-            <span className="ds-livecube__face ds-livecube__face--top" />
-            <span className="ds-livecube__face ds-livecube__face--back" />
-            <span className="ds-livecube__face ds-livecube__face--left" />
-            <span className="ds-livecube__face ds-livecube__face--bottom" />
+        <span className="ds-liveblock__stage" aria-hidden="true">
+          <span className="ds-liveblock__grid">
+            <span className="ds-liveblock__block ds-liveblock__block--1" />
+            <span className="ds-liveblock__block ds-liveblock__block--2" />
+            <span className="ds-liveblock__block ds-liveblock__block--3" />
+            <span className="ds-liveblock__block ds-liveblock__block--4" />
+            <span className="ds-liveblock__block ds-liveblock__block--5" />
+            <span className="ds-liveblock__block ds-liveblock__block--6" />
+            <span className="ds-liveblock__block ds-liveblock__block--7" />
           </span>
         </span>
-        <span className="ds-livecube__sr" aria-live="polite">
+        <span className="ds-liveblock__sr" aria-live="polite">
           {announceText}
         </span>
         {visibleLabel !== undefined && (
           <span
-            className="ds-livecube__label"
+            className="ds-liveblock__label"
             aria-hidden={rotating ? true : undefined}
           >
             {visibleLabel}
             {rotating && (
-              <span className="ds-livecube__caret" aria-hidden="true" />
+              <span className="ds-liveblock__caret" aria-hidden="true" />
             )}
           </span>
         )}

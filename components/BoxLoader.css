@@ -34,15 +34,18 @@
   justify-content: center;
 }
 
-/* Field is the iso-projected 3×2 playfield. The keyframes translate
-   each box in units of its own size (translate(100%, 0) = one cell
-   right), so the field width/height aren't strictly needed — but the
-   visible bounding box of the tilted rotation is what determines
-   layout centering inside the stage. */
+/* Field is the iso-projected 3×2 playfield. Its intrinsic dimensions
+   match the full playfield (3 cells wide × 2 cells tall) so the
+   field's geometric center coincides with the visual center of the
+   moving boxes — without this, the field collapses to one cell and
+   the absolutely-positioned boxes drift right of the layout axis.
+   The keyframes still translate each box in units of its own size
+   (translate(100%, 0) = one cell right), since `100%` resolves
+   against the box's own width, not the parent's. */
 .ds-box-loader__field {
   position: relative;
-  width: var(--ds-box-loader-edge);
-  height: var(--ds-box-loader-edge);
+  width: calc(var(--ds-box-loader-edge) * 3);
+  height: calc(var(--ds-box-loader-edge) * 2);
   transform-style: preserve-3d;
   transform: rotateX(-30deg) rotateY(-45deg);
 }
