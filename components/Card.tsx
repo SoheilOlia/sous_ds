@@ -3,7 +3,8 @@ import "./Card.css";
 
 type Padding = "none" | "sm" | "md" | "lg";
 
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   /** Internal padding. Defaults to `md` (24px). */
   padding?: Padding;
   /** Optional section number (rendered as "01") in the head row. */

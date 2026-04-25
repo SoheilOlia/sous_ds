@@ -105,7 +105,7 @@ export function DotTimeline(props: DotTimelineProps) {
   const resolved = React.useMemo<Bucket[]>(() => {
     if (providedBuckets) return providedBuckets;
     if (events) return bucketize(events, windowMs, bucketSize, Date.now());
-    if (process.env.NODE_ENV !== "production") {
+    if (typeof process !== "undefined" && process.env?.NODE_ENV !== "production") {
       throw new Error(
         "DotTimeline: either `buckets` or `events` is required.",
       );

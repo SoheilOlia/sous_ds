@@ -1,27 +1,46 @@
 {
   "name": "sous-ds",
-  "version": "0.4.0",
-  "description": "Dark-first, data-dense, restraint-led design system for AI-native interfaces. Monospace for data, 1px borders over shadows, semantic accents for live and success only, motion under 300ms. Distributes as a global Claude/Codex/Goose skill plus React reference implementations.",
+  "version": "0.5.0",
+  "description": "Dark-first, data-dense, restraint-led design system for AI-native interfaces. Monospace for data, 1px borders over shadows, semantic accents for live and success only, motion under 300ms. Distributes as a global Claude/Codex/Goose skill plus installable React components.",
   "license": "Apache-2.0",
   "author": "Soheil Yasrebi",
-  "homepage": "https://github.com/soheilolia/sous_ds",
+  "homepage": "https://github.com/SoheilOlia/sous_ds",
   "repository": {
     "type": "git",
-    "url": "https://github.com/soheilolia/sous_ds.git"
+    "url": "https://github.com/SoheilOlia/sous_ds.git"
   },
   "type": "module",
-  "main": "./index.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "bin": {
     "sous-lint": "./scripts/lint.mjs"
   },
   "exports": {
-    ".": "./index.ts",
-    "./tokens.css": "./tokens.css",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js",
+      "require": "./dist/components/index.cjs"
+    },
+    "./motion": {
+      "types": "./dist/components/motion.d.ts",
+      "import": "./dist/components/motion.js",
+      "require": "./dist/components/motion.cjs"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./tokens.css": "./dist/tokens.css",
+    "./tailwind": "./tailwind.preset.cjs",
     "./tokens": "./design-tokens.json",
     "./refusals": "./refusals.json",
-    "./skill": "./SKILL.md",
-    "./components": "./components/index.ts",
-    "./motion": "./components/motion.ts"
+    "./skill": "./SKILL.md"
   },
   "files": [
     "SKILL.md",
@@ -39,26 +58,42 @@
     "refusals.json",
     "design-tokens.json",
     "tokens.css",
-    "index.ts",
+    "tailwind.preset.cjs",
+    "dist/",
     "components/",
     "scripts/",
     "examples/",
     "preview.html"
   ],
   "scripts": {
+    "build:js": "tsup",
+    "build:css": "node scripts/build-styles.mjs",
+    "build": "npm run build:js && npm run build:css",
     "lint:contract": "npx --yes @google/design.md lint DESIGN.md",
     "lint:ui": "node scripts/lint.mjs components/ preview.html",
     "pack:check": "node scripts/check-package.mjs",
     "lint": "npm run lint:contract && npm run lint:ui",
-    "verify": "npm run lint && npm run pack:check"
+    "verify": "npm run lint && npm run pack:check",
+    "prepublishOnly": "npm run build"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": false
+    }
   },
   "keywords": [
     "design-system",
     "design-tokens",
     "dtcg",
+    "react",
+    "tailwind",
+    "tailwindcss",
     "ai-agents",
     "agent-ui",
     "skill",
@@ -71,5 +106,12 @@
   ],
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "25.6.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "tsup": "8.5.1",
+    "typescript": "6.0.3"
   }
 }

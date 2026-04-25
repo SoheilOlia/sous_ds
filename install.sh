@@ -3,11 +3,11 @@
 # sous-ds · one-line installer
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/soheilolia/sous_ds/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/SoheilOlia/sous_ds/main/install.sh | bash
 #
 # Options (env vars):
-#   SOUS_DS_VERSION     release tag to install (default: v0.2.0)
-#   SOUS_DS_REPO        repo slug (default: soheilolia/sous_ds)
+#   SOUS_DS_VERSION     release tag to install (default: v0.5.0)
+#   SOUS_DS_REPO        repo slug (default: SoheilOlia/sous_ds)
 #   SOUS_DS_DEST        target dir (default: .)
 #   SOUS_DS_INCLUDE_CI  copy .github/workflows/design.yml when set to 1
 #
@@ -15,8 +15,8 @@
 
 set -euo pipefail
 
-VERSION="${SOUS_DS_VERSION:-v0.2.0}"
-REPO="${SOUS_DS_REPO:-soheilolia/sous_ds}"
+VERSION="${SOUS_DS_VERSION:-v0.5.0}"
+REPO="${SOUS_DS_REPO:-SoheilOlia/sous_ds}"
 DEST="${SOUS_DS_DEST:-.}"
 INCLUDE_CI="${SOUS_DS_INCLUDE_CI:-0}"
 
@@ -66,7 +66,7 @@ TAR_URL="https://github.com/$REPO/archive/refs/tags/$VERSION.tar.gz"
 echo "  ${DIM}→${RESET} downloading $TAR_URL"
 curl -fsSL "$TAR_URL" | tar -xz -C "$TMP"
 
-ROOT=$(find "$TMP" -maxdepth 1 -type d -name "sous-ds-*" | head -1)
+ROOT=$(find "$TMP" -maxdepth 1 -type d \( -name "sous_ds-*" -o -name "sous-ds-*" \) | head -1)
 if [ -z "$ROOT" ]; then
   echo "  ${RED}✗${RESET} could not find extracted tarball root"
   exit 1

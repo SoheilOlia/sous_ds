@@ -4,7 +4,7 @@ A dark-first, data-dense, restraint-led design system for AI coding agents.
 Monospace for data. 1px borders over shadows. Two semantic accents only. Motion under 300ms.
 
 ```
-v0.2.0 · alpha · 2026-04-22
+v0.5.0 · installable · 2026-04-24
 ```
 
 Cash Sans display + Geist body + Geist Mono. WCAG AA on every foreground/background pair. Structured as a skill-ready repo.
@@ -30,46 +30,57 @@ Plus: `tokens.css` (runtime CSS variables), `components/` (reference implementat
 
 ## Install
 
-### From a local checkout (works today)
+Three install paths; pick the one matching your consumer. Full details in [INSTALL.md](./INSTALL.md).
 
-This repo contains a real root `SKILL.md` plus the rule files it points to. If your agent supports repo-backed skills, point it at the repo root and let `SKILL.md` serve as the entrypoint.
-
-### One-line scaffold installer (release-ready)
+### React app
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/soheilolia/sous_ds/main/install.sh | bash
+npm install sous-ds
 ```
 
-The same script already lives in this repo as [install.sh](./install.sh), so you can validate the install path before the public remote is live.
+```tsx
+// app/layout.tsx
+import "sous-ds/styles.css";
+import { Button, Card, LiveDot } from "sous-ds";
+```
 
-### As a published skill (release target)
+Peer dep: React 18 or 19. Ships ESM + CJS + full types.
+
+### Tailwind CSS app
+
+```js
+// tailwind.config.cjs
+const sousPreset = require("sous-ds/tailwind");
+module.exports = { presets: [sousPreset], content: [/* ... */] };
+```
+
+```css
+/* src/global.css */
+@import "sous-ds/tokens.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+Every `--ds-*` token becomes a Tailwind utility — `bg-ds-surface`, `text-ds-primary`, `gap-ds-5`, `rounded-ds-md`, `duration-ds-standard`. All utilities resolve to CSS variables, so overriding a token propagates through every class automatically.
+
+### Agent skill (Claude Code / Codex / Goose)
 
 ```bash
-npx skills add soheilolia/sous_ds
+curl -fsSL https://raw.githubusercontent.com/SoheilOlia/sous_ds/main/install.sh | bash
 ```
 
-Until that release exists, use the local workflow in [INSTALL.md](./INSTALL.md).
+Drops `SKILL.md`, `DESIGN.md`, `AGENTS.md`, `ANIMATION_RULES.md`, `TASTE_LOG.md`, `refusals.json`, `tokens.css`, and the component reference implementations into the current directory. Or `npm install sous-ds` if the agent already reads `node_modules/` — every contract file ships with the package.
 
-### As a direct dependency
-
-Copy the contract and token files into your project root, then reference `tokens.css` from your app root:
-
-```html
-<link rel="stylesheet" href="./tokens.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap">
-```
-
-`Cash Sans` is the display/page-title face. `h2`/`h3` framing and numeric runs inside chapter/page titles should use `Geist Mono`. If `Cash Sans` is installed locally or self-hosted in your product, `--ds-font-display` will pick it up automatically; otherwise those display roles fall back to Geist.
+`Cash Sans` is the display/page-title face. If it's installed locally or self-hosted in your product, `--ds-font-display` picks it up; otherwise display roles fall back to Geist.
 
 ### Recommended companion
 
 ```bash
-# Emil Kowalski's design engineering skill (covers animations, Sonner, component design)
 npx skills add emilkowalski/skill
 ```
 
-The two skills compose. Emil's provides the underlying animation taste; this one builds the system contract on top.
+Emil Kowalski's skill provides the underlying animation taste; this one builds the system contract on top.
 
 ---
 
@@ -195,4 +206,4 @@ Apache 2.0. See `LICENSE`.
 
 ## Status
 
-**alpha / v0.2.0.** The contract is stable enough to build against; token names may shift before v1.
+**beta / v0.5.0 — installable.** Published to npm, React components ship as ESM + CJS + types, Tailwind preset exposes every token as a utility, and the one-line installer drops the contract into any agent's working directory. The contract is stable; token names may shift before v1.

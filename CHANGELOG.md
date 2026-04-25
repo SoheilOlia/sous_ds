@@ -4,6 +4,66 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.5.0] — 2026-04-24
+
+**Installable release.** Previously the library shipped raw `.ts`/`.tsx`
+source and pointed `package.json` `main` at `./index.ts`, which only
+worked in bundlers (Vite, Next.js) willing to compile TSX on import.
+This release adds a proper build pipeline, peer-dep declaration, and a
+Tailwind preset — so the three install paths advertised in the README
+(React, Tailwind, agent skill) now all actually work.
+
+### Added
+- **Build pipeline** via `tsup`. `npm run build` emits:
+  - `dist/index.{js,cjs,d.ts}` — ESM + CJS + types for the barrel
+  - `dist/components/*.{js,cjs,d.ts}` — per-component chunks
+  - `dist/components/motion.{js,cjs,d.ts}` — motion primitive subpath
+  - `dist/styles.css` — tokens + every component's CSS, concatenated
+  - `dist/tokens.css` — just the `--ds-*` custom properties
+- **Tailwind preset** at `tailwind.preset.cjs`, exposed as
+  `sous-ds/tailwind`. Every `--ds-*` token becomes a Tailwind utility
+  (`bg-ds-surface`, `text-ds-primary`, `gap-ds-5`, `rounded-ds-md`,
+  `duration-ds-standard`, etc.). Utilities resolve to `var(--ds-*)` at
+  runtime — overriding a token cascades through every Tailwind class.
+- **`peerDependencies`** declares React 18/19. `npm` now warns if the
+  consumer's React version is missing or out of range.
+- **`tsconfig.json`** at the root with `strict: true`, `jsx: react-jsx`,
+  Bundler module resolution, and `ignoreDeprecations: "6.0"` for TS 6.x.
+- **`scripts/build-styles.mjs`** — deterministic CSS concatenator;
+  tokens.css first, then every component CSS in alphabetical order.
+- **Three install paths** documented in `INSTALL.md` (npm / Tailwind /
+  agent skill) with worked examples for each.
+
+### Changed
+- **`package.json` exports map** now points at `dist/` for the code
+  paths (`.`, `./components`, `./motion`) and adds new subpaths:
+  `./styles.css`, `./tokens.css`, `./tailwind`. Backwards-compatible
+  subpaths (`./tokens`, `./refusals`, `./skill`) kept. `main` / `module`
+  / `types` fields added for tools that don't read `exports`.
+- **`sideEffects: ["**/*.css"]`** so bundlers don't tree-shake the
+  styles.css side-effect import.
+- **`prepublishOnly`** runs `npm run build` automatically — forgetting
+  to rebuild before publishing is no longer possible.
+- **`check-package.mjs`** now requires `dist/*` and
+  `tailwind.preset.cjs` in the published tarball.
+- **`install.sh`** default version bumped to `v0.5.0`, repo slug
+  corrected to `SoheilOlia/sous_ds`, and the tarball-root match
+  pattern now accepts both `sous_ds-*` (GitHub convention for this
+  repo) and `sous-ds-*` (prior assumption).
+- **README** status updated from `alpha / v0.2.0` to
+  `beta / v0.5.0 — installable`. Install section rewritten around the
+  three paths.
+
+### Fixed
+- **`Card.tsx` + `MetricStat.tsx` type signatures.** `title` (Card) and
+  `prefix` (MetricStat) collided with native HTML attributes of the
+  same name — `Omit<>` applied so `ReactNode` values type-check.
+- **`DotTimeline.tsx` dev-mode validation** no longer trips types when
+  consumers haven't included `@types/node` (`typeof process` guard
+  plus `@types/node` moved to devDependencies).
+
+---
+
 ## [0.4.0] — 2026-04-24
 
 Two follow-ups on the v0.3.9 polish: a centering fix on `<BoxLoader>`

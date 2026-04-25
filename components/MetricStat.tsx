@@ -2,7 +2,7 @@ import * as React from "react";
 import "./MetricStat.css";
 
 export interface MetricStatProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "children" | "prefix"> {
   /** Small uppercase label above the value. */
   label: React.ReactNode;
   /** Numeric value rendered in mono. */

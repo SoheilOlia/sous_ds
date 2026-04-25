@@ -21,10 +21,18 @@ const requiredPaths = [
   "TASTE_LOG.md",
   "components/index.ts",
   "design-tokens.json",
+  "dist/index.js",
+  "dist/index.cjs",
+  "dist/index.d.ts",
+  "dist/components/index.js",
+  "dist/components/motion.js",
+  "dist/styles.css",
+  "dist/tokens.css",
   "examples/slop-vs-system.html",
   "quality-evaluator.md",
   "refusals.json",
   "scripts/lint.mjs",
+  "tailwind.preset.cjs",
   "tokens.css",
 ];
 
