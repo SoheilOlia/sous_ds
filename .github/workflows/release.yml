@@ -35,7 +35,12 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Install
-        run: npm ci
+        run: npm ci --include=dev
+        env:
+          # Explicitly opt out of production mode so devDependencies
+          # (tsup, typescript) install — GH Actions sometimes inherits
+          # NODE_ENV=production from the runner environment.
+          NODE_ENV: development
 
       - name: Lint (UI rules)
         run: npm run lint:ui
