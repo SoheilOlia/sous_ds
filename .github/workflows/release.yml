@@ -29,18 +29,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Note: we deliberately do NOT pass `registry-url` here.
+      # When `registry-url` is set together with NODE_AUTH_TOKEN in env,
+      # `actions/setup-node` writes an .npmrc that applies the auth
+      # token to every package fetch — public package installs then
+      # hang and crash with "Exit handler never called!" Auth is
+      # configured later, only for the publish step.
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
 
       - name: Install
-        run: npm ci --include=dev
-        env:
-          # Explicitly opt out of production mode so devDependencies
-          # (tsup, typescript) install — GH Actions sometimes inherits
-          # NODE_ENV=production from the runner environment.
-          NODE_ENV: development
+        run: npm ci
 
       - name: Lint (UI rules)
         run: npm run lint:ui
@@ -60,10 +61,15 @@ jobs:
             exit 1
           fi
 
+      - name: Configure npm auth
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > "$HOME/.npmrc"
+          echo "registry=https://registry.npmjs.org/" >> "$HOME/.npmrc"
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish to npm
         run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         env:
