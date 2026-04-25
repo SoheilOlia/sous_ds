@@ -1,0 +1,77 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+# Tag push → build → publish to npm + create a GitHub Release.
+#
+# Setup (one-time, before this workflow can run):
+# 1. Create an npm account at https://www.npmjs.com/ and verify ownership of `sous-ds`.
+# 2. Generate an npm Automation token (Settings → Access Tokens → Generate New Token →
+#    "Automation"). Automation tokens skip 2FA prompts so they work in CI.
+# 3. In this repo: Settings → Secrets and variables → Actions → New repository secret
+#    Name: NPM_TOKEN
+#    Value: <the automation token from step 2>
+#
+# After that, every `git push origin v0.x.y` triggers a publish.
+
+permissions:
+  contents: write   # needed to create the GitHub Release
+  id-token: write   # for npm provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint (UI rules)
+        run: npm run lint:ui
+
+      - name: Build
+        run: npm run build
+
+      - name: Pack check
+        run: npm run pack:check
+
+      - name: Verify tag matches package.json
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          PKG=$(node -p "require('./package.json').version")
+          if [ "$TAG" != "$PKG" ]; then
+            echo "Tag v$TAG does not match package.json version $PKG"
+            exit 1
+          fi
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          # Pull the matching CHANGELOG section into the release notes.
+          # Falls back to a generic message if the section isn't found.
+          NOTES=$(awk -v ver="$TAG" '
+            /^## \[/ { if (found) exit; if ($2 == "[" substr(ver,2) "]") found=1; next }
+            found
+          ' CHANGELOG.md)
+          if [ -z "$NOTES" ]; then
+            NOTES="Release $TAG. See CHANGELOG.md for details."
+          fi
+          gh release create "$TAG" --title "$TAG" --notes "$NOTES"
