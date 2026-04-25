@@ -4,6 +4,29 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.5.1] — 2026-04-25
+
+Publish hygiene — clears the npm publish warnings that surfaced on the
+v0.5.0 first-publish attempt. No source changes.
+
+### Fixed
+- **`bin[sous-lint]` no longer stripped on publish.** npm 11.x rejected
+  `./scripts/lint.mjs` because the script wasn't marked executable and
+  the leading `./` failed bin-path validation. Fixed by `chmod +x` on
+  every `scripts/*.mjs` and dropping the leading `./` in the bin entry
+  (relative paths in `package.json` resolve from the package root
+  regardless). After install, `npx sous-lint` now works.
+- **`repository.url`** normalized to the `git+` prefix npm prefers.
+
+### Note
+v0.5.0 is on GitHub but never published to npm — the corp network
+filters direct access to `registry.npmjs.org` (Cloudflare WARP
+"Dependency Confusion" rule). Future releases publish via the
+`.github/workflows/release.yml` pipeline, which runs on GitHub's
+network and uses the `NPM_TOKEN` secret.
+
+---
+
 ## [0.5.0] — 2026-04-24
 
 **Installable release.** Previously the library shipped raw `.ts`/`.tsx`
