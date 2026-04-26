@@ -7,7 +7,58 @@ Monospace for data. 1px borders over shadows. Two semantic accents only. Motion 
 v0.6.0 · auto-onboarding · 2026-04-25
 ```
 
-Cash Sans display + Geist body + Geist Mono. WCAG AA on every foreground/background pair. Structured as a skill-ready repo.
+---
+
+## Install
+
+In any React project — new or existing — run these two commands:
+
+```bash
+npm install sous-ds && npx sous-ds init
+```
+
+That's it. After those two commands every AI assistant configured for the project (**Cursor · Claude Code · Codex · Goose**, plus anything else that reads `AGENTS.md`) automatically follows the contract: no further prompting required.
+
+Then in your code:
+
+```tsx
+// app/layout.tsx — once at the app root
+import "sous-ds/styles.css";
+
+// anywhere
+import { Button, Card, LiveDot, BlockLoader } from "sous-ds";
+```
+
+Peer dep: React 18 or 19. Ships ESM + CJS + full TypeScript types.
+
+### Tailwind users
+
+```js
+// tailwind.config.cjs
+const sousPreset = require("sous-ds/tailwind");
+module.exports = { presets: [sousPreset], content: ["./src/**/*.{ts,tsx}"] };
+```
+
+Every `--ds-*` token becomes a Tailwind utility (`bg-ds-surface`, `text-ds-primary`, `gap-ds-5`, `rounded-ds-md`, `duration-ds-standard`, ...). All utilities resolve to CSS variables, so overriding a token cascades through every class automatically.
+
+### What `npx sous-ds init` actually writes
+
+It drops one bootstrap file at each agent's expected location, pointing back at the installed package:
+
+| Path | Read by |
+|---|---|
+| `AGENTS.md` (root, managed block) | Codex CLI, Goose, the `agents.md` spec |
+| `CLAUDE.md` (root, managed block) | Claude Code |
+| `.cursor/rules/sous-ds.mdc` | Cursor |
+| `.claude/skills/sous-ds/SKILL.md` | Claude Code per-project skills |
+
+Idempotent (safe to re-run after upgrading) and never clobbers user content — managed-block markers preserve text above and below. `--dry-run` shows the plan, `--force` overwrites owned files.
+
+### Other entry points
+
+- **Plain HTML / no bundler:** `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sous-ds@latest/dist/styles.css">`
+- **Standalone agent skill (no React):** `curl -fsSL https://raw.githubusercontent.com/SoheilOlia/sous_ds/main/install.sh | bash`
+- **Full subpath reference and per-consumer details:** [INSTALL.md](./INSTALL.md)
 
 ---
 
@@ -26,56 +77,7 @@ A full contract for building interfaces that feel like precision instruments ins
 
 Plus: `tokens.css` (runtime CSS variables), `components/` (reference implementations), `preview.html` (visual catalog).
 
----
-
-## Install
-
-Three install paths; pick the one matching your consumer. Full details in [INSTALL.md](./INSTALL.md).
-
-### React app
-
-```bash
-npm install sous-ds
-npx sous-ds init     # wires the contract into Cursor / Claude Code / Codex / Goose
-```
-
-```tsx
-// app/layout.tsx
-import "sous-ds/styles.css";
-import { Button, Card, LiveDot } from "sous-ds";
-```
-
-`init` writes a managed block to `AGENTS.md` / `CLAUDE.md` and drops rule files at `.cursor/rules/sous-ds.mdc` and `.claude/skills/sous-ds/SKILL.md`, so every AI assistant on the project obeys the contract without you re-prompting it. Idempotent + safe on existing files.
-
-Peer dep: React 18 or 19. Ships ESM + CJS + full types.
-
-### Tailwind CSS app
-
-```js
-// tailwind.config.cjs
-const sousPreset = require("sous-ds/tailwind");
-module.exports = { presets: [sousPreset], content: [/* ... */] };
-```
-
-```css
-/* src/global.css */
-@import "sous-ds/tokens.css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-```
-
-Every `--ds-*` token becomes a Tailwind utility — `bg-ds-surface`, `text-ds-primary`, `gap-ds-5`, `rounded-ds-md`, `duration-ds-standard`. All utilities resolve to CSS variables, so overriding a token propagates through every class automatically.
-
-### Agent skill (Claude Code / Codex / Goose)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/SoheilOlia/sous_ds/main/install.sh | bash
-```
-
-Drops `SKILL.md`, `DESIGN.md`, `AGENTS.md`, `ANIMATION_RULES.md`, `TASTE_LOG.md`, `refusals.json`, `tokens.css`, and the component reference implementations into the current directory. Or `npm install sous-ds` if the agent already reads `node_modules/` — every contract file ships with the package.
-
-`Cash Sans` is the display/page-title face. If it's installed locally or self-hosted in your product, `--ds-font-display` picks it up; otherwise display roles fall back to Geist.
+Cash Sans display + Geist body + Geist Mono. WCAG AA on every foreground/background pair.
 
 ### Recommended companion
 
