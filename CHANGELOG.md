@@ -4,6 +4,43 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.6.0] — 2026-04-25
+
+**Auto-onboarding for AI coding assistants.** `npm install sous-ds`
+puts the contract files inside `node_modules/`, but no agent reads
+`node_modules/` for design rules — each looks at specific paths at
+the project root. This release ships the bridge.
+
+### Added
+- **`npx sous-ds init`** — one-shot CLI that wires the contract into
+  every AI assistant configured for the current project. Writes:
+  - `AGENTS.md` (root, managed block) — covers Codex CLI, Goose, and
+    the emerging agents.md spec
+  - `CLAUDE.md` (root, managed block) — Claude Code's preferred entry
+  - `.cursor/rules/sous-ds.mdc` — Cursor rule with `alwaysApply: true`
+  - `.claude/skills/sous-ds/SKILL.md` — Claude Code per-project skill
+  Idempotent (safe to re-run after upgrading); never clobbers user
+  content (managed-block markers preserve text above and below);
+  `--dry-run` shows the plan, `--force` overwrites owned files.
+- **Two new bin entries:** `sous-ds` (the init CLI) alongside the
+  existing `sous-lint`. After install, both are on `npx`.
+- **`bin/init.test.mjs`** — 10 tests covering managed-block insert,
+  replace, idempotency, and clobber-refusal. Runs via the built-in
+  `node --test` runner; no test-framework devDep added.
+- **`npm test`** wired to the test runner. `npm verify` now runs
+  lint + tests + pack-check.
+
+### Note
+The full workflow consumers expect now works:
+\`\`\`bash
+npm install sous-ds
+npx sous-ds init
+\`\`\`
+After those two commands, every AI assistant on the project follows
+the contract without further prompting.
+
+---
+
 ## [0.5.1] — 2026-04-25
 
 Publish hygiene — clears the npm publish warnings that surfaced on the

@@ -11,7 +11,17 @@ Install the npm package. Components are tree-shakeable ESM with full TypeScript 
 ```bash
 npm install sous-ds
 # or: pnpm add sous-ds / yarn add sous-ds / bun add sous-ds
+npx sous-ds init    # wires the contract into Cursor / Claude Code / Codex / Goose
 ```
+
+`sous-ds init` is the bridge that turns "package installed" into "every AI assistant on this project follows the contract." It writes a small bootstrap file at each agent's expected location:
+
+- `AGENTS.md` (root) — the emerging agents.md spec; read by Codex CLI, Goose, and most coding agents
+- `CLAUDE.md` (root) — Claude Code's preferred entrypoint
+- `.cursor/rules/sous-ds.mdc` — Cursor rule with `alwaysApply: true`
+- `.claude/skills/sous-ds/SKILL.md` — Claude Code per-project skill discovery
+
+It's idempotent (safe to re-run after upgrading sous-ds) and never clobbers user content. Existing `AGENTS.md` / `CLAUDE.md` files get a managed block appended between markers; user content above and below is preserved. Pass `--dry-run` to see what would change, `--force` to overwrite owned files.
 
 Load the stylesheet once at the app root (the tokens + every component's CSS, in the right order):
 
@@ -54,6 +64,13 @@ React 18 or 19. `npm` will warn if missing; your app almost certainly already ha
 | `sous-ds/tokens` | DTCG JSON tokens (machine-readable source) |
 | `sous-ds/refusals` | Machine-readable refusal corpus for agent linting |
 | `sous-ds/skill` | SKILL.md path for agent tooling |
+
+### Bin commands
+
+| Command | Purpose |
+|---|---|
+| `npx sous-ds init` | Wire the contract into Cursor / Claude Code / Codex / Goose for the current project. Idempotent. |
+| `npx sous-lint` | Run the implementation linter against the current project's components/CSS |
 
 ---
 

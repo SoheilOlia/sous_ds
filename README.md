@@ -4,7 +4,7 @@ A dark-first, data-dense, restraint-led design system for AI coding agents.
 Monospace for data. 1px borders over shadows. Two semantic accents only. Motion under 300ms.
 
 ```
-v0.5.0 · installable · 2026-04-24
+v0.6.0 · auto-onboarding · 2026-04-25
 ```
 
 Cash Sans display + Geist body + Geist Mono. WCAG AA on every foreground/background pair. Structured as a skill-ready repo.
@@ -36,6 +36,7 @@ Three install paths; pick the one matching your consumer. Full details in [INSTA
 
 ```bash
 npm install sous-ds
+npx sous-ds init     # wires the contract into Cursor / Claude Code / Codex / Goose
 ```
 
 ```tsx
@@ -43,6 +44,8 @@ npm install sous-ds
 import "sous-ds/styles.css";
 import { Button, Card, LiveDot } from "sous-ds";
 ```
+
+`init` writes a managed block to `AGENTS.md` / `CLAUDE.md` and drops rule files at `.cursor/rules/sous-ds.mdc` and `.claude/skills/sous-ds/SKILL.md`, so every AI assistant on the project obeys the contract without you re-prompting it. Idempotent + safe on existing files.
 
 Peer dep: React 18 or 19. Ships ESM + CJS + full types.
 
@@ -206,4 +209,4 @@ Apache 2.0. See `LICENSE`.
 
 ## Status
 
-**beta / v0.5.0 — installable.** Published to npm, React components ship as ESM + CJS + types, Tailwind preset exposes every token as a utility, and the one-line installer drops the contract into any agent's working directory. The contract is stable; token names may shift before v1.
+**beta / v0.6.0 — auto-onboarding.** Published to npm with `npm install sous-ds` + `npx sous-ds init`. Wires the contract into Cursor / Claude Code / Codex / Goose for any project in two commands. React components ship as ESM + CJS + types, Tailwind preset exposes every token as a utility. The contract is stable; token names may shift before v1.
