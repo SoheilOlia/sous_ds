@@ -20,6 +20,7 @@ const requiredPaths = [
   "SKILL.md",
   "TASTE_LOG.md",
   "bin/init.mjs",
+  "bin/sous-ds.mjs",
   "components/index.ts",
   "design-tokens.json",
   "dist/index.js",

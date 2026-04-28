@@ -4,6 +4,58 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.6.1] — 2026-04-27
+
+**`npx sous-ds init` was silently no-op'ing in production.** Fixed.
+This is the bug @soheil hit minutes after v0.6.0 published — `npm
+install sous-ds@latest && npx sous-ds init` printed nothing and wrote
+no files, even though every unit test was green.
+
+### Fixed
+- **`bin/init.mjs` `isDirect` check failed against bin symlinks.** The
+  ESM "main module" idiom
+  \`\`\`js
+  const isDirect = import.meta.url === \`file://${'$'}{process.argv[1]}\`;
+  \`\`\`
+  silently fails when the script is invoked through a bin symlink:
+  `process.argv[1]` is the symlink path
+  (`node_modules/.bin/sous-ds`) but `import.meta.url` is the resolved
+  target (`node_modules/sous-ds/bin/init.mjs`). They never match,
+  so `main()` never ran. npm and npx **always** invoke bins through
+  symlinks, so every real-world install hit this. Tests passed
+  because tests import the module directly, not through a symlink.
+
+### Changed
+- **Architectural fix:** split the bin entrypoint from the library.
+  `bin/init.mjs` is now pure exports (testable). `bin/sous-ds.mjs`
+  is a tiny new entrypoint that imports `main` and always runs it.
+  `package.json` `bin.sous-ds` points at the new file. No detection
+  logic anywhere — that whole class of bug is now structurally
+  impossible.
+- **`main()` now returns an exit code instead of calling
+  `process.exit()`** — makes it cleanly testable and lets the
+  entrypoint own process lifecycle.
+
+### Added
+- **`--version` / `-V` flag** prints just the package version. Useful
+  for sanity-checking `npm install` actually upgraded.
+- **`sous-ds@<version> init · <cwd>`** in the header so you can see
+  at a glance which version is running.
+- **8 new subprocess + symlink regression tests.** They spawn the
+  real entrypoint through a real symlink (exactly as npm/npx do)
+  and assert it prints the plan, supports `--dry-run`, supports
+  `--version` / `--help`, writes the four files, and is idempotent.
+  Test count: 10 → 18. Total runtime: 130ms → 910ms.
+
+### Migration
+None for consumers. `npm install sous-ds@latest` then re-run the
+two-command flow:
+\`\`\`bash
+npm install sous-ds && npx sous-ds init
+\`\`\`
+
+---
+
 ## [0.6.0] — 2026-04-25
 
 **Auto-onboarding for AI coding assistants.** `npm install sous-ds`

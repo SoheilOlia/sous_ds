@@ -1,11 +1,16 @@
-#!/usr/bin/env node
 /*
- * sous-ds · init
+ * sous-ds · init (library)
  *
- * Run after `npm install sous-ds` to wire the design contract into
- * every AI coding assistant configured for this project. Drops a
- * small bootstrap file in each agent's expected location, telling
- * the agent to read the full contract from node_modules/sous-ds/.
+ * Pure library. Tests import from here. The CLI entrypoint lives at
+ * bin/sous-ds.mjs and just calls main() — that keeps detection
+ * logic (which is fragile across Node versions and bin symlinks)
+ * out of this file entirely.
+ *
+ * Run via `npx sous-ds init` after `npm install sous-ds` to wire the
+ * design contract into every AI coding assistant configured for this
+ * project. Drops a small bootstrap file in each agent's expected
+ * location, telling the agent to read the full contract from
+ * node_modules/sous-ds/.
  *
  * Files written (idempotent — safe to re-run):
  *   AGENTS.md                          → root, managed block.
@@ -26,9 +31,11 @@
  *   .claude/skills/sous-ds/SKILL.md
  *
  * Usage:
- *   npx sous-ds init
- *   npx sous-ds init --dry-run     (print plan, write nothing)
- *   npx sous-ds init --force       (overwrite even non-managed content)
+ *   npx sous-ds init                  Apply the bootstrap
+ *   npx sous-ds init --dry-run        Print the plan, write nothing
+ *   npx sous-ds init --force          Overwrite owned files
+ *   npx sous-ds --version             Print package version
+ *   npx sous-ds --help                Print usage
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync, statSync } from "node:fs";
@@ -262,41 +269,80 @@ function planTarget(target, cwd, opts) {
   throw new Error(`unknown mode: ${target.mode}`);
 }
 
-function main(argv) {
-  const cwd = process.cwd();
-  const opts = {
-    dryRun: argv.includes("--dry-run") || argv.includes("-n"),
-    force: argv.includes("--force") || argv.includes("-f"),
-    help: argv.includes("--help") || argv.includes("-h"),
-  };
+/**
+ * Read the package version from node_modules/sous-ds/package.json
+ * (or whatever PKG_ROOT resolves to). Returns "unknown" on failure
+ * so a missing/malformed package.json never crashes the CLI.
+ */
+function readPackageVersion() {
+  try {
+    const pkg = JSON.parse(readFileSync(join(PKG_ROOT, "package.json"), "utf8"));
+    return pkg.version || "unknown";
+  } catch {
+    return "unknown";
+  }
+}
 
-  if (opts.help) {
-    console.log(`Usage: npx sous-ds init [options]
+const HELP = `Usage: npx sous-ds [command] [options]
 
 Wires the sous-ds design contract into every AI coding assistant
 configured for this project (Cursor, Claude Code, Codex, Goose, and
-any agent reading AGENTS.md).
+any agent that reads AGENTS.md).
+
+Commands:
+  init             Apply the bootstrap (default; runs when no command given)
 
 Options:
   -n, --dry-run    Print the plan; write nothing
   -f, --force      Overwrite owned files even if they exist
+  -V, --version    Print sous-ds version
   -h, --help       Show this help
 
-Idempotent: safe to re-run after upgrading sous-ds.`);
-    process.exit(0);
+Idempotent: safe to re-run after upgrading sous-ds. Existing
+AGENTS.md / CLAUDE.md content above and below the managed-block
+markers is preserved.`;
+
+/**
+ * Run the init bootstrap. Exits the process on terminal errors
+ * (sanity-check failure, write errors). Returns 0 on success.
+ *
+ * Exported so the CLI entrypoint (bin/sous-ds.mjs) and tests can
+ * both invoke it directly without re-implementing arg parsing.
+ */
+export function main(argv = []) {
+  const opts = {
+    dryRun: argv.includes("--dry-run") || argv.includes("-n"),
+    force: argv.includes("--force") || argv.includes("-f"),
+    help: argv.includes("--help") || argv.includes("-h"),
+    version: argv.includes("--version") || argv.includes("-V"),
+  };
+
+  if (opts.help) {
+    console.log(HELP);
+    return 0;
+  }
+
+  if (opts.version) {
+    console.log(readPackageVersion());
+    return 0;
   }
 
   // Sanity check that PKG_ROOT looks like the installed sous-ds package.
+  // Without SKILL.md, the .claude/skills/ target can't be populated and
+  // the bootstrap content references files that won't exist — fail loud.
   if (!fileExists(join(PKG_ROOT, "SKILL.md"))) {
-    console.error(`sous-ds init: cannot find SKILL.md in ${PKG_ROOT}.`);
-    console.error("Are you running this from inside an installed sous-ds package?");
-    process.exit(1);
+    console.error(`sous-ds: cannot find SKILL.md in ${PKG_ROOT}.`);
+    console.error("This usually means the package is not installed correctly.");
+    console.error("Try: rm -rf node_modules package-lock.json && npm install sous-ds");
+    return 1;
   }
 
+  const cwd = process.cwd();
+  const version = readPackageVersion();
   const targets = buildTargets(PKG_ROOT);
   const plans = targets.map((t) => ({ target: t, ...planTarget(t, cwd, opts) }));
 
-  console.log(`sous-ds init · ${cwd}`);
+  console.log(`sous-ds@${version} init · ${cwd}`);
   console.log("");
   let wrote = 0;
   let skipped = 0;
@@ -323,8 +369,5 @@ Idempotent: safe to re-run after upgrading sous-ds.`);
     console.log(`Wrote ${wrote} file${wrote === 1 ? "" : "s"}, skipped ${skipped}.`);
     console.log(`Verify with: npx sous-lint`);
   }
+  return 0;
 }
-
-// CLI entry — only run when invoked directly, not when imported by tests.
-const isDirect = import.meta.url === `file://${process.argv[1]}`;
-if (isDirect) main(process.argv.slice(2));

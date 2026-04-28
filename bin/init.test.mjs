@@ -13,7 +13,15 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { mkdtempSync, mkdirSync, rmSync, symlinkSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { applyManagedBlock, planLine, buildTargets } from "./init.mjs";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ENTRYPOINT = resolve(__dirname, "sous-ds.mjs");
 
 const BEGIN = "<!-- BEGIN sous-ds managed — do not edit; re-run `npx sous-ds init` to update. -->";
 const END   = "<!-- END sous-ds managed -->";
@@ -112,4 +120,118 @@ test("buildTargets: returns the four expected paths in order", () => {
   assert.equal(targets[1].mode, "managed-block");
   assert.equal(targets[2].mode, "owned-file");
   assert.equal(targets[3].mode, "owned-file");
+});
+
+// ─── Subprocess + symlink regression tests ────────────────────────────
+//
+// The bug fixed in v0.6.1 was: bin/init.mjs's `isDirect` check
+// (`import.meta.url === file://${process.argv[1]}`) silently failed when
+// invoked through a bin symlink — npm/npx ALWAYS invoke via symlink, so
+// the CLI silently no-op'd in production while passing every unit test
+// because tests import directly. These tests spawn the real entrypoint
+// through a real symlink so the same failure mode can never recur
+// silently again.
+
+function withTmpDir(fn) {
+  const dir = mkdtempSync(join(tmpdir(), "sous-ds-cli-test-"));
+  try {
+    return fn(dir);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+test("CLI: direct invocation prints the plan and exits 0", () => {
+  withTmpDir((cwd) => {
+    const result = spawnSync(process.execPath, [ENTRYPOINT, "--dry-run"], {
+      cwd,
+      encoding: "utf8",
+    });
+    assert.equal(result.status, 0, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+    assert.match(result.stdout, /sous-ds@.* init/);
+    assert.match(result.stdout, /AGENTS\.md/);
+    assert.match(result.stdout, /CLAUDE\.md/);
+    assert.match(result.stdout, /\.cursor\/rules\/sous-ds\.mdc/);
+    assert.match(result.stdout, /\.claude\/skills\/sous-ds\/SKILL\.md/);
+    assert.match(result.stdout, /Plan only\. Re-run without --dry-run to apply\./);
+  });
+});
+
+test("CLI: invocation through a symlink (the bin pattern) still works", () => {
+  // Reproduces exactly how npm/npx invoke the bin: via a symlink in
+  // node_modules/.bin/ that points at the real entrypoint. Pre-v0.6.1
+  // this path silently no-op'd because of the isDirect check.
+  withTmpDir((cwd) => {
+    const link = join(cwd, "fake-bin");
+    symlinkSync(ENTRYPOINT, link);
+    const result = spawnSync(process.execPath, [link, "--dry-run"], {
+      cwd,
+      encoding: "utf8",
+    });
+    assert.equal(result.status, 0, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+    assert.match(result.stdout, /sous-ds@.* init/);
+    assert.match(result.stdout, /\+ create  AGENTS\.md/);
+    // No writes in --dry-run, even via symlink.
+    assert.equal(existsSync(join(cwd, "AGENTS.md")), false);
+  });
+});
+
+test("CLI: --version prints just the version and exits 0", () => {
+  const result = spawnSync(process.execPath, [ENTRYPOINT, "--version"], {
+    encoding: "utf8",
+  });
+  assert.equal(result.status, 0);
+  // Should be the package's own version, e.g. "0.6.1\n".
+  const pkg = JSON.parse(readFileSync(resolve(__dirname, "..", "package.json"), "utf8"));
+  assert.equal(result.stdout.trim(), pkg.version);
+});
+
+test("CLI: -V short flag also prints the version", () => {
+  const result = spawnSync(process.execPath, [ENTRYPOINT, "-V"], { encoding: "utf8" });
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /^\d+\.\d+\.\d+/);
+});
+
+test("CLI: --help prints usage and exits 0", () => {
+  const result = spawnSync(process.execPath, [ENTRYPOINT, "--help"], { encoding: "utf8" });
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Usage: npx sous-ds/);
+  assert.match(result.stdout, /--dry-run/);
+  assert.match(result.stdout, /--force/);
+  assert.match(result.stdout, /--version/);
+});
+
+test("CLI: real run writes the four files in an empty cwd", () => {
+  withTmpDir((cwd) => {
+    const result = spawnSync(process.execPath, [ENTRYPOINT], { cwd, encoding: "utf8" });
+    assert.equal(result.status, 0, `stderr=${result.stderr}`);
+    assert.match(result.stdout, /Wrote 4 files/);
+    assert.equal(existsSync(join(cwd, "AGENTS.md")), true);
+    assert.equal(existsSync(join(cwd, "CLAUDE.md")), true);
+    assert.equal(existsSync(join(cwd, ".cursor/rules/sous-ds.mdc")), true);
+    assert.equal(existsSync(join(cwd, ".claude/skills/sous-ds/SKILL.md")), true);
+  });
+});
+
+test("CLI: re-running is idempotent (skip x4 on second run)", () => {
+  withTmpDir((cwd) => {
+    spawnSync(process.execPath, [ENTRYPOINT], { cwd, encoding: "utf8" });
+    const second = spawnSync(process.execPath, [ENTRYPOINT], { cwd, encoding: "utf8" });
+    assert.equal(second.status, 0);
+    assert.match(second.stdout, /Wrote 0 files, skipped 4/);
+  });
+});
+
+test("CLI: existing AGENTS.md gets a managed block appended without clobbering user content", () => {
+  withTmpDir((cwd) => {
+    const userContent = "# My project\n\nMy own AGENTS.md rules.\n";
+    writeFileSync(join(cwd, "AGENTS.md"), userContent);
+    const result = spawnSync(process.execPath, [ENTRYPOINT], { cwd, encoding: "utf8" });
+    assert.equal(result.status, 0);
+    const after = readFileSync(join(cwd, "AGENTS.md"), "utf8");
+    assert.ok(after.startsWith("# My project"), "user content preserved at top");
+    assert.ok(after.includes("My own AGENTS.md rules."), "user content body preserved");
+    assert.ok(after.includes("BEGIN sous-ds managed"), "managed block inserted");
+    assert.ok(after.includes("END sous-ds managed"), "managed block closed");
+  });
 });
