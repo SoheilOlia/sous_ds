@@ -53,7 +53,7 @@ Rules are grouped. Severity is fixed per rule. Violations produce structured fin
 | `TY05` | warning | Uppercase label with tracking below 0.06em |
 | `TY06` | warning | Font size not from the defined scale (`display`, `h1`–`h3`, `body-*`, `label`, `mono-*`) |
 | `TY07` | error | Underline used on non-link text |
-| `TY08` | error | Display or `h1` falls back to a serif when Cash Sans is unavailable. Fallback must be `Geist Mono` at the same display size with `font-weight: 600`. Source: `R-TYPE-002`. |
+| `TY08` | error | Display or `h1` falls back to a serif when Cash Sans is unavailable. Fallback must be `Geist Mono` at the same display size with `font-weight: 600`. Source: `R-TYPE-004`. |
 
 ### Layout (LY)
 

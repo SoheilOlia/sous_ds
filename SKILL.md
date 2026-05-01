@@ -121,7 +121,7 @@ Load `refusals.json` for the full machine-readable corpus with patterns. Summary
 | R-COLOR-002 | Decorative brand hues (purple/teal/gold/orange or decorative green) | Accent discipline |
 | R-COLOR-003 | Accent on CTA buttons | Semantic collision |
 | R-TYPE-001 | Inter/Roboto/system-ui as primary | AI-slop type signature |
-| R-TYPE-002 | Display/h1 falling back to a serif when Cash Sans is unavailable | Voice drift; fallback must be Geist Mono Bold at the same size |
+| R-TYPE-004 | Display/h1 falling back to a serif when Cash Sans is unavailable | Voice drift; fallback must be Geist Mono Bold at the same size |
 | R-ELEV-001 | Shadow blur ≥ 25px | AI-slop elevation |
 | R-ELEV-002 | Dark card radius > 16px | Too soft for instrument UI |
 | R-MOTION-001 | `transition: all` | Opaque, thrash-prone |
@@ -263,18 +263,21 @@ Before writing any JSX for a page, Claude must answer these in the order shown. 
 | "Add a status callout / RAG indicator" | Use **RAGStatus** recipe. State word + colon + verb-led clause; one explanatory sentence; ≤2 supporting `<MetricStat>`. |
 | "List recent PRs / events / activity" | Use **AgentLog** (live) or **ReceiptStack** (historical). Never a markdown table with status pills. Cite R-COMPOSE-003 if pill density is the temptation. |
 | "Where we are going" / "What we are building" as h1 | Refuse R-VOICE-003. Replace with the artifact: "Five phases queued." "Ten stages, four wired." |
-| "Cash Sans isn't loading; can we use a serif?" | Refuse R-TYPE-002. Fallback is `Geist Mono` at the same display size with `font-weight: 600`. Never a serif. |
+| "Cash Sans isn't loading; can we use a serif?" | Refuse R-TYPE-004. Fallback is `Geist Mono` at the same display size with `font-weight: 600`. Never a serif. |
 
-## Roadmap primitives (not yet shipped)
+## Roadmap primitives
 
-These are the signature AI-native components the system is growing toward. If a user needs one before it ships, compose from current primitives and flag the gap:
+Two components graduated to the catalogue in v0.7.1:
 
-- **`<AgentStream>`** — token-by-token reveal, variable-rate easing, cursor glyph
-- **`<Citation>`** — inline source chip with hover preview (extends `<Pill>`)
-- **`<Transcript>`** — role-keyed rows with mono timestamps
-- **`<TokenMeter>`** — context-window usage using mono + tabular-nums
-- **`<DiffBlock>`** — before/after with accent for changes only
-- **`<ConfidenceBar>`** — low/mid/high probability by length (extends dot motif)
+- **`<AgentStream>`** — token-by-token reveal of agent or model output. Composes the `typewriter` motion primitive. Inline span; mono type; `▍` cursor glyph blinks via opacity. Cancellable via unmount. Use inside `<ToolCall>` detail rows or as the body of an AgentLog recipe row.
+- **`<Citation>`** — inline source chip with hover/focus preview. Extends `<Pill>` shape; on hover or keyboard focus a popover surfaces the source name + optional preview + meta. Replaces the 1.0 footgun of file paths inline in body prose (cite `R-VOICE-001`).
+
+Still on the roadmap (not yet shipped) — compose from current primitives and flag the gap if a user needs one:
+
+- **`<Transcript>`** — role-keyed rows with mono timestamps (v0.8)
+- **`<TokenMeter>`** — context-window usage using mono + tabular-nums (v0.8)
+- **`<DiffBlock>`** — before/after with accent for changes only (deferred — composable from existing primitives)
+- **`<ConfidenceBar>`** — low/mid/high probability by length (deferred — composable from `<DottedChart>`)
 
 ## Verify before shipping
 

@@ -62,7 +62,7 @@ This is the proof that the spec is sized correctly against the failing case stud
 
 | Failure (1.0 screenshot) | 2.0 fix | Evidence |
 |---|---|---|
-| Hero h1 in serif while body in mono | `R-TYPE-002` / `TY08` — fallback must be Geist Mono Bold | [`docs/specs/sous-ds-v2.md`](./sous-ds-v2.md) §"New refusals" |
+| Hero h1 in serif while body in mono | `R-TYPE-004` / `TY08` — fallback must be Geist Mono Bold | [`docs/specs/sous-ds-v2.md`](./sous-ds-v2.md) §"New refusals" |
 | Same `eyebrow + h1 + body + grid-of-cards` rhythm 7 times | `R-COMPOSE-002` (no recipe twice) + `R-COMPOSE-004` (≥3 recipes) | [`docs/specs/sous-ds-v2-composition-recipes.md`](./sous-ds-v2-composition-recipes.md) catalogue |
 | Pill walls by section 4 | `R-COMPOSE-003` — max 3 pills/card, 8 pills/section | [`SKILL.md`](../../SKILL.md) refusal table |
 | 4-of-18 components used; pipeline rendered as flat card grid | Intent → Component decision tree + `R-COMPOSE-001` | [`SKILL.md`](../../SKILL.md) §"Intent → component decision tree" |

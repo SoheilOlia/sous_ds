@@ -57,7 +57,7 @@ Five new layers, all additive. None rewrite or break 1.0.
 ```
 sous-ds 2.0
 ├── Layer 0: Tokens                 [1.0, preserved]
-├── Layer 1: Refusal corpus         [1.0, augmented with R-COMPOSE-*, R-VOICE-*, R-METRIC-*, R-TYPE-002]
+├── Layer 1: Refusal corpus         [1.0, augmented with R-COMPOSE-*, R-VOICE-*, R-METRIC-*, R-TYPE-004]
 ├── Layer 2: Component vocabulary   [1.0, preserved + 6 roadmap primitives promoted]
 ├── Layer 3: Composition Recipes    [NEW] — named page archetypes
 ├── Layer 4: Intent → Component     [NEW] — decision tree
@@ -219,7 +219,7 @@ These are new rule IDs that the Quality Evaluator and SKILL.md must enforce. Sev
 
 | ID | Severity | Check |
 |---|---|---|
-| `R-TYPE-002` / `TY08` | error | Display or h1 falls back to a serif when Cash Sans is unavailable. The fallback must be `Geist Mono` at the same display size with `font-weight: 600`, never a serif. |
+| `R-TYPE-004` / `TY08` | error | Display or h1 falls back to a serif when Cash Sans is unavailable. The fallback must be `Geist Mono` at the same display size with `font-weight: 600`, never a serif. (`R-TYPE-002` was already taken in the 1.0 corpus for full-width body paragraphs.) |
 | `R-COMPOSE-001` / `LY04` | error | Sequenced or DAG content rendered as a flat card grid instead of a structured primitive (`<DotTimeline>` / `<PulseTrail>` / `<DottedChart>`). |
 | `R-COMPOSE-002` / `LY05` | warning | A page renders the same recipe more than twice. Forces variance. |
 | `R-COMPOSE-003` / `CO07` | warning | A single card contains > 3 `<Pill>` instances, or a section contains > 8. Pills are status atoms, not page furniture. |
@@ -257,7 +257,7 @@ The contract is **fully backwards compatible**. Existing 1.0 consumers see no br
 - Tokens unchanged.
 - Refusals unchanged (only new ones added).
 - Components unchanged (4 promoted from roadmap, none removed or renamed).
-- One typography fallback rule changes behavior (`R-TYPE-002`) — projects already setting Geist as a fallback are unaffected.
+- One typography fallback rule changes behavior (`R-TYPE-004`) — projects already setting Geist as a fallback are unaffected.
 
 New 2.0 consumers opt in by:
 
@@ -276,7 +276,7 @@ The 2.0 spec is verified against the case-study page. After 2.0:
 
 | Failure (before) | Cause closed by | After (target) |
 |---|---|---|
-| Serif h1 in monospace page | `R-TYPE-002` | All headings in Geist Mono Bold (no Cash Sans available) |
+| Serif h1 in monospace page | `R-TYPE-004` | All headings in Geist Mono Bold (no Cash Sans available) |
 | Card monotony, 7 same sections | Composition Recipes + `R-COMPOSE-002` | 6+ distinct recipes per page draft |
 | Pill wall by section 4 | `R-COMPOSE-003` | Max 3 pills per card, max 8 per section |
 | Component starvation (4/18) | Intent → Component map | Pipeline page uses `<DotTimeline>`, `<PulseTrail>`, `<DottedChart>`, `<ToolCall>`, `<MetricStat>`, `<LiveBlock>`, `<InlineStatus>`, `<SegmentedBar>` (8+) |

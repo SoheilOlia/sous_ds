@@ -57,6 +57,12 @@ export type { MetricStatProps } from "./MetricStat";
 export { ToolCall } from "./ToolCall";
 export type { ToolCallProps } from "./ToolCall";
 
+export { AgentStream } from "./AgentStream";
+export type { AgentStreamProps } from "./AgentStream";
+
+export { Citation } from "./Citation";
+export type { CitationProps } from "./Citation";
+
 export { TetrisLoader } from "./TetrisLoader";
 export type {
   TetrisLoaderProps,

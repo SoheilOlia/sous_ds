@@ -1,6 +1,6 @@
 {
   "$schema": "https://sous-ds.dev/schema/refusals.v0.json",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Machine-readable refusal corpus. Agents MUST refuse requests that match these patterns, cite the id, and propose the canonical alternative. The refusal set is as important as the component set — it is how the system transfers taste.",
   "categories": {
     "color": "Hue, tone, and the reserved semantic accents",
@@ -11,7 +11,10 @@
     "state": "Loading, progress, and transient system state",
     "semantic": "Meaningful accent carriers and semantic discipline",
     "process": "How new components get designed, proposed, and added to the system",
-    "anti-slop": "The recognizable AI-slop signatures"
+    "anti-slop": "The recognizable AI-slop signatures",
+    "compose": "Page-level composition rules — recipes, density quotas, anti-card-grid, anti-pill-wall (2.0)",
+    "voice": "Copy contract — terse instrument-readout voice, banned phrases, rhythm variance (2.0)",
+    "metric": "Coherence rules for metric clusters (2.0)"
   },
   "refusals": [
     {
@@ -231,6 +234,110 @@
       "correct": "Name the action (`Summarize`, `Regenerate`, `Cite`). Use geometric or text-only affordance. Reserve the accent-live dot for active processing, not for 'AI present'.",
       "source": "DESIGN.md#voice",
       "manualCheck": true
+    },
+    {
+      "id": "R-TYPE-004",
+      "category": "typography",
+      "title": "Display or h1 falls back to a serif when Cash Sans is unavailable",
+      "pattern": "font-family:[^;]*(Times|Georgia|Garamond|Playfair|Cambria|Charter|serif)[^;]*;[\\s\\S]{0,200}(--ds-font-display|--ds-font-h1|font-size:\\s*(?:48|56|64|72|80|90)px)",
+      "severity": "error",
+      "rationale": "When Cash Sans isn't licensed/loaded, models reach for a serif fallback because hero headlines 'feel editorial.' That breaks the system's voice — sous-ds is a monospace-instrument aesthetic, never a serif page. The 1.0 case-study page rendered the hero in serif because no fallback was named.",
+      "correct": "Display and h1 fallback when Cash Sans is unavailable: `var(--ds-font-mono)` (Geist Mono) at the same display size with `font-weight: 600`. Never a serif. Set the `font-family` stack as `\"Cash Sans\", var(--ds-font-mono)` so the cascade reaches mono, not the system serif.",
+      "source": "docs/specs/sous-ds-v2.md#new-refusals",
+      "manualCheck": true
+    },
+    {
+      "id": "R-COMPOSE-001",
+      "category": "compose",
+      "title": "Sequenced or DAG content rendered as a flat card grid",
+      "pattern": "",
+      "severity": "error",
+      "rationale": "Pipeline pages, milestone strips, multi-stage processes, and DAG-shaped content rendered as a grid of `<Card>` elements lose their primary information: the order, flow, and per-stage state. The 1.0 case-study page rendered a 10-stage pipeline as a 5-card flat grid — the biggest creative miss on that page.",
+      "correct": "Use a structured primitive: `<DotTimeline>` for time-ordered stages with state, `<PulseTrail>` for live-now activity, `<DottedChart>` for per-stage density. See `docs/specs/sous-ds-v2-composition-recipes.md` (PipelineMap, MilestoneStrip, AgentLog).",
+      "source": "docs/specs/sous-ds-v2.md#new-refusals",
+      "manualCheck": true,
+      "appliesTo": [
+        "any page describing a pipeline, workflow, sequence, DAG, or multi-stage process",
+        "any 'show me how X flows from Y to Z' request",
+        "any milestone or phase visualization"
+      ]
+    },
+    {
+      "id": "R-COMPOSE-002",
+      "category": "compose",
+      "title": "Same composition recipe used more than twice on one page",
+      "pattern": "",
+      "severity": "warning",
+      "rationale": "Card monotony — every section the same `eyebrow + h1 + body + grid-of-cards` rhythm — is the dominant 1.0 failure mode. Repeating any single recipe more than twice flattens hierarchy and removes scannability.",
+      "correct": "A page must use ≥3 distinct recipes from the catalogue when `RHYTHM ≥ 4` (default). Pick the recipe whose intent matches each section's content shape; don't reach for the same recipe by default.",
+      "source": "docs/specs/sous-ds-v2-composition-recipes.md",
+      "manualCheck": true
+    },
+    {
+      "id": "R-COMPOSE-003",
+      "category": "compose",
+      "title": "Pill wall — too many `<Pill>` per card or per section",
+      "pattern": "(<Pill[\\s>][\\s\\S]{0,300}){4,}",
+      "severity": "warning",
+      "rationale": "Pills are status atoms. When a single card carries > 3 or a section carries > 8, pills lose their meaning and become page furniture. The 1.0 case-study page reached pill-wall density by section 4.",
+      "correct": "Cap at 3 pills per card, 8 per section. If you need more, restructure into `<DotTimeline>`, `<ToolCall>` rows, or a `<DottedChart>` — the content shape is wrong, not the pill count.",
+      "source": "docs/specs/sous-ds-v2.md#new-refusals",
+      "manualCheck": true
+    },
+    {
+      "id": "R-COMPOSE-004",
+      "category": "compose",
+      "title": "Page uses fewer than 3 distinct composition recipes when RHYTHM ≥ 4",
+      "pattern": "",
+      "severity": "warning",
+      "rationale": "Without recipe variance, every page converges on the same shape. The 2.0 contract requires ≥3 distinct recipes per page at default `RHYTHM` to force layout variation.",
+      "correct": "Choose ≥3 recipes whose intents match the page's content shapes. Default fallback set: MetricWall + RAGStatus + AgentLog covers most AI-product status surfaces.",
+      "source": "docs/specs/sous-ds-v2.md#new-refusals",
+      "manualCheck": true
+    },
+    {
+      "id": "R-METRIC-001",
+      "category": "metric",
+      "title": "MetricStat group without a shared unit or axis",
+      "pattern": "",
+      "severity": "warning",
+      "rationale": "A row of `<MetricStat>` reading `10`, `M2`, `5`, `2` mixes units that don't compose — count of stages, milestone label, count of fixtures, count of blockers. The numbers can't be compared. The 1.0 case-study page made this exact mistake twice.",
+      "correct": "A `<MetricStat>` group of 2+ must share a unit OR a clear semantic axis named in the eyebrow (e.g., `EVIDENCE MATURITY — % PER STAGE`). If units don't compose, split into separate one-stat callouts or pick a single axis and exclude the outliers.",
+      "source": "docs/specs/sous-ds-v2.md#new-refusals",
+      "manualCheck": true
+    },
+    {
+      "id": "R-VOICE-001",
+      "category": "voice",
+      "title": "File path appears in body prose",
+      "pattern": "(?:<p[^>]*>|>)[^<]*(?:[a-zA-Z0-9_-]+\\/){2,}[a-zA-Z0-9._-]+\\.(?:md|json|js|ts|tsx|css|html|yml|yaml|py|sh)",
+      "severity": "warning",
+      "rationale": "File paths in body prose (e.g., `consent_orders/docs/receipts/2026-04-28-smoke-matrix-expansion-receipt.md` set in a `<p>`) read like a status-meeting transcript, not interface copy. The 1.0 case-study page set three file paths inline in body prose.",
+      "correct": "File paths belong in `<code>` blocks, `<ToolCall>` detail rows, footnotes, or `<Citation>` chips. Body prose names the artifact (`Three receipts. See the ReceiptStack below.`), the path renders elsewhere.",
+      "source": "docs/specs/sous-ds-v2-voice.md#v4",
+      "manualCheck": false
+    },
+    {
+      "id": "R-VOICE-002",
+      "category": "voice",
+      "title": "Adjacent sections share micro-template (database-dump rhythm)",
+      "pattern": "",
+      "severity": "warning",
+      "rationale": "When every card in a page ends with the same closer template (e.g., `Evidence: X. Next: Y.`), the page reads as a database dump rather than designed copy. Rhythm variance is required by the voice contract.",
+      "correct": "Rotate among permitted card-closer templates: `Next: <subject-verb-object>.`, `Blocks on <subject>.`, `<Phase> remains <state>.`, `Owner: <name>.`, `Updates <event>.`, or no closer. Never two adjacent sections with the same closer.",
+      "source": "docs/specs/sous-ds-v2-voice.md#v6",
+      "manualCheck": true
+    },
+    {
+      "id": "R-VOICE-003",
+      "category": "voice",
+      "title": "Status-meeting phrasing in body prose, headlines, or eyebrows",
+      "pattern": "(?:>|\\b)(we are building|what we are building|what we're working on|things are stricter|main-branch truth|draft-PR truth|working-tree truth|still-blocked truth|where we are going|the project is not green because)\\b",
+      "severity": "info",
+      "rationale": "These phrasings come from engineering status meetings. They narrate the existence of the work rather than naming the state. The 1.0 case-study page used `we are building`, `things are stricter`, `main-branch truth`, and `where we are going` — every one of them obscured the actual state.",
+      "correct": "Replace with the named substitute from the V7 banned-phrase catalogue. `We are building…` → name the artifact. `Where we are going` → `Five phases queued.` `Things are stricter` → name what got stricter and how. `Main-branch truth` (as adjective) → `Lands on main.`",
+      "source": "docs/specs/sous-ds-v2-voice.md#v7",
+      "manualCheck": false
     },
     {
       "id": "R-FAMILY-001",

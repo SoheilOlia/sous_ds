@@ -1,0 +1,144 @@
+/* ============================================================
+   Citation.css — inline source chip with hover preview
+   Extends the Pill family shape; adds a popover on hover/focus.
+   ============================================================ */
+
+.ds-citation {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  height: var(--ds-space-6);
+  padding: 0 var(--ds-space-4);
+  border: 1px dashed var(--ds-line-strong);
+  border-radius: var(--ds-radius-pill);
+  background: transparent;
+  color: var(--ds-text-secondary);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  /* Transitioning `color` is banned by MO02 — the chip flips its
+     foreground via the filled-state rule below; only background and
+     border animate to keep the motion contract clean. */
+  transition:
+    border-color var(--ds-dur-micro) var(--ds-ease-out),
+    background-color var(--ds-dur-micro) var(--ds-ease-out);
+}
+
+/* Hover / focus / open states promote to filled, matching Pill[filled] */
+.ds-citation:hover,
+.ds-citation:focus-visible,
+.ds-citation[data-open] {
+  background: var(--ds-text-primary);
+  color: var(--ds-text-on-primary);
+  border-color: var(--ds-text-primary);
+}
+
+.ds-citation:focus-visible {
+  outline: 2px solid var(--ds-line-strong);
+  outline-offset: 2px;
+}
+
+.ds-citation[href]:hover .ds-citation__id {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ds-citation__id {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ============================================================
+   Popover — surface-raised, 1px border, no shadow.
+   Positioned above the trigger, centered, 8px gap.
+   ============================================================ */
+
+.ds-citation__popover {
+  position: absolute;
+  bottom: calc(100% + var(--ds-space-3));
+  left: 50%;
+  transform: translateX(-50%) translateY(var(--ds-space-1)) scale(0.97);
+  transform-origin: center bottom;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  min-width: 220px;
+  max-width: 360px;
+  padding: var(--ds-space-4) var(--ds-space-5);
+
+  background: var(--ds-surface-raised);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-type-body-sm-size);
+  line-height: var(--ds-type-body-sm-lh);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ds-text-primary);
+  text-align: left;
+  white-space: normal;
+
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--ds-dur-standard) var(--ds-ease-out),
+    transform var(--ds-dur-standard) var(--ds-ease-out),
+    visibility 0s linear var(--ds-dur-standard);
+  z-index: 10;
+}
+
+.ds-citation[data-open] .ds-citation__popover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) scale(1);
+  transition:
+    opacity var(--ds-dur-standard) var(--ds-ease-out),
+    transform var(--ds-dur-standard) var(--ds-ease-out),
+    visibility 0s linear 0s;
+}
+
+.ds-citation__popover-source {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-label-size);
+  font-weight: 500;
+  letter-spacing: var(--ds-type-label-track);
+  text-transform: uppercase;
+  color: var(--ds-text-primary);
+}
+
+.ds-citation__popover-meta {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-mono-size);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-muted);
+}
+
+.ds-citation__popover-body {
+  color: var(--ds-text-secondary);
+  /* ≤ 65ch via the popover max-width, not a measured rule. */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-citation,
+  .ds-citation__popover {
+    transition: none;
+  }
+  .ds-citation[data-open] .ds-citation__popover {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  .ds-citation__popover {
+    transform: translateX(-50%);
+  }
+}

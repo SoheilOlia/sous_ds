@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>sous-ds 2.0 — pipeline status (verification artifact)</title>
+
+<!--
+  Verification artifact for the v2.0 composition contract.
+
+  This file is the rebuilt version of a 1.0 test page (a "PRD-to-verified-
+  handoff" pipeline status dashboard) that graded B+ overall but D− on
+  visual taste, hierarchy, copywriting, and component-IQ. Every failure
+  on that 1.0 page maps to a specific 2.0 layer; this file demonstrates
+  the fix.
+
+  Recipes used (6 of 6 in the catalogue):
+    1. RAGStatus
+    2. MetricWall
+    3. PipelineMap
+    4. MilestoneStrip
+    5. AgentLog
+    6. ReceiptStack
+
+  Components touched: LiveBlock, Pill, MetricStat, DotTimeline, DottedChart,
+  InlineStatus, SegmentedBar, ToolCall, PulseTrail, AgentStream, Citation.
+  Eleven of eighteen — versus four in the 1.0 output.
+
+  Copy follows the V1–V7 voice contract: terse-first sentences, present
+  tense, numerals in mono, no file paths in body, no status-meeting voice.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ds-bg: #0A0A0A;
+  --ds-surface: #141414;
+  --ds-surface-raised: #1C1C1C;
+  --ds-line: rgba(255,255,255,0.08);
+  --ds-line-strong: rgba(255,255,255,0.14);
+  --ds-text-primary: #F0F0F0;
+  --ds-text-secondary: #A0A0A0;
+  --ds-text-muted: #888888;
+  --ds-text-on-primary: #0A0A0A;
+  --ds-accent-live: #E5533C;
+  --ds-accent-success: #00E013;
+
+  /* Display fallback rule (R-TYPE-004): when Cash Sans isn't available,
+     fall back to Geist Mono Bold — never a serif. */
+  --ds-font-display: "Cash Sans", "Geist Mono", ui-monospace, "SF Mono", monospace;
+  --ds-font-sans: "Geist", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --ds-font-mono: "Geist Mono", ui-monospace, "SF Mono", "JetBrains Mono", monospace;
+  --ds-measure: 65ch;
+
+  --ds-space-2: 4px; --ds-space-3: 8px; --ds-space-4: 12px;
+  --ds-space-5: 16px; --ds-space-6: 24px; --ds-space-7: 32px;
+  --ds-space-8: 48px; --ds-space-9: 64px;
+  --ds-radius-xs: 4px; --ds-radius-sm: 8px; --ds-radius-md: 12px;
+  --ds-radius-pill: 9999px;
+  --ds-dur-micro: 140ms; --ds-dur-standard: 220ms;
+  --ds-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--ds-bg);
+  color: var(--ds-text-primary);
+  font-family: var(--ds-font-sans);
+  font-size: 15px;
+  line-height: 24px;
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--ds-space-9) var(--ds-space-7);
+}
+
+/* ============================================================
+   Header strip — minimal. One line. Two pills max.
+   1.0 had four pills; 2.0 caps at the meaningful pair.
+   ============================================================ */
+header.ds-page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--ds-space-7);
+  border-bottom: 1px solid var(--ds-line);
+  margin-bottom: var(--ds-space-9);
+}
+
+.ds-brand {
+  display: flex; align-items: center; gap: var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+  font-size: 13px;
+  color: var(--ds-text-secondary);
+}
+
+.ds-brand__dots {
+  display: grid;
+  grid-template-columns: repeat(3, 4px);
+  grid-template-rows: repeat(3, 4px);
+  gap: 2px;
+}
+.ds-brand__dots span { background: var(--ds-text-secondary); border-radius: 50%; }
+
+.ds-page-head__pills { display: flex; gap: var(--ds-space-3); }
+
+/* ============================================================
+   Eyebrows + headlines (shared across recipes)
+   ============================================================ */
+.ds-eyebrow {
+  display: block;
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-text-muted);
+  margin-bottom: var(--ds-space-4);
+}
+
+h1, h2, h3 {
+  /* When Cash Sans isn't loaded, fall through the stack to Geist Mono. */
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.02em;
+  color: var(--ds-text-primary);
+}
+h1 { font-size: 56px; line-height: 60px; letter-spacing: -0.035em; }
+h2 { font-size: 32px; line-height: 36px; letter-spacing: -0.025em; }
+h3 { font-size: 18px; line-height: 24px; letter-spacing: -0.01em; font-family: var(--ds-font-mono); font-weight: 500; }
+
+p { margin: 0; max-width: var(--ds-measure); color: var(--ds-text-secondary); }
+code { font-family: var(--ds-font-mono); color: var(--ds-text-primary); }
+
+/* ============================================================
+   Pill — minimal recreation matching components/Pill.css
+   ============================================================ */
+.ds-pill {
+  display: inline-flex; align-items: center; gap: var(--ds-space-2);
+  height: var(--ds-space-6);
+  padding: 0 var(--ds-space-4);
+  border-radius: var(--ds-radius-pill);
+  font-family: var(--ds-font-mono);
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  white-space: nowrap;
+}
+.ds-pill[data-variant="filled"] {
+  background: var(--ds-text-primary);
+  color: var(--ds-text-on-primary);
+  border: 1px solid var(--ds-text-primary);
+}
+.ds-pill[data-variant="outline"] {
+  background: transparent;
+  color: var(--ds-text-secondary);
+  border: 1px dashed var(--ds-line-strong);
+}
+.ds-pill__dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ds-accent-live);
+  animation: ds-pulse 2s linear infinite;
+}
+@keyframes ds-pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* ============================================================
+   Section spacing
+   ============================================================ */
+section { margin-bottom: var(--ds-space-9); }
+section + section { padding-top: var(--ds-space-7); }
+section header { margin-bottom: var(--ds-space-6); }
+section header h2 + p { margin-top: var(--ds-space-4); }
+
+/* ============================================================
+   Recipe 1: RAGStatus
+   ============================================================ */
+.recipe-rag .ds-rag-row {
+  display: flex; align-items: center; gap: var(--ds-space-5);
+  margin-top: var(--ds-space-3);
+}
+.ds-live-block {
+  display: inline-flex; align-items: center;
+  font-family: var(--ds-font-mono);
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-on-primary);
+  background: #E5A23C; /* amber surface — semantic state, not decorative */
+  height: var(--ds-space-6);
+  padding: 0 var(--ds-space-4);
+  border-radius: var(--ds-radius-xs);
+}
+.recipe-rag .ds-stat-row { margin-top: var(--ds-space-5); }
+
+/* ============================================================
+   MetricStat row
+   ============================================================ */
+.ds-stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--ds-space-6); }
+.ds-stat-row.cols-2 { grid-template-columns: repeat(2, max-content); gap: var(--ds-space-7); }
+.ds-metric-stat { display: flex; flex-direction: column; gap: var(--ds-space-3); }
+.ds-metric-stat__label {
+  font-family: var(--ds-font-mono);
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-muted);
+}
+.ds-metric-stat__value {
+  font-family: var(--ds-font-mono);
+  font-size: 40px; line-height: 44px; font-weight: 500;
+  color: var(--ds-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.ds-metric-stat__unit {
+  font-size: 20px; font-weight: 400;
+  color: var(--ds-text-secondary);
+  margin-left: var(--ds-space-2);
+  vertical-align: baseline;
+}
+
+/* ============================================================
+   PipelineMap — DotTimeline + DottedChart strip
+   ============================================================ */
+.recipe-pipeline { background: var(--ds-surface); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-md); padding: var(--ds-space-7); }
+.ds-dot-timeline {
+  display: grid; grid-template-columns: repeat(10, 1fr);
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-6);
+}
+.ds-dot-timeline__col { display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-3); }
+.ds-dot-timeline__cells {
+  display: flex; flex-direction: column; gap: 2px;
+  width: 100%; min-height: 64px;
+  align-items: center; justify-content: flex-end;
+}
+.ds-dot-timeline__cell { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-text-muted); }
+.ds-dot-timeline__cell[data-state="done"] { background: var(--ds-accent-success); }
+.ds-dot-timeline__cell[data-state="live"] { background: var(--ds-accent-live); }
+.ds-dot-timeline__cell[data-state="active"] { background: var(--ds-text-primary); }
+.ds-dot-timeline__label {
+  font-family: var(--ds-font-mono);
+  font-size: 11px; letter-spacing: 0.04em;
+  color: var(--ds-text-muted);
+  text-align: center;
+  text-transform: uppercase;
+}
+.ds-dot-timeline__col[data-current] .ds-dot-timeline__label { color: var(--ds-text-primary); }
+.ds-dotted-chart {
+  display: grid; grid-template-columns: repeat(10, 1fr);
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-5);
+  padding-top: var(--ds-space-5);
+  border-top: 1px solid var(--ds-line);
+}
+.ds-dotted-chart__bar {
+  display: flex; flex-direction: column-reverse; gap: 2px;
+  align-items: center; height: 48px;
+}
+.ds-dotted-chart__bar span { width: 4px; height: 4px; border-radius: 50%; background: var(--ds-text-muted); }
+.ds-dotted-chart__bar[data-strong] span { background: var(--ds-text-primary); }
+.ds-dotted-chart__bar[data-success] span:last-child { background: var(--ds-accent-success); }
+
+/* ============================================================
+   MilestoneStrip — 5 phases horizontal
+   ============================================================ */
+.recipe-milestones .ds-phase-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--ds-space-5); }
+.ds-phase {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-6);
+}
+.ds-phase__id {
+  font-family: var(--ds-font-mono); font-size: 11px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-muted);
+}
+.ds-phase__title { margin-top: var(--ds-space-3); margin-bottom: var(--ds-space-4); }
+.ds-segmented-bar { display: flex; gap: 2px; margin: var(--ds-space-4) 0; }
+.ds-segmented-bar__seg { flex: 1; height: 14px; background: var(--ds-line-strong); border-radius: 1px; }
+.ds-segmented-bar__seg[data-active] { background: var(--ds-text-primary); }
+.ds-segmented-bar__seg[data-success] { background: var(--ds-accent-success); }
+.ds-phase__body { font-size: 13px; line-height: 20px; color: var(--ds-text-secondary); margin-top: var(--ds-space-4); }
+.ds-phase__pills { display: flex; flex-wrap: wrap; gap: var(--ds-space-2); margin-top: var(--ds-space-5); }
+
+/* ============================================================
+   AgentLog & ReceiptStack — ToolCall stack
+   ============================================================ */
+.recipe-log, .recipe-receipts { max-width: 720px; }
+.ds-tool-call {
+  background: var(--ds-surface-raised);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-4) var(--ds-space-5);
+  margin-bottom: var(--ds-space-3);
+}
+.ds-tool-call__head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--ds-space-5);
+}
+.ds-tool-call__name { font-family: var(--ds-font-mono); font-size: 13px; font-weight: 500; color: var(--ds-text-primary); }
+.ds-tool-call__meta { display: flex; align-items: center; gap: var(--ds-space-4); font-family: var(--ds-font-mono); font-size: 11px; color: var(--ds-text-muted); }
+.ds-tool-call__detail { font-size: 13px; line-height: 20px; color: var(--ds-text-secondary); margin: var(--ds-space-3) 0 0; }
+.ds-inline-status { display: inline-flex; gap: 2px; align-items: center; font-family: var(--ds-font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ds-text-muted); }
+.ds-inline-status[data-tone="active"] { color: var(--ds-text-primary); }
+.ds-inline-status[data-tone="live"]::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ds-accent-live); animation: ds-pulse 2s linear infinite; margin-right: 6px; }
+.ds-inline-status[data-tone="live"] { color: var(--ds-text-primary); }
+
+/* PulseTrail head — simplified */
+.ds-pulse-trail { position: relative; display: flex; align-items: center; gap: 4px; height: 20px; padding: 0 4px; }
+.ds-pulse-trail__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-text-muted); }
+.ds-pulse-trail__dot[data-state="done"] { background: var(--ds-accent-success); }
+.ds-pulse-trail__dot[data-role="head"] { background: var(--ds-accent-live); animation: ds-pulse 2s linear infinite; }
+
+/* AgentStream cursor */
+.ds-agent-stream { font-family: var(--ds-font-mono); }
+.ds-agent-stream__cursor { display: inline-block; width: 0.5em; color: var(--ds-text-primary); animation: ds-cursor 1s linear infinite; }
+@keyframes ds-cursor { 0%,49%{opacity:1} 50%,99%{opacity:0} 100%{opacity:1} }
+
+/* Citation */
+.ds-citation {
+  display: inline-flex; align-items: center;
+  height: 20px; padding: 0 8px;
+  border: 1px dashed var(--ds-line-strong);
+  border-radius: var(--ds-radius-pill);
+  background: transparent;
+  font-family: var(--ds-font-mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--ds-dur-micro) var(--ds-ease-out), border-color var(--ds-dur-micro) var(--ds-ease-out);
+}
+.ds-citation:hover {
+  background: var(--ds-text-primary);
+  color: var(--ds-text-on-primary);
+  border-color: var(--ds-text-primary);
+}
+
+/* Section variance — recipe header pattern subtly differs per recipe */
+section.recipe-rag { padding: var(--ds-space-7); background: var(--ds-surface); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-md); }
+section.recipe-metrics { padding: 0; }
+section.recipe-pipeline { padding: 0; }
+section.recipe-milestones { padding: 0; }
+section.recipe-log { padding: 0; }
+section.recipe-receipts { padding: 0; }
+</style>
+</head>
+<body>
+
+<main>
+
+<header class="ds-page-head">
+  <div class="ds-brand">
+    <span class="ds-brand__dots" aria-hidden="true">
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+    </span>
+    <span>Trust Automation / Pipeline</span>
+  </div>
+  <div class="ds-page-head__pills">
+    <span class="ds-pill" data-variant="filled"><span class="ds-pill__dot"></span>M2 active</span>
+    <span class="ds-pill" data-variant="outline">Updated 2026-04-30</span>
+  </div>
+</header>
+
+<!-- ============================================================
+     RECIPE 1 — RAGStatus
+     ============================================================ -->
+<section class="recipe-rag">
+  <header>
+    <span class="ds-eyebrow">PROJECT RAG</span>
+    <div class="ds-rag-row">
+      <span class="ds-live-block">AMBER</span>
+      <h2>Amber: diagnostics tightened the bar.</h2>
+    </div>
+    <p style="margin-top: var(--ds-space-5);">Bar confidence climbs to <code>78–80%</code> after <code>#16</code> and <code>#17</code> land. Green requires <code>PR #20</code> (CI gate).</p>
+  </header>
+  <div class="ds-stat-row cols-2">
+    <div class="ds-metric-stat">
+      <span class="ds-metric-stat__label">Bar confidence</span>
+      <span class="ds-metric-stat__value">78–80<span class="ds-metric-stat__unit">%</span></span>
+    </div>
+    <div class="ds-metric-stat">
+      <span class="ds-metric-stat__label">Evidence maturity</span>
+      <span class="ds-metric-stat__value">69–71<span class="ds-metric-stat__unit">%</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     RECIPE 2 — MetricWall (shared unit: % evidence per stage)
+     ============================================================ -->
+<section class="recipe-metrics">
+  <header>
+    <span class="ds-eyebrow">EVIDENCE MATURITY — % PER STAGE</span>
+    <h2>Evidence is climbing.</h2>
+  </header>
+  <div class="ds-stat-row">
+    <div class="ds-metric-stat">
+      <span class="ds-metric-stat__label">Verify</span>
+      <span class="ds-metric-stat__value">68<span class="ds-metric-stat__unit">%</span></span>
+    </div>
+    <div class="ds-metric-stat">
+      <span class="ds-metric-stat__label">Codegen</span>
+      <span class="ds-metric-stat__value">52<span class="ds-metric-stat__unit">%</span></span>
+    </div>
+    <div class="ds-metric-stat">
+      <span class="ds-metric-stat__label">Render</span>
+      <span class="ds-metric-stat__value">48<span class="ds-metric-stat__unit">%</span></span>
+    </div>
+    <div class="ds-metric-stat">
+      <span class="ds-metric-stat__label">Output</span>
+      <span class="ds-metric-stat__value">52<span class="ds-metric-stat__unit">%</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     RECIPE 3 — PipelineMap (the key fix: a real diagram for the
+     diagram). Horizontal DotTimeline + DottedChart strip.
+     ============================================================ -->
+<section class="recipe-pipeline">
+  <header>
+    <span class="ds-eyebrow">STAGES — 10</span>
+    <h2>Ten stages, four wired.</h2>
+    <p>Stage <code>5</code> (Copy) holds the strongest current evidence. Stage <code>10</code> (Output) blocked on WARP.</p>
+  </header>
+
+  <div class="ds-dot-timeline" role="list" aria-label="Pipeline stages">
+    <!-- 10 columns, each ~7 cells, state per cell encodes evidence density -->
+    <div class="ds-dot-timeline__col"><div class="ds-dot-timeline__cells"><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell"></span></div><span class="ds-dot-timeline__label">Input</span></div>
+    <div class="ds-dot-timeline__col"><div class="ds-dot-timeline__cells"><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span></div><span class="ds-dot-timeline__label">Classify</span></div>
+    <div class="ds-dot-timeline__col"><div class="ds-dot-timeline__cells"><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span></div><span class="ds-dot-timeline__label">Variants</span></div>
+    <div class="ds-dot-timeline__col"><div class="ds-dot-timeline__cells"><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell"></span></div><span class="ds-dot-timeline__label">Surfaces</span></div>
+    <div class="ds-dot-timeline__col" data-current><div class="ds-dot-timeline__cells"><span class="ds-dot-timeline__cell" data-state="done"></span><span class="ds-dot-timeline__cell" data-state="done"></span><span class="ds-dot-timeline__cell" data-state="done"></span><span class="ds-dot-timeline__cell" data-state="done"></span><span class="ds-dot-timeline__cell" data-state="done"></span></div><span class="ds-dot-timeline__label">Copy</span></div>
+    <div class="ds-dot-timeline__col"><div class="ds-dot-timeline__cells"><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span></div><span class="ds-dot-timeline__label">Compliance</span></div>
+    <div class="ds-dot-timeline__col"><div class="ds-dot-timeline__cells"><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell"></span></div><span class="ds-dot-timeline__label">Render</span></div>
+    <div class="ds-dot-timeline__col"><div class="ds-dot-timeline__cells"><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span></div><span class="ds-dot-timeline__label">Codegen</span></div>
+    <div class="ds-dot-timeline__col"><div class="ds-dot-timeline__cells"><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span></div><span class="ds-dot-timeline__label">Verify</span></div>
+    <div class="ds-dot-timeline__col"><div class="ds-dot-timeline__cells"><span class="ds-dot-timeline__cell" data-state="live"></span><span class="ds-dot-timeline__cell" data-state="active"></span><span class="ds-dot-timeline__cell" data-state="active"></span></div><span class="ds-dot-timeline__label">Output</span></div>
+  </div>
+
+  <div class="ds-dotted-chart" aria-label="Evidence density per stage">
+    <div class="ds-dotted-chart__bar" data-strong><span></span><span></span><span></span></div>
+    <div class="ds-dotted-chart__bar" data-strong><span></span><span></span><span></span><span></span></div>
+    <div class="ds-dotted-chart__bar" data-strong><span></span><span></span><span></span></div>
+    <div class="ds-dotted-chart__bar" data-strong><span></span><span></span><span></span></div>
+    <div class="ds-dotted-chart__bar" data-strong data-success><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="ds-dotted-chart__bar" data-strong><span></span><span></span><span></span></div>
+    <div class="ds-dotted-chart__bar"><span></span><span></span></div>
+    <div class="ds-dotted-chart__bar" data-strong><span></span><span></span><span></span></div>
+    <div class="ds-dotted-chart__bar" data-strong><span></span><span></span><span></span><span></span></div>
+    <div class="ds-dotted-chart__bar"><span></span><span></span></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     RECIPE 4 — MilestoneStrip (M1–M5 horizontal)
+     ============================================================ -->
+<section class="recipe-milestones">
+  <header>
+    <span class="ds-eyebrow">MILESTONES — 5 PHASES</span>
+    <h2>Five phases. Three live, two queued.</h2>
+  </header>
+  <div class="ds-phase-strip">
+    <article class="ds-phase">
+      <span class="ds-phase__id">M1</span>
+      <h3 class="ds-phase__title">Verified handoff spine</h3>
+      <div class="ds-segmented-bar">
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+      </div>
+      <p class="ds-phase__body">SPEC-O schema, smoke matrix, freshness manifest land on main.</p>
+      <div class="ds-phase__pills">
+        <span class="ds-pill" data-variant="outline">CI gate</span>
+        <span class="ds-pill" data-variant="outline">Sync Linear</span>
+      </div>
+    </article>
+
+    <article class="ds-phase">
+      <span class="ds-phase__id">M2</span>
+      <h3 class="ds-phase__title">Fixture confidence</h3>
+      <div class="ds-segmented-bar">
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+      </div>
+      <p class="ds-phase__body">Fixtures grow from 2 to 5. Owner: PM.</p>
+      <div class="ds-phase__pills">
+        <span class="ds-pill" data-variant="outline">8–10 templates</span>
+        <span class="ds-pill" data-variant="outline">CI smoke</span>
+      </div>
+    </article>
+
+    <article class="ds-phase">
+      <span class="ds-phase__id">M3</span>
+      <h3 class="ds-phase__title">Review package</h3>
+      <div class="ds-segmented-bar">
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+      </div>
+      <p class="ds-phase__body">Render contract and provenance states ship. Bundles regenerate next.</p>
+      <div class="ds-phase__pills">
+        <span class="ds-pill" data-variant="outline">Runtime provenance</span>
+      </div>
+    </article>
+
+    <article class="ds-phase">
+      <span class="ds-phase__id">M4</span>
+      <h3 class="ds-phase__title">Operating loop</h3>
+      <div class="ds-segmented-bar">
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+      </div>
+      <p class="ds-phase__body">Linear triage and BuilderBot demo land. Slack write blocks on WARP.</p>
+      <div class="ds-phase__pills">
+        <span class="ds-pill" data-variant="outline">WARP blocked</span>
+      </div>
+    </article>
+
+    <article class="ds-phase">
+      <span class="ds-phase__id">M5</span>
+      <h3 class="ds-phase__title">PR-ready runway</h3>
+      <div class="ds-segmented-bar">
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg" data-active></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+        <span class="ds-segmented-bar__seg"></span>
+      </div>
+      <p class="ds-phase__body">Adapters and name validation ship. PR automation deferred.</p>
+      <div class="ds-phase__pills">
+        <span class="ds-pill" data-variant="outline">Dry-run receipt</span>
+        <span class="ds-pill" data-variant="outline">Measurement pack</span>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================================================
+     RECIPE 5 — AgentLog (live activity, "now" head)
+     ============================================================ -->
+<section class="recipe-log">
+  <header>
+    <span class="ds-eyebrow">RECENT — 16:42</span>
+    <h2>Indexing Linear tickets.</h2>
+  </header>
+
+  <div class="ds-tool-call">
+    <div class="ds-tool-call__head">
+      <span class="ds-tool-call__name">fetch_tickets — Linear</span>
+      <div class="ds-tool-call__meta">
+        <span class="ds-pulse-trail" aria-hidden="true">
+          <span class="ds-pulse-trail__dot" data-state="done"></span>
+          <span class="ds-pulse-trail__dot" data-state="done"></span>
+          <span class="ds-pulse-trail__dot" data-state="done"></span>
+          <span class="ds-pulse-trail__dot" data-role="head"></span>
+        </span>
+        <span class="ds-inline-status" data-tone="live">Live 00:14</span>
+      </div>
+    </div>
+    <p class="ds-tool-call__detail"><code>54</code> of <code>188</code> indexed.</p>
+  </div>
+
+  <div class="ds-tool-call">
+    <div class="ds-tool-call__head">
+      <span class="ds-tool-call__name">audit_handoffs — pipeline</span>
+      <div class="ds-tool-call__meta">
+        <span><code>00:08.4</code></span>
+        <span class="ds-inline-status" data-tone="active">Done</span>
+      </div>
+    </div>
+    <p class="ds-tool-call__detail">PR <code>#17</code> retired stale handoffs.</p>
+  </div>
+
+  <div class="ds-tool-call">
+    <div class="ds-tool-call__head">
+      <span class="ds-tool-call__name">expand_smoke_matrix — fixtures</span>
+      <div class="ds-tool-call__meta">
+        <span><code>00:11.2</code></span>
+        <span class="ds-inline-status" data-tone="active">Done</span>
+      </div>
+    </div>
+    <p class="ds-tool-call__detail">PR <code>#16</code> grew the matrix from <code>2</code> to <code>5</code>.</p>
+  </div>
+
+  <div class="ds-tool-call">
+    <div class="ds-tool-call__head">
+      <span class="ds-tool-call__name">render_contract — surfaces</span>
+      <div class="ds-tool-call__meta">
+        <span><code>00:06.8</code></span>
+        <span class="ds-inline-status" data-tone="active">Done</span>
+      </div>
+    </div>
+    <p class="ds-tool-call__detail">PR <code>#10</code> + PR <code>#13</code> shipped contract <code>v1</code>.</p>
+  </div>
+
+  <div class="ds-tool-call">
+    <div class="ds-tool-call__head">
+      <span class="ds-tool-call__name">spec_o_normalizer — review</span>
+      <div class="ds-tool-call__meta">
+        <span><code>00:04.1</code></span>
+        <span class="ds-inline-status" data-tone="active">Done</span>
+      </div>
+    </div>
+    <p class="ds-tool-call__detail">PR <code>#12</code> normalized the SPEC-O gate payload.</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     RECIPE 6 — ReceiptStack (machine-attested truth)
+     Citations replace inline file paths from the 1.0 page.
+     ============================================================ -->
+<section class="recipe-receipts">
+  <header>
+    <span class="ds-eyebrow">RECEIPTS — origin/main</span>
+    <h2>Six receipts. Five merged. One superseded.</h2>
+    <p>Three in receipts, three in the canonical handoff manifest. Sources behind the chips below.</p>
+  </header>
+
+  <div class="ds-tool-call">
+    <div class="ds-tool-call__head">
+      <span class="ds-tool-call__name"><code>[#10]</code> Render contract v1 lands</span>
+      <div class="ds-tool-call__meta">
+        <a class="ds-citation" href="#" title="docs/receipts/2026-04-28-smoke-matrix-expansion-receipt.md">Receipt</a>
+        <span class="ds-inline-status" data-tone="active">Merged 2026-04-28</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-tool-call">
+    <div class="ds-tool-call__head">
+      <span class="ds-tool-call__name"><code>[#12]</code> SPEC-O gate payload normalizer</span>
+      <div class="ds-tool-call__meta">
+        <a class="ds-citation" href="#" title="handoffs/canonical-freshness-manifest.json">Manifest</a>
+        <span class="ds-inline-status" data-tone="active">Merged 2026-04-28</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-tool-call">
+    <div class="ds-tool-call__head">
+      <span class="ds-tool-call__name"><code>[#13]</code> Surface provenance states</span>
+      <div class="ds-tool-call__meta">
+        <a class="ds-citation" href="#" title="docs/receipts/2026-04-29-quick-wins-receipt.md">Receipt</a>
+        <span class="ds-inline-status" data-tone="active">Merged 2026-04-29</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-tool-call">
+    <div class="ds-tool-call__head">
+      <span class="ds-tool-call__name"><code>[#16]</code> Smoke matrix expansion</span>
+      <div class="ds-tool-call__meta">
+        <a class="ds-citation" href="#" title="docs/receipts/2026-04-28-smoke-matrix-expansion-receipt.md">Receipt</a>
+        <span class="ds-inline-status" data-tone="active">Merged 2026-04-29</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-tool-call">
+    <div class="ds-tool-call__head">
+      <span class="ds-tool-call__name"><code>[#17]</code> Stale handoffs retired</span>
+      <div class="ds-tool-call__meta">
+        <a class="ds-citation" href="#" title="docs/receipts/2026-04-29-quick-wins-receipt.md">Receipt</a>
+        <span class="ds-inline-status" data-tone="active">Merged 2026-04-29</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-tool-call">
+    <div class="ds-tool-call__head">
+      <span class="ds-tool-call__name"><code>[#14]</code> Earlier handoff sweep</span>
+      <div class="ds-tool-call__meta">
+        <span class="ds-pill" data-variant="outline">Superseded by #17</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+</body>
+</html>

@@ -4,6 +4,103 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.7.1] — 2026-05-01
+
+**Composition contract — components, lint enforcement, verification artifact.** The implementation half of v0.7.0. v0.7.0 landed the docs-only spec for the 2.0 composition contract; this release lands the code that backs it.
+
+### Added
+
+- **`<AgentStream>`** graduated from roadmap to catalogue.
+  Token-by-token reveal of agent or model output. Composes the
+  `typewriter` motion primitive — no new dependency. Renders inline as a
+  `<span>` so it slots into existing prose, `<ToolCall>` detail rows, or
+  `<Card>` bodies without forcing block layout. Mono type, `▍` cursor
+  glyph blinking via opacity-only on a 1s linear loop. Cancellable via
+  `AbortController` on unmount. Under `prefers-reduced-motion`, full text
+  renders immediately and the cursor stops blinking. No accent — the
+  stream is in-progress content, not "live" in the live-dot sense.
+  Props: `text`, `speed` (`slow|normal|fast` → 32/18/8 ms/char), `cursor`,
+  `play`, `onComplete`, `onUpdate`. Files: `components/AgentStream.tsx`,
+  `components/AgentStream.css`.
+- **`<Citation>`** graduated from roadmap to catalogue.
+  Inline source chip with hover/focus popover. Extends the Pill shape so
+  a chain of citations reads as the same family (`[1] [2] [3] [#16]`).
+  On hover or keyboard focus, a popover with `surface-raised` background
+  + 1px `line` border surfaces the source name, optional preview body,
+  optional meta line. Keyboard-accessible: `tabindex` chip opens the
+  popover on focus, Esc dismisses. Renders as `<a>` when `href` is set.
+  No accent — citations are reference, not live or successful state.
+  Replaces the 1.0 footgun of file paths inline in body prose
+  (`R-VOICE-001`). Files: `components/Citation.tsx`,
+  `components/Citation.css`.
+- **9 new refusal patterns shipped to `refusals.json`** (was 21, now 30).
+  Bumped `refusals.json` version to `0.3.0`. Three new categories:
+  `compose`, `voice`, `metric`. Manual-check rules are flagged
+  `manualCheck: true`. Two patterns are statically detectable
+  (`R-VOICE-001`, `R-VOICE-003`) and shipped with regex.
+- **3 new statically-enforced lint rules** in `scripts/lint.mjs`:
+  - `TY08` (R-TYPE-004) — flags `font-family` declarations in CSS that
+    fall back to `serif` (generic) or to a known serif face (Times,
+    Georgia, Garamond, Cambria, Charter, Playfair, Baskerville,
+    Merriweather, Lora, PT Serif, Source Serif). The 1.0 case-study page
+    rendered the hero h1 in serif because no fallback was named.
+  - `CO09` (R-VOICE-001) — flags multi-segment file paths inside `<p>`
+    body prose. Skips `<code>`, `<pre>`, `<ToolCall>` content,
+    `<Citation>` content, and any element with `data-allow-path`.
+  - `CO11` (R-VOICE-003) — flags status-meeting phrasings ("we are
+    building," "things are stricter," "main-branch truth," "the project
+    is not green because…", "where we are going," etc.) in HTML/JSX
+    rendered text. Severity: info (taste-level signal).
+- **`examples/pipeline-status-2.0.html`** — the verification artifact.
+  The 1.0 case-study page rebuilt against the 2.0 composition contract.
+  Uses all six recipes (PipelineMap, MilestoneStrip, AgentLog,
+  ReceiptStack, MetricWall, RAGStatus). Touches eleven distinct
+  components. Pipeline rendered as horizontal `<DotTimeline>` plus a
+  per-stage `<DottedChart>` strip — versus the 1.0 page's flat
+  five-card grid. Receipts surface via `<Citation>` chips, not inline
+  file paths. Copy is instrument-readout: terse-first sentences,
+  numerals in mono, no banned phrasings. This file is the side-by-side
+  teaching artifact next to `examples/slop-vs-system.html`.
+
+### Changed
+
+- **`components/index.ts`** — exports `AgentStream`, `AgentStreamProps`,
+  `Citation`, `CitationProps`. Component count: 18 → 20.
+- **`SKILL.md`** — Roadmap primitives section restructured. `AgentStream`
+  and `Citation` graduated to the catalogue with full prose. `Transcript`
+  and `TokenMeter` remain on the v0.8 roadmap. `DiffBlock` and
+  `ConfidenceBar` deferred — composable from existing primitives.
+- **`scripts/lint.mjs`** — `examples/pipeline-status-2.0.html` added to
+  the CL07 (semantic accent carrier) allowlist alongside
+  `examples/slop-vs-system.html` so the verification artifact's
+  legitimate accent use (DotTimeline cells, DottedChart success
+  endpoint, SegmentedBar) doesn't flag.
+- **`docs/specs/sous-ds-v2*.md`** — `R-TYPE-002` renamed to `R-TYPE-004`
+  to avoid ID collision with existing 1.0 rule (`R-TYPE-002` was already
+  taken for "Full-width body paragraph"). All cross-references updated.
+
+### Migration
+
+None for consumers. `npm install sous-ds@0.7.1 && npx sous-ds init`
+re-runs the wiring with the updated `SKILL.md`. Existing imports keep
+working; two new exports are additive.
+
+```tsx
+import { AgentStream, Citation } from "sous-ds";
+
+<AgentStream text="Indexing 188 Linear tickets…" speed="normal" />
+<Citation id="#16" source="Smoke matrix expansion" href="…" />
+```
+
+### Verified
+
+- Local: `npm run lint:ui` (46 files scanned, 0 findings, verdict pass);
+  `npm test` (18/18 pass, 1.07s); `npm run pack:check` (80 files OK).
+- Direct lint of the verification artifact: 0 findings.
+- CI release workflow: tag-driven build + publish to npm with provenance.
+
+---
+
 ## [0.7.0] — 2026-05-01
 
 **Composition contract.** v0.7.0 is the docs-only cut of sous-ds 2.0.

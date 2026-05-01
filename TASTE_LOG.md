@@ -334,7 +334,7 @@ Root cause: 1.0 is a **refusal contract + token contract** (what to refuse, what
 - Source: `taste-skill` three-dial system; `anthropics` Tone Picker; `ui-ux-pro-max` searchable BM25 taxonomy.
 
 **6. Nine new refusal IDs added to the corpus.**
-- `R-TYPE-002` (no serif fallback for display/h1)
+- `R-TYPE-004` (no serif fallback for display/h1; `R-TYPE-002` already taken in 1.0)
 - `R-COMPOSE-001` (no card grid for sequenced content)
 - `R-COMPOSE-002` (no recipe used > 2 times)
 - `R-COMPOSE-003` (max 3 pills per card / 8 per section)

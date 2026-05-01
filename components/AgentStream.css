@@ -1,0 +1,39 @@
+/* ============================================================
+   AgentStream.css — token-by-token reveal of agent output
+   ============================================================ */
+
+.ds-agent-stream {
+  display: inline;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-type-mono-size);
+  line-height: var(--ds-type-mono-lh);
+  color: var(--ds-text-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: pre-wrap;
+}
+
+.ds-agent-stream__text {
+  display: inline;
+}
+
+.ds-agent-stream__cursor {
+  display: inline-block;
+  margin-left: 1px;
+  color: var(--ds-text-primary);
+  animation: ds-agent-stream-cursor 1s linear infinite;
+  /* The cursor is a glyph, not an animated shape — never animate width. */
+  will-change: opacity;
+}
+
+@keyframes ds-agent-stream-cursor {
+  0%, 49%   { opacity: 1; }
+  50%, 99%  { opacity: 0; }
+  100%      { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-agent-stream__cursor {
+    animation: none;
+    opacity: 1;
+  }
+}

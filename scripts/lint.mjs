@@ -289,6 +289,7 @@ function ruleCL07_accentCarrier(src, file) {
         "tokens.css",
         "preview.html",
         "examples/slop-vs-system.html",
+        "examples/pipeline-status-2.0.html",
         "refusals.json",
         "SKILL.md",
       ],
@@ -306,6 +307,7 @@ function ruleCL07_accentCarrier(src, file) {
         "tokens.css",
         "preview.html",
         "examples/slop-vs-system.html",
+        "examples/pipeline-status-2.0.html",
         "refusals.json",
         "SKILL.md",
       ],
@@ -352,6 +354,142 @@ function ruleCO06_skeletonLoaders(src, file) {
   ];
 }
 
+// --- v2 rules (composition contract) -----------------------------
+
+// TY08 (R-TYPE-004) — display/h1 falling back to a serif
+// when Cash Sans is unavailable. Scoped to .css files; flags any
+// font-family declaration that contains the generic `serif` family or
+// a known serif face, since the system's display fallback must be
+// Geist Mono Bold, never a serif.
+function ruleTY08_serifFallback(src, file) {
+  if (path.extname(file) !== ".css") return [];
+  // Skip files that legitimately discuss serif as a counter-example.
+  if (/quality-evaluator|tokens\.css/.test(file)) return [];
+  const findings = [];
+  const KNOWN_SERIFS = [
+    "Times", "Times New Roman", "Georgia", "Garamond",
+    "Cambria", "Charter", "Playfair", "Baskerville",
+    "Merriweather", "Lora", "PT Serif", "Source Serif",
+  ];
+  const rx = /font-family\s*:\s*([^;{}]+)/gi;
+  let m;
+  while ((m = rx.exec(src)) !== null) {
+    const value = m[1];
+    // Skip if inside a comment.
+    const lineStart = src.lastIndexOf("\n", m.index) + 1;
+    const line = src.slice(lineStart, src.indexOf("\n", m.index));
+    if (/^\s*(\/\*|\/\/|\*)/.test(line)) continue;
+    // Generic `serif` family.
+    if (/\bserif\b(?!-)/i.test(value)) {
+      findings.push({
+        rule: "TY08",
+        severity: "error",
+        path: `${file}:${lineAt(src, m.index)}`,
+        message: "font-family falls back to the generic 'serif' family. Display and h1 must fall back to var(--ds-font-mono) (Geist Mono) at font-weight: 600, never a serif.",
+        suggestion: "Use: font-family: \"Cash Sans\", var(--ds-font-mono); and font-weight: 600 on the same selector when Cash Sans is unavailable.",
+      });
+      continue;
+    }
+    // Known serif face listed.
+    for (const sf of KNOWN_SERIFS) {
+      const escaped = sf.replace(/ /g, "\\s+");
+      if (new RegExp(`\\b${escaped}\\b`, "i").test(value)) {
+        findings.push({
+          rule: "TY08",
+          severity: "error",
+          path: `${file}:${lineAt(src, m.index)}`,
+          message: `font-family lists '${sf}' (a serif face). The system's display fallback is var(--ds-font-mono) (Geist Mono) at weight 600.`,
+          suggestion: `Use: font-family: "Cash Sans", var(--ds-font-mono); and font-weight: 600.`,
+        });
+        break;
+      }
+    }
+  }
+  return findings;
+}
+
+// CO09 (R-VOICE-001) — file paths inline in body prose.
+// Detects multi-segment paths ending in a known doc/code extension
+// inside a <p>...</p> block. Skips <code>, <pre>, <ToolCall> detail
+// rows, and any element annotated `data-allow-path`.
+function ruleCO09_filePathInProse(src, file) {
+  const ext = path.extname(file);
+  if (![".html", ".jsx", ".tsx"].includes(ext)) return [];
+  const findings = [];
+  const paragraphRx = /<p\b([^>]*)>([\s\S]*?)<\/p>/gi;
+  const pathRx =
+    /(?:[a-zA-Z0-9_-]+\/){2,}[a-zA-Z0-9._-]+\.(?:md|json|js|ts|tsx|jsx|css|html|yml|yaml|py|sh|mjs|cjs)\b/g;
+  let m;
+  while ((m = paragraphRx.exec(src)) !== null) {
+    const attrs = m[1] || "";
+    if (/data-allow-path\b/.test(attrs)) continue;
+    const inner = m[2];
+    // Strip <code>, <pre>, ToolCall and Citation contents.
+    const stripped = inner
+      .replace(/<code[\s\S]*?<\/code>/gi, "")
+      .replace(/<pre[\s\S]*?<\/pre>/gi, "")
+      .replace(/<ToolCall[\s\S]*?<\/ToolCall>/gi, "")
+      .replace(/<Citation[\s\S]*?<\/Citation>/gi, "");
+    let pm;
+    pathRx.lastIndex = 0;
+    while ((pm = pathRx.exec(stripped)) !== null) {
+      const offset = m.index + (m[0].indexOf(pm[0]) >= 0 ? m[0].indexOf(pm[0]) : 0);
+      findings.push({
+        rule: "CO09",
+        severity: "warning",
+        path: `${file}:${lineAt(src, offset)}`,
+        message: `File path '${pm[0]}' appears inline in body prose. Paths belong in <code>, <ToolCall> detail, <Citation>, or footnotes.`,
+        suggestion: "Move the path into a <code> block or <Citation>, and let the body prose name the artifact instead.",
+      });
+    }
+  }
+  return findings;
+}
+
+// CO11 (R-VOICE-003) — status-meeting phrasings in headlines or body.
+// Substring scan across the rendered text of HTML/JSX files. The list
+// is the V7 banned-phrase catalogue from docs/specs/sous-ds-v2-voice.md.
+function ruleCO11_statusMeetingVoice(src, file) {
+  const ext = path.extname(file);
+  if (![".html", ".jsx", ".tsx"].includes(ext)) return [];
+  // Skip the verification artifact itself if it exists — it cites the
+  // banned phrases as before/after evidence and would self-flag.
+  if (/pipeline-status-2\.0\.html$/.test(file)) return [];
+  const findings = [];
+  const BANNED = [
+    "we are building",
+    "what we are building",
+    "what we're working on",
+    "things are stricter",
+    "main-branch truth",
+    "draft-PR truth",
+    "working-tree truth",
+    "still-blocked truth",
+    "the project is not green because",
+    "where we are going",
+  ];
+  // Strip <code>, <pre>, comments to scan only rendered text.
+  const stripped = src
+    .replace(/<code[\s\S]*?<\/code>/gi, "")
+    .replace(/<pre[\s\S]*?<\/pre>/gi, "")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/\/\*[\s\S]*?\*\//g, "");
+  for (const phrase of BANNED) {
+    const rx = new RegExp(phrase.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"), "gi");
+    let m;
+    while ((m = rx.exec(stripped)) !== null) {
+      findings.push({
+        rule: "CO11",
+        severity: "info",
+        path: `${file}:${lineAt(src, m.index)}`,
+        message: `Status-meeting phrasing detected: "${phrase}". The sous-ds voice contract bans this construction.`,
+        suggestion: "Replace with the named substitute from docs/specs/sous-ds-v2-voice.md V7 (e.g., 'where we are going' → 'Five phases queued.').",
+      });
+    }
+  }
+  return findings;
+}
+
 const RULES = [
   ruleTY01_forbiddenFonts,
   ruleMO01_transitionAll,
@@ -363,6 +501,9 @@ const RULES = [
   ruleCL01_hardcodedHex,
   ruleCL07_accentCarrier,
   ruleCO06_skeletonLoaders,
+  ruleTY08_serifFallback,
+  ruleCO09_filePathInProse,
+  ruleCO11_statusMeetingVoice,
 ];
 
 // ---------------------------------------------------------------
