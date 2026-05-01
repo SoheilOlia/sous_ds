@@ -18,7 +18,7 @@ cat MyComponent.tsx | claude eval --skill=.     # lints an implementation
 
 ## System prompt (paste into your agent)
 
-> You are the Quality Evaluator for the `sous-ds` design system. You have read `DESIGN.md`, `ANIMATION_RULES.md`, and `TASTE_LOG.md`. You audit UI code and rendered screenshots against the rules below. You never speculate. If a rule cannot be verified from the provided input, you mark it `unknown` instead of passing or failing.
+> You are the Quality Evaluator for the `sous-ds` design system. You have read `DESIGN.md`, `ANIMATION_RULES.md`, `TASTE_LOG.md`, `docs/specs/sous-ds-v2.md`, `docs/specs/sous-ds-v2-composition-recipes.md`, and `docs/specs/sous-ds-v2-voice.md`. You audit UI code and rendered screenshots against the rules below — both the 1.0 cell-level and token rules and the 2.0 composition, recipe, voice, and dial rules. You never speculate. If a rule cannot be verified from the provided input, you mark it `unknown` instead of passing or failing.
 >
 > Your output is a single JSON object with `findings` and `summary`. Nothing else. No prose. No markdown fences. No preamble.
 >
@@ -53,6 +53,7 @@ Rules are grouped. Severity is fixed per rule. Violations produce structured fin
 | `TY05` | warning | Uppercase label with tracking below 0.06em |
 | `TY06` | warning | Font size not from the defined scale (`display`, `h1`–`h3`, `body-*`, `label`, `mono-*`) |
 | `TY07` | error | Underline used on non-link text |
+| `TY08` | error | Display or `h1` falls back to a serif when Cash Sans is unavailable. Fallback must be `Geist Mono` at the same display size with `font-weight: 600`. Source: `R-TYPE-002`. |
 
 ### Layout (LY)
 
@@ -61,6 +62,8 @@ Rules are grouped. Severity is fixed per rule. Violations produce structured fin
 | `LY01` | error | Spacing value not on the 8pt scale (permitted: 0, 2, 4, 8, 12, 16, 24, 32, 48, 64, 96, 128) |
 | `LY02` | warning | Grid uses uniform card sizes where bento hierarchy would serve better |
 | `LY03` | info | Hardcoded pixel value where a token exists |
+| `LY04` | error | Sequenced or DAG content rendered as a flat card grid instead of a structured primitive (`<DotTimeline>` / `<PulseTrail>` / `<DottedChart>`). Source: `R-COMPOSE-001`. |
+| `LY05` | warning | A page renders the same composition recipe more than twice. Source: `R-COMPOSE-002`. |
 
 ### Elevation (EL)
 
@@ -102,6 +105,12 @@ Rules are grouped. Severity is fixed per rule. Violations produce structured fin
 | `CO04` | warning | Button hit area below 44×44 CSS pixels |
 | `CO05` | error | Accent-bearing states compete inside one cluster without a clear positive/attention map, or accent replaces the neutral hierarchy |
 | `CO06` | warning | Skeleton loaders, shimmer placeholders, or `animate-pulse` loading chrome are present. Use terse mono status text or segmented progress instead |
+| `CO07` | warning | A single card contains > 3 `<Pill>` instances, or a section contains > 8 `<Pill>` instances. Pill wall — content shape is wrong. Source: `R-COMPOSE-003`. |
+| `CO08` | warning | A `<MetricStat>` group of 2+ without a shared unit or axis named in the eyebrow. Source: `R-METRIC-001`. |
+| `CO09` | warning | File path appears in body prose. Belongs in code blocks, `<ToolCall>` detail, footnotes, or `<Citation>` chips. Source: `R-VOICE-001`. |
+| `CO10` | warning | Two adjacent sections share the same micro-template (e.g., both end in `Evidence: X. Next: Y.`). Source: `R-VOICE-002`. |
+| `CO11` | info | Forbidden status-meeting phrasing detected: "we are building," "things are stricter," "main-branch truth" (as adjective), "the project is not green because…", "where we are going" (as h1), "what we are building" (as h1). Source: `R-VOICE-003`. |
+| `CO12` | warning | Page uses fewer than 3 distinct composition recipes when `RHYTHM ≥ 4`. Source: `R-COMPOSE-004`. |
 
 ### Restraint (RE)
 
@@ -114,6 +123,18 @@ Taste-level rules. Can produce false positives. Always output with reasoning.
 | `RE03` | warning | More than 3 distinct "accent" hues visible (including semantic accent) |
 | `RE04` | info | Generic SaaS signals: avatar stacks for social proof, star ratings, "trusted by" badges |
 | `RE05` | warning | Elevation theater: multiple stacked shadows on a single element to simulate light |
+
+### Composition / 2.0 (CO + LY extensions)
+
+The 2.0 rules above (`LY04`, `LY05`, `CO07`–`CO12`, `TY08`) collectively enforce the composition contract. When auditing a screenshot:
+
+- Count distinct recipes used. If < 3 and the page is multi-purpose, fire `CO12` (`R-COMPOSE-004`).
+- Count `<Pill>` per visible card and per visible section. Fire `CO07` if quotas exceeded.
+- For any sequenced content (numbered stages, ordered milestones, time-tagged phases), check the primary representation. If it's a card grid, fire `LY04` (`R-COMPOSE-001`).
+- For any `<MetricStat>` group, check that the eyebrow names a shared unit or axis. Fire `CO08` otherwise.
+- Read body prose and scan for: (a) file paths inline → `CO09`; (b) repeated micro-template across adjacent sections → `CO10`; (c) banned phrases from the V7 catalogue → `CO11`.
+
+When the input is code, the same rules apply with `path` as `file:line`.
 
 ---
 

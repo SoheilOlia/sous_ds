@@ -1,11 +1,13 @@
 ---
 name: sous-ds
-description: Use when building, styling, auditing, or refining UI in any project using the sous-ds design system. Triggers on any UI task mentioning components, pages, dashboards, data displays, agent or chat interfaces, streaming responses, tool-call rows, citation chips, or the dot/dash data motif. Also triggers on dark mode, restrained aesthetic, monospace-for-data, sub-300ms motion, WCAG AA review, the `--ds-accent-live` or `--ds-accent-success` semantics, and any task referencing DESIGN.md, AGENTS.md, tokens.css, or components/. Use to review or reject UI that uses gradients, shadow blur ≥ 25px, `transition: all`, scale(0) entries, Inter/system-ui as primary face, accent on CTAs, or glass morphism.
+description: Use when building, styling, auditing, or refining UI in any project using the sous-ds design system. Triggers on any UI task mentioning components, pages, dashboards, data displays, agent or chat interfaces, streaming responses, tool-call rows, citation chips, or the dot/dash data motif. Also triggers on dark mode, restrained aesthetic, monospace-for-data, sub-300ms motion, WCAG AA review, the `--ds-accent-live` or `--ds-accent-success` semantics, and any task referencing DESIGN.md, AGENTS.md, tokens.css, or components/. Use to review or reject UI that uses gradients, shadow blur ≥ 25px, `transition: all`, scale(0) entries, Inter/system-ui as primary face, accent on CTAs, glass morphism, card-grid layouts for sequenced content, pill walls, or status-meeting voice.
 ---
 
 # sous-ds
 
 A dark-first, data-dense, restraint-led design system for AI-native interfaces. Precision instrument, not marketing brochure. This skill transfers the contract so generated UI matches the system's taste without re-prompting.
+
+> **2.0 — composition contract.** Layered on top of the 1.0 refusal contract. The refusal corpus, tokens, components, and family-grammar rules are unchanged. Five new layers added: composition recipes, intent → component decision tree, voice contract, design dials, and new refusals. Full spec: [`docs/specs/sous-ds-v2.md`](./docs/specs/sous-ds-v2.md). Read 1.0 first; the 2.0 layer below assumes it.
 
 ## When this skill applies
 
@@ -27,6 +29,9 @@ Signal phrases that should trigger this skill:
 5. `quality-evaluator.md` — lint rule IDs and severities.
 6. `refusals.json` — **machine-readable refusal corpus. Load this first when evaluating or generating.**
 7. `components/` — reference implementations. Check before building new.
+8. `docs/specs/sous-ds-v2.md` — composition contract. Read this before composing any page.
+9. `docs/specs/sous-ds-v2-composition-recipes.md` — named page archetypes.
+10. `docs/specs/sous-ds-v2-voice.md` — copy contract.
 
 ## Non-negotiables
 
@@ -116,6 +121,7 @@ Load `refusals.json` for the full machine-readable corpus with patterns. Summary
 | R-COLOR-002 | Decorative brand hues (purple/teal/gold/orange or decorative green) | Accent discipline |
 | R-COLOR-003 | Accent on CTA buttons | Semantic collision |
 | R-TYPE-001 | Inter/Roboto/system-ui as primary | AI-slop type signature |
+| R-TYPE-002 | Display/h1 falling back to a serif when Cash Sans is unavailable | Voice drift; fallback must be Geist Mono Bold at the same size |
 | R-ELEV-001 | Shadow blur ≥ 25px | AI-slop elevation |
 | R-ELEV-002 | Dark card radius > 16px | Too soft for instrument UI |
 | R-MOTION-001 | `transition: all` | Opaque, thrash-prone |
@@ -126,10 +132,18 @@ Load `refusals.json` for the full machine-readable corpus with patterns. Summary
 | R-STATE-001 | Skeleton / shimmer loading UI | Use terse mono status or segmented progress |
 | R-SLOP-001 | Glass morphism | AI-slop marker |
 | R-SLOP-003 | Sparkle/magic-wand for AI features | AI-theatre |
+| R-COMPOSE-001 | Sequenced/DAG content rendered as a flat card grid | Use DotTimeline / PulseTrail / DottedChart |
+| R-COMPOSE-002 | Same recipe used > 2 times on one page | Forces variance; ≥3 distinct recipes per page when RHYTHM ≥ 4 |
+| R-COMPOSE-003 | More than 3 `<Pill>` per card or > 8 per section | Pill wall — content shape is wrong |
+| R-COMPOSE-004 | Page uses < 3 distinct recipes when RHYTHM ≥ 4 | Forces archetype variance |
+| R-METRIC-001 | `<MetricStat>` group of 2+ without a shared unit/axis | Mismatched-unit KPI grid |
+| R-VOICE-001 | File path inline in body prose | Belongs in code block, ToolCall detail, or footnote |
+| R-VOICE-002 | Two adjacent sections share micro-template | Database-dump rhythm |
+| R-VOICE-003 | Status-meeting phrasing ("we are building," "things are stricter," "draft-PR truth") | Generic editorial voice; replace with instrument readout |
 
 When refusing: cite the `R-*` id, quote the rationale, propose the canonical alternative.
 
-## Composition patterns
+## Composition patterns (cell level)
 
 - **Dashboard cell:** `<Card>` → header row with `<Pill>` status + `mono` timestamp → body with `<DottedChart>` or tabular-nums numbers → optional `<LiveDot>` in header when live-updating.
 - **Data row:** monospace for every data column; sans for labels only. Right-align numbers. Use `tabular-nums`.
@@ -138,6 +152,100 @@ When refusing: cite the `R-*` id, quote the rationale, propose the canonical alt
 - **Empty state:** short sans body text, single ghost-variant action, no illustration.
 - **Error state:** `<Toast tone="error">` for transient, inline text + retry button for persistent. Never modal for an error unless destructive.
 
+## Composition recipes (page level — 2.0)
+
+Cell-level patterns above describe what one card or row looks like. **Recipes describe what one section of a page looks like.** Without recipes, every section converges on `eyebrow + h1 + body + grid-of-cards` and pages grade D− on hierarchy.
+
+A page in 2.0 must use **≥3 distinct recipes** unless `RHYTHM ≤ 3` (single-purpose surfaces). Repeating the same recipe more than twice is `R-COMPOSE-002`.
+
+| Recipe | Use when content is… | Primary primitive |
+|---|---|---|
+| **PipelineMap** | A multi-stage process with order and per-stage state | `<DotTimeline>` horizontal + per-stage `<DottedChart>` |
+| **MilestoneStrip** | Time-tagged phases with done/active/queued state | `<DotTimeline>` + per-phase `<SegmentedBar>` |
+| **AgentLog** | Live agent/tool activity with a "now" head | `<ToolCall>` stack + `<PulseTrail>` head |
+| **ReceiptStack** | Completed events as machine-attested truth | `<ToolCall tone="done">` rows with `[ID]` + `[STATE]` |
+| **MetricWall** | 2–4 numbers sharing a unit or axis | `<MetricStat>` row + optional `<DottedChart>` strip |
+| **RAGStatus** | Single state-word callout (RED/AMBER/GREEN) | `<LiveBlock>` + `<Pill>` + one body sentence |
+
+Full specs (JSX skeletons, microcopy templates, density quotas, forbidden substitutes) in [`docs/specs/sous-ds-v2-composition-recipes.md`](./docs/specs/sous-ds-v2-composition-recipes.md).
+
+**Recipe-pair anti-patterns:**
+- PipelineMap + MilestoneStrip on the same page (overlapping intent — pick one or split explicitly)
+- Two MetricWalls (only one anchor per page)
+- AgentLog + ReceiptStack of the same source (live + historical of the same stream — distinguish or pick one)
+
+## Intent → component decision tree (2.0)
+
+The single largest 1.0 failure was **component starvation** — using 4 of 18 components because the contract listed components without naming when each is the right primitive. The decision tree is a forcing function.
+
+| If your content has… | Reach for | Forbidden substitute |
+|---|---|---|
+| Time-ordered stages with state | `<DotTimeline>` | Card grid; numbered list |
+| Live agent activity, "now" feel | `<PulseTrail>` (canonical) or `<LiveDot>` | Spinning loader; pulsing card border |
+| Multi-cell live indicator | `<LiveBlock>` | Multiple `<LiveDot>` instances |
+| A sequence of completed events | `<ToolCall tone="done">` stack | Bulleted markdown list |
+| Bar chart of counts | `<DottedChart>` | `<SegmentedBar>` per row |
+| Discrete progress (known total) | `<SegmentedBar>` | Continuous progress bar |
+| Scope/filter switcher (≤5 options) | `<SegmentedControl>` | Radio buttons; pill row |
+| Indeterminate working state | `<InlineStatus tone="active">` | Skeleton; spinner |
+| Page-level working state | `<TetrisLoader>` / `<BoxLoader>` / `<DotLoader>` | Full-page spinner |
+| Agent thinking with rotating labels | `<LiveDot labels={…}>` or `<ThinkingCube>` | Static "Thinking…" |
+| Single state-word callout | `<LiveBlock>` + `<Pill>` | Colored card |
+| 1–4 numbers sharing a unit | `<MetricStat>` row | Card grid of stats |
+| Success endpoint marker | `<DottedChart>` final dot in `accent-success` | Green check icon |
+| Inline attention/error | `<InlineStatus tone="live">` | Red text |
+| Transient confirmation | `<Toast>` | Modal; banner |
+
+**Selection priority when two primitives compete:**
+1. Time-ordered, multi-stage beats everything else
+2. Live now beats completed past
+3. Discrete state beats continuous progress
+4. Inline status beats modal status (non-destructive events)
+
+## Voice contract (2.0)
+
+The system speaks like a precision instrument that has learned English. Full contract: [`docs/specs/sous-ds-v2-voice.md`](./docs/specs/sous-ds-v2-voice.md).
+
+The seven voice rules:
+
+1. **Terse-first sentences.** ≤12 words for the opening sentence of any section/card/row. Optional second sentence ≤24 words.
+2. **Present tense, active voice.** Subject-verb-object. "PR #16 lands the smoke matrix." Not "PR #16 was the PR that landed…"
+3. **Numerals in mono.** Every numeral, percentage, ID, timestamp, code token in `Geist Mono` + `tabular-nums`.
+4. **No file paths in body prose.** Belongs in code blocks, `<ToolCall>` detail, footnotes, or `<Citation>` chips. `R-VOICE-001`.
+5. **Project jargon needs a one-clause unpack on first appearance.** Then runs free.
+6. **Rhythm variance.** No two adjacent sections share micro-template. `R-VOICE-002`.
+7. **No status-meeting voice.** Banned: "we are building," "things are stricter," "main-branch truth" as adjective, "the project is not green because…", "where we are going" as h1. `R-VOICE-003`.
+
+Headlines: verb-led, present tense, period at end of declarative h1/h2. No editorial frames as h1 ("What we are building" → name the artifact).
+
+Body: first sentence names the state (≤12 words). Second sentence (optional) names cause or next. Third sentence requires a structural reason — almost always means restructure into a recipe.
+
+## Design dials (2.0)
+
+A page is generated against three dials. Set in the prompt or default per the table below.
+
+| Dial | Range | Effect |
+|---|---|---|
+| **DENSITY** | 1–10 | 1–3 gallery (negative space, few elements); 4–7 working surface; 8–10 cockpit (12px paddings, 1px lines instead of cards) |
+| **RHYTHM** | 1–10 | 1–3 single-archetype; 4–7 mixed (≥3 recipes); 8–10 high-variance (≥5 recipes, asymmetric layouts, hero typography filling viewport) |
+| **VOICE** | 1–10 | 1–3 telegram (≤8 words/sentence); 4–7 instrument (default, the contract above); 8–10 editorial (≤3 sentences/card, rhetorical structure permitted) |
+
+**Defaults for AI-product pages:** `DENSITY=6, RHYTHM=6, VOICE=4`.
+
+`RHYTHM` binds recipe variance — at `RHYTHM=2` only one recipe is allowed; at `RHYTHM=8` Claude must use ≥5 distinct recipes. `VOICE` bounds sentence length and structural latitude. `DENSITY` selects layout variant within each recipe.
+
+## Pre-composition checklist (2.0)
+
+Before writing any JSX for a page, Claude must answer these in the order shown. Skipping is `R-COMPOSE-004`.
+
+1. **What is the page's purpose?** One sentence.
+2. **What dials does the user want?** Read prompt. Default if unspecified.
+3. **What recipes does the content shape demand?** ≥3 distinct unless `RHYTHM ≤ 3`. Map content to the recipe catalogue. If content has time order or state-per-stage and no PipelineMap/MilestoneStrip is selected, restart.
+4. **What components does each recipe need?** Use the Intent → Component tree. Cite the row.
+5. **What microcopy template applies per recipe?** State the eyebrow, title, body, row template before writing JSX.
+6. **What's the variance check?** No two adjacent sections share a recipe or a micro-template.
+7. **What did the cell-level patterns and refusals add?** Apply 1.0 contract last; it's enforcement, not composition.
+
 ## Prompt → action mapping
 
 | User says | Do this |
@@ -145,11 +253,17 @@ When refusing: cite the `R-*` id, quote the rationale, propose the canonical alt
 | "Make it pop" | Refuse. Propose stronger weight/luminance hierarchy instead. Cite R-COLOR-001/002 if they asked for gradient or decorative hue. |
 | "Add an accent color" | If it is semantic, choose `accent-live` or `accent-success` and update the contract. If decorative, refuse with R-COLOR-002. |
 | "Use a sparkle for the AI feature" | Refuse R-SLOP-003. Suggest geometric glyph or text label. |
-| "Streaming response / chat bubble / agent output" | Use `<ToolCall>` for execution rows and `<InlineStatus>` for explicit state. Stream body content still composes from `<Card>` + mono body + `<LiveDot>` until `<AgentStream>` ships. |
+| "Streaming response / chat bubble / agent output" | Use **AgentLog** recipe: `<ToolCall>` stack with `<PulseTrail>` head row. Stream body content composes from `<ToolCall>` + mono body + `<LiveDot>` until `<AgentStream>` ships. |
 | "Show a loading state" | Refuse skeletons with R-STATE-001. Use `<InlineStatus>` for indefinite work or `<SegmentedBar>` if the total is known. |
 | "Rounded-20 dark card" | Refuse R-ELEV-002. Offer `--ds-radius-md` (12) or `--ds-radius-lg` (16). |
 | "Loading spinner" | Ghost variant with `prefers-reduced-motion` fallback; duration ≤ standard; opacity pulse, not rotation. |
 | "Celebration / success moment" | Short (≤ 220ms) opacity+scale pulse on the affected element; no confetti, no sparkle. |
+| "Build a status page / dashboard / pipeline view" | Use **PipelineMap** or **MilestoneStrip** recipe — never a card grid for sequenced content. Cite R-COMPOSE-001 if the user pushes back on the structured primitive. |
+| "Show our 4 KPIs" | Use **MetricWall** recipe. Eyebrow names the shared unit/axis. Refuse R-METRIC-001 if the units don't compose. |
+| "Add a status callout / RAG indicator" | Use **RAGStatus** recipe. State word + colon + verb-led clause; one explanatory sentence; ≤2 supporting `<MetricStat>`. |
+| "List recent PRs / events / activity" | Use **AgentLog** (live) or **ReceiptStack** (historical). Never a markdown table with status pills. Cite R-COMPOSE-003 if pill density is the temptation. |
+| "Where we are going" / "What we are building" as h1 | Refuse R-VOICE-003. Replace with the artifact: "Five phases queued." "Ten stages, four wired." |
+| "Cash Sans isn't loading; can we use a serif?" | Refuse R-TYPE-002. Fallback is `Geist Mono` at the same display size with `font-weight: 600`. Never a serif. |
 
 ## Roadmap primitives (not yet shipped)
 

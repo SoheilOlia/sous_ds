@@ -1,7 +1,7 @@
 # TASTE_LOG.md
 > Canonical taste memory for the design system.
 > Append-only. Never silently overwrite. Each entry is timestamped and sourced.
-> Last updated: 2026-04-22 (v1.2)
+> Last updated: 2026-05-01 (v2.0 — composition contract)
 
 ---
 
@@ -279,3 +279,89 @@ DESIGN.md is a Google Stitch / Google Labs convention. A markdown file with YAML
 **2. Green should appear only where the state has actually resolved**
 - Repeated signal: progress completion and a chart endpoint are the places where green feels earned.
 - Decision: allow `accent-success` on `SegmentedBar` only when `value === total`, and on `DottedChart` only for an explicitly documented success endpoint. Keep the rest of the graph monochrome.
+
+---
+
+## ENTRY 010 — 2.0 Consolidation: Refusal Contract → Composition Contract
+**Date:** 2026-05-01
+**Source:** Cross-skill mining of nine external design-skill repos + direct review of a B+/D− test page produced by 1.0
+**Type:** Major extension (additive, no removals)
+
+### Why this entry exists
+
+A real test page produced by sous-ds 1.0 (a "PRD-to-verified-handoff" pipeline status dashboard) graded B+ overall but D− on visual taste, hierarchy, copywriting, and component-IQ. Every failure on that page was reachable inside 1.0's rule space — meaning 1.0 is incomplete.
+
+Root cause: 1.0 is a **refusal contract + token contract** (what to refuse, what tokens to consume) with no positive theory of composition (no page archetypes, no intent → component decision tree, no copy contract, no variance dial). The safest default that satisfies 1.0 — `card grid + Pill walls + verbose body + 4-of-18 components` — is a legal output that grades D−.
+
+### Sources mined for 2.0
+
+| Source | Highest-leverage extraction |
+|---|---|
+| `Donsoleil/awesome-design-md` | 9-section DESIGN.md template; semantic-over-technical naming; Agent Prompt Guide pattern |
+| `Donsoleil/awesome-design-patterns` | Problem-centric component selection (vs. listing components by name) |
+| `anthropics/skills` → `frontend-design` | Tone Picker (10 extreme aesthetics); Spatial Composition (asymmetry, overlap); "intentionality > intensity" mantra; pre-coding Design Thinking checklist (Purpose / Tone / Constraints / Differentiation) |
+| `vercel-labs/agent-skills` → `web-design-guidelines` | Anti-pattern audit checklist; content-aware layout (truncate / min-w-0); content & copy guards (active voice, error messages that suggest fixes) |
+| `google-labs-code/stitch-skills` → `design-md` | Atmosphere statement (one line that constrains all decisions); whitespace rhythm as system (8px units, 2rem vertical); responsive as architecture |
+| `nextlevelbuilder/ui-ux-pro-max-skill` | Priority-ranked decision (a11y/touch GATE style); type scale `12-14-16-18-24-32`; touch targets `44pt + 8px`; product-type → component matching (161 categories) |
+| `leonxlnx/taste-skill` | Three Design Dials (DESIGN_VARIANCE, MOTION_INTENSITY, VISUAL_DENSITY); specific bans (no Inter, no #000, spring physics constants); centered-hero ban when DESIGN_VARIANCE > 4; mobile fallback rule |
+| `github/awesome-copilot` → `documentation-writer` | Diátaxis four-quadrant (Tutorial / How-to / Reference / Explanation); brevity-as-structure; user-goal-first writing |
+| `remotion-dev/skills` → `remotion-best-practices` | Motion-as-information (every motion answers "why does this animate?"); still-frame legibility audit; stagger-and-delay rhythm; duration-clarity checklist |
+
+### Decisions
+
+**1. 2.0 is additive, not a rewrite.**
+- 1.0 tokens, refusals, components, family-grammar (`R-FAMILY-001`), accent semantics — all preserved verbatim.
+- Five new layers stacked on top: composition recipes, intent → component map, voice contract, design dials, new refusals.
+
+**2. Composition Recipes — named page archetypes.**
+- Initial six: `PipelineMap`, `MilestoneStrip`, `AgentLog`, `ReceiptStack`, `MetricWall`, `RAGStatus`.
+- Each declares: intent, primary primitive, supporting components, layout, microcopy template, density quotas, forbidden substitutes.
+- Page must use ≥3 distinct recipes when `RHYTHM ≥ 4` (default).
+- Source: `anthropics/frontend-design` Spatial Composition + `awesome-design-patterns` problem-centric mapping + `stitch` atmosphere statement.
+
+**3. Intent → Component decision tree.**
+- 15-row table mapping content shape to canonical primitive + forbidden substitute.
+- Closes the 4-of-18 component starvation gap by removing selection ambiguity.
+- Source: `awesome-design-patterns` + `ui-ux-pro-max` product-type matching.
+
+**4. Voice Contract — terse instrument-readout.**
+- Seven canonical voice rules. Per-recipe microcopy templates. Banned phrases (V7) catalogue (status-meeting voice).
+- Source: `documentation-writer` Diátaxis + brevity-as-structure; `taste-skill` name bans; `vercel` content guards; `remotion` still-frame legibility.
+
+**5. Design Dials — DENSITY / RHYTHM / VOICE.**
+- Three dials parameterize the page. Defaults `6/6/4` for AI-product surfaces.
+- `RHYTHM` binds recipe variance.
+- Source: `taste-skill` three-dial system; `anthropics` Tone Picker; `ui-ux-pro-max` searchable BM25 taxonomy.
+
+**6. Nine new refusal IDs added to the corpus.**
+- `R-TYPE-002` (no serif fallback for display/h1)
+- `R-COMPOSE-001` (no card grid for sequenced content)
+- `R-COMPOSE-002` (no recipe used > 2 times)
+- `R-COMPOSE-003` (max 3 pills per card / 8 per section)
+- `R-COMPOSE-004` (≥3 distinct recipes when RHYTHM ≥ 4)
+- `R-METRIC-001` (MetricStat group needs shared unit/axis)
+- `R-VOICE-001` (no file paths in body prose)
+- `R-VOICE-002` (no adjacent-section micro-template repetition)
+- `R-VOICE-003` (no status-meeting phrasing)
+
+**7. Roadmap promotions.**
+- `<AgentStream>` and `<Citation>` committed for v0.7.
+- `<Transcript>` and `<TokenMeter>` committed for v0.8.
+- `<DiffBlock>` and `<ConfidenceBar>` deferred (composable from existing primitives).
+
+### Source-driven decisions explicitly rejected
+
+- **No Tailwind / Framer Motion adoption.** `taste-skill` and `vercel-labs` lean heavily on these; sous-ds keeps the zero-dep CSS + RAF motion primitive for portability.
+- **No font expansion to Geist / Outfit / Cabinet Grotesk / Satoshi.** `taste-skill`'s "no Inter, use Geist/Outfit/Satoshi" rule conflicts with sous-ds's already-canonical Cash Sans + Geist + Geist Mono stack. Adopted the principle (no Inter), kept the family choice.
+- **No spring physics defaults.** `taste-skill` mandates `type: spring, stiffness: 100, damping: 20` via Framer Motion. sous-ds keeps `var(--ds-ease-out)` (`cubic-bezier(0.16, 1, 0.3, 1)`) as the canonical entrance easing, since the motion primitive is dependency-free.
+- **No "67 named styles" taxonomy.** `ui-ux-pro-max`'s 67-style search index (Glassmorphism, Bento, Brutalism, etc.) over-constrains. sous-ds is one style; the dials parameterize within it.
+
+### Verification target
+
+The 1.0 case-study page becomes the v0.7.0 verification target. After 2.0 ships, the same prompt should produce a page that uses `PipelineMap` + `MetricWall` + `RAGStatus` + `AgentLog` + `MilestoneStrip` (≥5 recipes), 8+ distinct components, no card grid for the pipeline, instrument-readout copy, and no file paths inline. Side-by-side with the 1.0 output, this becomes a teaching artifact at `examples/pipeline-status-2.0.html`.
+
+### Spec artifacts (not in repo root — under `docs/specs/`)
+
+- `docs/specs/sous-ds-v2.md` — canonical 2.0 spec with full architecture, gap analysis, and rule additions
+- `docs/specs/sous-ds-v2-composition-recipes.md` — initial six recipes with JSX skeletons and microcopy templates
+- `docs/specs/sous-ds-v2-voice.md` — voice contract with seven rules, per-recipe templates, banned phrases catalogue

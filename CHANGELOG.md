@@ -4,6 +4,72 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.7.0] — 2026-05-01
+
+**Composition contract.** v0.7.0 is the docs-only cut of sous-ds 2.0.
+
+The forcing case study: a real test page produced by 1.0 (a "PRD-to-verified-handoff" pipeline status dashboard) graded B+ overall but D− on visual taste, hierarchy, copywriting, and component-IQ. Every failure on that page was reachable inside 1.0's rule space — so 1.0 was incomplete.
+
+Root cause: 1.0 is a **refusal contract** (what to refuse, what tokens to consume) with no positive theory of composition. The safest default that satisfies every 1.0 refusal — `card grid + Pill walls + verbose body + 4-of-18 components` — is a legal output that grades D−.
+
+This release adds the **composition contract** on top. Backwards compatible: zero token changes, zero component renames, zero refusal removals.
+
+### Added
+- **`docs/specs/sous-ds-v2.md`** — canonical 2.0 spec. Five additive layers on top of 1.0: composition recipes, intent → component decision tree, voice contract, design dials, new refusals. Full gap analysis against the case-study page; 1:1 failure → fix mapping.
+- **`docs/specs/sous-ds-v2-composition-recipes.md`** — initial six page archetypes with JSX skeletons, microcopy templates, density quotas, and forbidden substitutes:
+  - `PipelineMap` — multi-stage process with order and per-stage state
+  - `MilestoneStrip` — time-tagged phases with done/active/queued
+  - `AgentLog` — live agent/tool activity with a "now" head
+  - `ReceiptStack` — completed events as machine-attested truth
+  - `MetricWall` — 2–4 numbers sharing a unit or axis
+  - `RAGStatus` — single state-word callout (RED/AMBER/GREEN)
+- **`docs/specs/sous-ds-v2-voice.md`** — voice contract. Seven canonical rules ("terse-first sentences," "present tense, active voice," "numerals in mono," "no file paths in body prose," "project jargon needs a one-clause unpack," "rhythm variance," "no status-meeting voice"), per-recipe microcopy templates, banned-phrase catalogue with substitutes.
+- **Design Dials** — three dials parameterize the page: `DENSITY` (gallery / working / cockpit), `RHYTHM` (single / mixed / high-variance), `VOICE` (telegram / instrument / editorial). Defaults `6/6/4` for AI-product surfaces. `RHYTHM` binds recipe variance.
+- **Pre-composition checklist** — six steps Claude must answer before writing any JSX for a page (purpose, dials, recipes, components, microcopy, variance).
+- **Nine new refusal IDs** in `SKILL.md` and `quality-evaluator.md`:
+  - `R-TYPE-002` / `TY08` — display/h1 fallback to serif when Cash Sans is unavailable (must be Geist Mono Bold)
+  - `R-COMPOSE-001` / `LY04` — sequenced/DAG content rendered as a flat card grid
+  - `R-COMPOSE-002` / `LY05` — same recipe used > 2 times on one page
+  - `R-COMPOSE-003` / `CO07` — > 3 pills per card or > 8 per section
+  - `R-COMPOSE-004` / `CO12` — < 3 distinct recipes when `RHYTHM ≥ 4`
+  - `R-METRIC-001` / `CO08` — `<MetricStat>` group without shared unit/axis
+  - `R-VOICE-001` / `CO09` — file path inline in body prose
+  - `R-VOICE-002` / `CO10` — adjacent sections sharing micro-template
+  - `R-VOICE-003` / `CO11` — status-meeting phrasing ("we are building," "things are stricter," "main-branch truth," etc.)
+
+### Changed
+- **`SKILL.md`** — header carries 2.0 marker; description expanded; v2 docs added to read order; refusal table grew by 9 rows; cell-level patterns renamed; new top-level sections added: Composition Recipes (page level), Intent → Component decision tree, Voice contract summary, Design Dials, Pre-composition checklist; six new prompt → action mappings.
+- **`TASTE_LOG.md`** — header version bumped to v2.0; ENTRY 010 logs source-by-source extraction from nine external skill repos (`anthropics/skills`, `vercel-labs/agent-skills`, `Donsoleil/awesome-design-md`, `Donsoleil/awesome-design-patterns`, `google-labs-code/stitch-skills`, `nextlevelbuilder/ui-ux-pro-max-skill`, `leonxlnx/taste-skill`, `github/awesome-copilot`, `remotion-dev/skills`), records decisions taken and decisions explicitly rejected.
+- **`quality-evaluator.md`** — system prompt references v2 docs; nine new rules added (`TY08`, `LY04`, `LY05`, `CO07`–`CO12`); new "Composition / 2.0" audit section explains how to detect recipe / pill / metric / voice violations from screenshots.
+
+### Roadmap component graduations
+Four 1.0-roadmap components committed for v0.7.x / v0.8 builds:
+- `<AgentStream>` — token-by-token reveal (v0.7.x)
+- `<Citation>` — inline source chip (v0.7.x)
+- `<Transcript>` — role-keyed rows (v0.8)
+- `<TokenMeter>` — context-window usage (v0.8)
+
+`<DiffBlock>` and `<ConfidenceBar>` deferred — composable from existing primitives.
+
+### Deliberately not changed
+- **Tokens** — `design-tokens.json`, `tokens.css` unchanged.
+- **Components** — all 18 keep their names and props.
+- **1.0 refusals** — every existing rule still applies.
+- **Cash Sans** — preferred display face; new fallback rule only governs serif fallback.
+- **Motion primitive** — zero-deps `sous-ds/motion` preserved (no Framer Motion / spring physics adoption).
+- **Font family choices** — `taste-skill`'s "no Inter, use Geist/Outfit/Satoshi" rule was already partial-1.0 (no Inter); the family choice (Cash Sans + Geist + Geist Mono) stays.
+
+### Migration
+None for consumers. `npm install sous-ds@0.7.0 && npx sous-ds init` re-runs the wiring with the updated `SKILL.md`. The 2.0 layer is additive — projects on 1.0 keep working unchanged.
+
+### Verification target (open)
+The 1.0 case-study page is the verification fixture. Re-prompting Claude with v0.7.0 `SKILL.md` should produce a page that uses ≥5 of the six recipes, ≥8 distinct components, no card grid for the pipeline, instrument-readout copy, and no file paths inline. Side-by-side with the 1.0 output, that becomes `examples/pipeline-status-2.0.html` — landing in v0.7.x alongside `<AgentStream>` and `<Citation>`.
+
+### Receipt
+Full audit: `docs/specs/sous-ds-v2-receipt.md`.
+
+---
+
 ## [0.6.1] — 2026-04-27
 
 **`npx sous-ds init` was silently no-op'ing in production.** Fixed.

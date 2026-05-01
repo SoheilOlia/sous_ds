@@ -1,6 +1,6 @@
 {
   "name": "sous-ds",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Dark-first, data-dense, restraint-led design system for AI-native interfaces. Monospace for data, 1px borders over shadows, semantic accents for live and success only, motion under 300ms. Distributes as a global Claude/Codex/Goose skill plus installable React components.",
   "license": "Apache-2.0",
   "author": "Soheil Yasrebi",
