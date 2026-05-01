@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>sous-ds 2.0 — what changed</title>
+
+<!--
+  Single-page visual showcase of the v2.0 upgrade.
+
+  Self-contained: no build step, no React, no external CSS. Open in any
+  browser. Live demos for <AgentStream> (typewriter) and <Citation>
+  (hover popover). All six recipes rendered. Voice contract shown via
+  side-by-side before/after diffs taken from the 1.0 case-study page.
+
+  This page itself is built against the 2.0 contract — every section
+  uses a distinct rhythm, every numeral runs in mono, no banned
+  phrasings, no card-grid for sequenced content.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ds-bg: #0A0A0A;
+  --ds-surface: #141414;
+  --ds-surface-raised: #1C1C1C;
+  --ds-line: rgba(255,255,255,0.08);
+  --ds-line-strong: rgba(255,255,255,0.14);
+  --ds-text-primary: #F0F0F0;
+  --ds-text-secondary: #A0A0A0;
+  --ds-text-muted: #888888;
+  --ds-text-on-primary: #0A0A0A;
+  --ds-accent-live: #E5533C;
+  --ds-accent-success: #00E013;
+
+  --ds-font-display: "Cash Sans", "Geist Mono", ui-monospace, "SF Mono", monospace;
+  --ds-font-sans: "Geist", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --ds-font-mono: "Geist Mono", ui-monospace, "SF Mono", "JetBrains Mono", monospace;
+  --ds-measure: 65ch;
+
+  --ds-space-2: 4px; --ds-space-3: 8px; --ds-space-4: 12px;
+  --ds-space-5: 16px; --ds-space-6: 24px; --ds-space-7: 32px;
+  --ds-space-8: 48px; --ds-space-9: 64px; --ds-space-10: 96px;
+  --ds-radius-xs: 4px; --ds-radius-sm: 8px; --ds-radius-md: 12px;
+  --ds-radius-pill: 9999px;
+  --ds-dur-micro: 140ms; --ds-dur-standard: 220ms;
+  --ds-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--ds-bg);
+  color: var(--ds-text-primary);
+  font-family: var(--ds-font-sans);
+  font-size: 15px;
+  line-height: 24px;
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: var(--ds-space-9) var(--ds-space-7);
+}
+
+/* ============================================================
+   Type, eyebrows, common chrome
+   ============================================================ */
+h1, h2, h3 {
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+h1 { font-size: 64px; line-height: 64px; letter-spacing: -0.04em; }
+h2 { font-size: 32px; line-height: 36px; }
+h3 { font-family: var(--ds-font-mono); font-weight: 500; font-size: 18px; line-height: 22px; letter-spacing: -0.005em; }
+
+p { margin: 0; max-width: var(--ds-measure); color: var(--ds-text-secondary); }
+code { font-family: var(--ds-font-mono); color: var(--ds-text-primary); }
+.mu { color: var(--ds-text-muted); }
+.s2 { color: var(--ds-text-secondary); }
+.lg { font-size: 17px; line-height: 26px; }
+
+.ds-eyebrow {
+  display: block;
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-text-muted);
+  margin-bottom: var(--ds-space-4);
+}
+
+section { margin-bottom: var(--ds-space-10); }
+section header { margin-bottom: var(--ds-space-7); }
+section header > p { margin-top: var(--ds-space-4); }
+
+/* ============================================================
+   Pill, Citation, InlineStatus, LiveBlock — minimal
+   ============================================================ */
+.ds-pill {
+  display: inline-flex; align-items: center; gap: var(--ds-space-2);
+  height: var(--ds-space-6);
+  padding: 0 var(--ds-space-4);
+  border-radius: var(--ds-radius-pill);
+  font-family: var(--ds-font-mono);
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  white-space: nowrap;
+}
+.ds-pill[data-variant="filled"] {
+  background: var(--ds-text-primary);
+  color: var(--ds-text-on-primary);
+  border: 1px solid var(--ds-text-primary);
+}
+.ds-pill[data-variant="outline"] {
+  background: transparent;
+  color: var(--ds-text-secondary);
+  border: 1px dashed var(--ds-line-strong);
+}
+.ds-pill__dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ds-accent-live);
+  animation: ds-pulse 2s linear infinite;
+}
+@keyframes ds-pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+.ds-inline-status {
+  display: inline-flex; gap: 2px; align-items: center;
+  font-family: var(--ds-font-mono);
+  font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-text-muted);
+}
+.ds-inline-status[data-tone="live"]::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ds-accent-live);
+  animation: ds-pulse 2s linear infinite;
+  margin-right: 6px;
+}
+.ds-inline-status[data-tone="live"], .ds-inline-status[data-tone="active"] { color: var(--ds-text-primary); }
+
+.ds-live-block {
+  display: inline-flex; align-items: center;
+  font-family: var(--ds-font-mono);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-on-primary);
+  background: var(--ds-accent-success);
+  height: var(--ds-space-6);
+  padding: 0 var(--ds-space-4);
+  border-radius: var(--ds-radius-xs);
+}
+
+/* ============================================================
+   Header — RAGStatus pattern
+   ============================================================ */
+header.page-head {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: var(--ds-space-6);
+  padding-bottom: var(--ds-space-7);
+  border-bottom: 1px solid var(--ds-line);
+  margin-bottom: var(--ds-space-9);
+}
+header.page-head .brand {
+  display: flex; align-items: center; gap: var(--ds-space-4);
+  font-family: var(--ds-font-mono); font-size: 13px; color: var(--ds-text-secondary);
+}
+.brand__dots {
+  display: grid; grid-template-columns: repeat(3, 4px); grid-template-rows: repeat(3, 4px); gap: 2px;
+}
+.brand__dots span { background: var(--ds-text-secondary); border-radius: 50%; }
+
+header.page-head .head-meta { display: flex; flex-direction: column; gap: var(--ds-space-3); align-items: flex-end; }
+header.page-head .pills { display: flex; gap: var(--ds-space-3); }
+
+/* ============================================================
+   Hero: RAGStatus
+   ============================================================ */
+.hero { display: flex; flex-direction: column; gap: var(--ds-space-6); margin-bottom: var(--ds-space-10); }
+.hero .rag-row { display: flex; align-items: center; gap: var(--ds-space-5); flex-wrap: wrap; }
+.hero h1 { max-width: 18ch; }
+.hero p { max-width: 60ch; }
+
+/* ============================================================
+   MetricWall
+   ============================================================ */
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--ds-space-7); }
+.stat {
+  display: flex; flex-direction: column; gap: var(--ds-space-3);
+  border-top: 1px solid var(--ds-line);
+  padding-top: var(--ds-space-5);
+}
+.stat__label {
+  font-family: var(--ds-font-mono); font-size: 11px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-muted);
+}
+.stat__value {
+  font-family: var(--ds-font-mono); font-size: 40px; line-height: 44px;
+  font-weight: 500; color: var(--ds-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.stat__delta {
+  font-family: var(--ds-font-mono); font-size: 11px;
+  color: var(--ds-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   Recipe gallery
+   ============================================================ */
+.recipes { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ds-space-5); }
+.recipe {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-6);
+  display: flex; flex-direction: column; gap: var(--ds-space-4);
+}
+.recipe__name { font-family: var(--ds-font-mono); font-weight: 500; font-size: 14px; color: var(--ds-text-primary); }
+.recipe__intent { font-size: 13px; line-height: 20px; color: var(--ds-text-secondary); }
+.recipe__primitive { font-family: var(--ds-font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--ds-text-muted); }
+.recipe__primitive code { color: var(--ds-text-secondary); }
+
+/* ============================================================
+   Live components demo box
+   ============================================================ */
+.demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ds-space-6); }
+.demo {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-7);
+  display: flex; flex-direction: column; gap: var(--ds-space-5);
+  min-height: 220px;
+}
+.demo__name { font-family: var(--ds-font-mono); font-size: 13px; color: var(--ds-text-secondary); }
+.demo__stage {
+  display: flex; flex-direction: column; gap: var(--ds-space-3);
+  padding: var(--ds-space-5);
+  background: var(--ds-surface-raised);
+  border-radius: var(--ds-radius-sm);
+  font-family: var(--ds-font-mono);
+  font-size: 13px; line-height: 22px;
+  min-height: 90px;
+}
+.demo__notes { font-size: 12px; line-height: 18px; color: var(--ds-text-muted); }
+
+/* AgentStream */
+.ds-agent-stream { font-family: var(--ds-font-mono); color: var(--ds-text-primary); white-space: pre-wrap; }
+.ds-agent-stream__cursor {
+  display: inline-block; margin-left: 1px;
+  color: var(--ds-text-primary);
+  animation: ds-cursor 1s linear infinite;
+}
+@keyframes ds-cursor { 0%,49%{opacity:1} 50%,99%{opacity:0} 100%{opacity:1} }
+
+/* Citation */
+.ds-citation {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 22px; padding: 0 10px;
+  border: 1px dashed var(--ds-line-strong);
+  border-radius: var(--ds-radius-pill);
+  background: transparent;
+  font-family: var(--ds-font-mono);
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--ds-dur-micro) var(--ds-ease-out), border-color var(--ds-dur-micro) var(--ds-ease-out);
+}
+.ds-citation:hover, .ds-citation:focus-visible, .ds-citation[data-open] {
+  background: var(--ds-text-primary);
+  color: var(--ds-text-on-primary);
+  border-color: var(--ds-text-primary);
+  outline: none;
+}
+.ds-citation__popover {
+  position: absolute; bottom: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%) translateY(4px) scale(0.97);
+  transform-origin: center bottom;
+  display: flex; flex-direction: column; gap: 6px;
+  min-width: 240px; max-width: 360px;
+  padding: 12px 16px;
+  background: var(--ds-surface-raised);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  font-family: var(--ds-font-sans);
+  font-size: 13px; line-height: 20px; font-weight: 400;
+  letter-spacing: 0; text-transform: none;
+  color: var(--ds-text-primary);
+  text-align: left; white-space: normal;
+  pointer-events: none;
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--ds-dur-standard) var(--ds-ease-out), transform var(--ds-dur-standard) var(--ds-ease-out), visibility 0s linear var(--ds-dur-standard);
+  z-index: 10;
+}
+.ds-citation:hover .ds-citation__popover, .ds-citation:focus-visible .ds-citation__popover, .ds-citation[data-open] .ds-citation__popover {
+  opacity: 1; visibility: visible;
+  transform: translateX(-50%) translateY(0) scale(1);
+  transition: opacity var(--ds-dur-standard) var(--ds-ease-out), transform var(--ds-dur-standard) var(--ds-ease-out), visibility 0s linear 0s;
+}
+.ds-citation__popover-source {
+  font-family: var(--ds-font-mono);
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-primary);
+}
+.ds-citation__popover-meta { font-family: var(--ds-font-mono); font-size: 12px; color: var(--ds-text-muted); }
+.ds-citation__popover-body { color: var(--ds-text-secondary); }
+
+/* ============================================================
+   Voice diff
+   ============================================================ */
+.voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--ds-line); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-md); overflow: hidden; }
+.voice-cell { background: var(--ds-surface); padding: var(--ds-space-6); display: flex; flex-direction: column; gap: var(--ds-space-3); }
+.voice-cell__label {
+  display: flex; align-items: center; gap: var(--ds-space-3);
+  font-family: var(--ds-font-mono); font-size: 11px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-muted);
+}
+.voice-cell__label::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+}
+.voice-cell--bad .voice-cell__label::before { background: var(--ds-accent-live); }
+.voice-cell--good .voice-cell__label::before { background: var(--ds-accent-success); }
+.voice-cell__copy { font-size: 14px; line-height: 22px; color: var(--ds-text-primary); }
+.voice-cell--bad .voice-cell__copy { color: var(--ds-text-secondary); }
+
+/* ============================================================
+   Pipeline mini
+   ============================================================ */
+.pipeline {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-7);
+}
+.dot-timeline {
+  display: grid; grid-template-columns: repeat(10, 1fr);
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-5);
+}
+.dot-col { display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-3); }
+.dot-cells { display: flex; flex-direction: column; gap: 2px; min-height: 56px; align-items: center; justify-content: flex-end; width: 100%; }
+.dot-cell { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-text-muted); }
+.dot-cell[data-state="active"] { background: var(--ds-text-primary); }
+.dot-cell[data-state="done"] { background: var(--ds-accent-success); }
+.dot-cell[data-state="live"] { background: var(--ds-accent-live); animation: ds-pulse 2s linear infinite; }
+.dot-label { font-family: var(--ds-font-mono); font-size: 10px; letter-spacing: 0.04em; color: var(--ds-text-muted); text-transform: uppercase; text-align: center; }
+.dot-col[data-current] .dot-label { color: var(--ds-text-primary); }
+
+.dotted-chart {
+  display: grid; grid-template-columns: repeat(10, 1fr);
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-5);
+  padding-top: var(--ds-space-5);
+  border-top: 1px solid var(--ds-line);
+}
+.bar { display: flex; flex-direction: column-reverse; gap: 2px; align-items: center; height: 40px; }
+.bar span { width: 4px; height: 4px; border-radius: 50%; background: var(--ds-text-muted); }
+.bar[data-strong] span { background: var(--ds-text-primary); }
+.bar[data-success] span:last-child { background: var(--ds-accent-success); }
+
+/* ============================================================
+   Banned phrases catalogue
+   ============================================================ */
+.banned-table {
+  width: 100%; border-collapse: collapse; font-size: 13px; line-height: 20px;
+  border-top: 1px solid var(--ds-line); border-bottom: 1px solid var(--ds-line);
+}
+.banned-table th, .banned-table td { padding: var(--ds-space-4) var(--ds-space-5); text-align: left; border-bottom: 1px solid var(--ds-line); }
+.banned-table tr:last-child td { border-bottom: none; }
+.banned-table th {
+  font-family: var(--ds-font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-muted);
+  background: var(--ds-surface);
+}
+.banned-table td.bad { color: var(--ds-text-secondary); font-style: italic; }
+.banned-table td.good { color: var(--ds-text-primary); font-family: var(--ds-font-mono); font-size: 12px; }
+
+/* ============================================================
+   Footer install
+   ============================================================ */
+.install {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-7);
+  display: flex; flex-direction: column; gap: var(--ds-space-5);
+}
+.install__cmd {
+  font-family: var(--ds-font-mono); font-size: 14px;
+  background: var(--ds-bg);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-sm);
+  padding: var(--ds-space-4) var(--ds-space-5);
+  color: var(--ds-text-primary);
+  display: flex; align-items: center; gap: var(--ds-space-3);
+}
+.install__cmd::before { content: "$"; color: var(--ds-text-muted); }
+.install__links { display: flex; gap: var(--ds-space-5); flex-wrap: wrap; font-family: var(--ds-font-mono); font-size: 12px; }
+.install__links a { color: var(--ds-text-secondary); text-decoration: none; border-bottom: 1px dashed var(--ds-line-strong); padding-bottom: 2px; }
+.install__links a:hover { color: var(--ds-text-primary); border-color: var(--ds-text-primary); }
+
+footer.page-foot {
+  margin-top: var(--ds-space-10);
+  padding-top: var(--ds-space-7);
+  border-top: 1px solid var(--ds-line);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--ds-space-4);
+  font-family: var(--ds-font-mono); font-size: 11px;
+  color: var(--ds-text-muted);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 900px) {
+  main { padding: var(--ds-space-7) var(--ds-space-5); }
+  .stat-row { grid-template-columns: repeat(2, 1fr); }
+  .recipes { grid-template-columns: 1fr; }
+  .demo-grid { grid-template-columns: 1fr; }
+  .voice-grid { grid-template-columns: 1fr; }
+  .dot-timeline, .dotted-chart { grid-template-columns: repeat(5, 1fr); }
+  h1 { font-size: 44px; line-height: 48px; }
+}
+</style>
+</head>
+<body>
+
+<main>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="page-head">
+  <div class="brand">
+    <span class="brand__dots" aria-hidden="true">
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+    </span>
+    <span>sous-ds / upgrade</span>
+  </div>
+  <div class="head-meta">
+    <div class="pills">
+      <span class="ds-pill" data-variant="filled"><span class="ds-pill__dot"></span>Live on npm</span>
+      <span class="ds-pill" data-variant="outline">v0.7.1</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     HERO — RAGStatus pattern. Single state-word callout.
+     ============================================================ -->
+<section class="hero">
+  <span class="ds-eyebrow">Release</span>
+  <div class="rag-row">
+    <span class="ds-live-block">SHIPPED</span>
+    <h1>Composition contract.</h1>
+  </div>
+  <p class="lg">v0.7 turned <code>sous-ds</code> from a refusal contract into a composition contract. Same tokens, same components, same motion rules — plus a positive theory of what to compose, in what voice, against three dials.</p>
+</section>
+
+<!-- ============================================================
+     METRIC WALL — shared axis: count of items in the system
+     ============================================================ -->
+<section>
+  <header>
+    <span class="ds-eyebrow">SYSTEM — COUNT OF ITEMS</span>
+    <h2>The system grew without breaking.</h2>
+    <p>Every token preserved. Every 1.0 refusal still applies. Two components graduated, six recipes named, seven voice rules added.</p>
+  </header>
+  <div class="stat-row">
+    <div class="stat">
+      <span class="stat__label">Refusals</span>
+      <span class="stat__value">30</span>
+      <span class="stat__delta">+9 from 1.0</span>
+    </div>
+    <div class="stat">
+      <span class="stat__label">Components</span>
+      <span class="stat__value">20</span>
+      <span class="stat__delta">+2 from 1.0</span>
+    </div>
+    <div class="stat">
+      <span class="stat__label">Page recipes</span>
+      <span class="stat__value">6</span>
+      <span class="stat__delta">+6 from 1.0</span>
+    </div>
+    <div class="stat">
+      <span class="stat__label">Voice rules</span>
+      <span class="stat__value">7</span>
+      <span class="stat__delta">+7 from 1.0</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LIVE DEMO — AgentStream + Citation
+     ============================================================ -->
+<section>
+  <header>
+    <span class="ds-eyebrow">NEW — LIVE</span>
+    <h2>Two new building blocks.</h2>
+    <p>Hover the citation chip below. Watch the stream below it type. Both are real DOM running the same code that ships in <code>sous-ds@0.7.1</code>, simplified for this page.</p>
+  </header>
+
+  <div class="demo-grid">
+    <div class="demo">
+      <span class="demo__name">&lt;Citation&gt;</span>
+      <div class="demo__stage" style="font-family: var(--ds-font-sans); flex-direction: row; flex-wrap: wrap; gap: 8px; align-items: center;">
+        <span style="color: var(--ds-text-secondary); font-family: var(--ds-font-sans); font-size: 13px;">Five receipts merged on</span>
+        <a class="ds-citation" href="#" tabindex="0">
+          <span>Receipt</span>
+          <span class="ds-citation__popover">
+            <span class="ds-citation__popover-source">PR #16 — Smoke matrix expansion</span>
+            <span class="ds-citation__popover-meta">Merged 2026-04-29 · origin/main</span>
+            <span class="ds-citation__popover-body">Fixture-level proof: matrix grew from 2 to 5 fixtures. Stage 5 (Copy) is the strongest current path.</span>
+          </span>
+        </a>
+        <a class="ds-citation" href="#" tabindex="0">
+          <span>Manifest</span>
+          <span class="ds-citation__popover">
+            <span class="ds-citation__popover-source">canonical-freshness-manifest.json</span>
+            <span class="ds-citation__popover-meta">Last verified 2026-04-30</span>
+            <span class="ds-citation__popover-body">Source-of-truth for handoff freshness. Three receipts trace through this file.</span>
+          </span>
+        </a>
+        <span style="color: var(--ds-text-secondary); font-family: var(--ds-font-sans); font-size: 13px;">.</span>
+      </div>
+      <div class="demo__notes">
+        Replaces the 1.0 footgun of file paths inline in body prose
+        (R-VOICE-001). Path lives in the popover; the body reads clean.
+      </div>
+    </div>
+
+    <div class="demo">
+      <span class="demo__name">&lt;AgentStream&gt;</span>
+      <div class="demo__stage">
+        <div>
+          <span class="ds-inline-status" data-tone="live">Live 00:14</span>
+        </div>
+        <div>
+          <span id="stream-host" class="ds-agent-stream"></span>
+        </div>
+      </div>
+      <div class="demo__notes">
+        Token-by-token reveal at 18ms/char. Cursor blinks via opacity-only,
+        1s linear loop. <code>prefers-reduced-motion</code> shows full text
+        instantly.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     THE SIX RECIPES
+     ============================================================ -->
+<section>
+  <header>
+    <span class="ds-eyebrow">PAGE — RECIPES</span>
+    <h2>Six named archetypes.</h2>
+    <p>Each recipe declares its intent, primary primitive, microcopy template, and forbidden substitute. A page must use ≥3 distinct recipes when the rhythm dial is at default. No more card-grid monotony.</p>
+  </header>
+  <div class="recipes">
+    <article class="recipe">
+      <span class="recipe__name">PipelineMap</span>
+      <p class="recipe__intent">Multi-stage process with order and per-stage state.</p>
+      <span class="recipe__primitive">primary: <code>&lt;DotTimeline&gt;</code> + <code>&lt;DottedChart&gt;</code></span>
+    </article>
+    <article class="recipe">
+      <span class="recipe__name">MilestoneStrip</span>
+      <p class="recipe__intent">Time-tagged phases with done / active / queued state.</p>
+      <span class="recipe__primitive">primary: <code>&lt;DotTimeline&gt;</code> + <code>&lt;SegmentedBar&gt;</code></span>
+    </article>
+    <article class="recipe">
+      <span class="recipe__name">AgentLog</span>
+      <p class="recipe__intent">Live agent or tool activity with a "now" head.</p>
+      <span class="recipe__primitive">primary: <code>&lt;ToolCall&gt;</code> + <code>&lt;PulseTrail&gt;</code></span>
+    </article>
+    <article class="recipe">
+      <span class="recipe__name">ReceiptStack</span>
+      <p class="recipe__intent">Completed events as machine-attested truth.</p>
+      <span class="recipe__primitive">primary: <code>&lt;ToolCall tone="done"&gt;</code></span>
+    </article>
+    <article class="recipe">
+      <span class="recipe__name">MetricWall</span>
+      <p class="recipe__intent">2–4 numbers sharing a unit or axis.</p>
+      <span class="recipe__primitive">primary: <code>&lt;MetricStat&gt;</code> row</span>
+    </article>
+    <article class="recipe">
+      <span class="recipe__name">RAGStatus</span>
+      <p class="recipe__intent">Single state-word callout (RED / AMBER / GREEN).</p>
+      <span class="recipe__primitive">primary: <code>&lt;LiveBlock&gt;</code> + <code>&lt;Pill&gt;</code></span>
+    </article>
+  </div>
+</section>
+
+<!-- ============================================================
+     PIPELINE MAP — live mini-render
+     ============================================================ -->
+<section>
+  <header>
+    <span class="ds-eyebrow">RECIPE — PIPELINEMAP</span>
+    <h2>Ten stages, four wired.</h2>
+    <p>The 1.0 page rendered this exact pipeline as a flat 5-card grid. The 2.0 PipelineMap recipe uses a horizontal <code>&lt;DotTimeline&gt;</code> over a per-stage <code>&lt;DottedChart&gt;</code> — flow is in the structure, density per stage is in the bars below.</p>
+  </header>
+  <div class="pipeline">
+    <div class="dot-timeline">
+      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Input</span></div>
+      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Classify</span></div>
+      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Variants</span></div>
+      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Surfaces</span></div>
+      <div class="dot-col" data-current><div class="dot-cells"><span class="dot-cell" data-state="done"></span><span class="dot-cell" data-state="done"></span><span class="dot-cell" data-state="done"></span><span class="dot-cell" data-state="done"></span><span class="dot-cell" data-state="done"></span></div><span class="dot-label">Copy</span></div>
+      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Compliance</span></div>
+      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Render</span></div>
+      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Codegen</span></div>
+      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Verify</span></div>
+      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="live"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Output</span></div>
+    </div>
+    <div class="dotted-chart">
+      <div class="bar" data-strong><span></span><span></span><span></span></div>
+      <div class="bar" data-strong><span></span><span></span><span></span><span></span></div>
+      <div class="bar" data-strong><span></span><span></span><span></span></div>
+      <div class="bar" data-strong><span></span><span></span><span></span></div>
+      <div class="bar" data-strong data-success><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="bar" data-strong><span></span><span></span><span></span></div>
+      <div class="bar"><span></span><span></span></div>
+      <div class="bar" data-strong><span></span><span></span><span></span></div>
+      <div class="bar" data-strong><span></span><span></span><span></span><span></span></div>
+      <div class="bar"><span></span><span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     VOICE — before/after diffs
+     ============================================================ -->
+<section>
+  <header>
+    <span class="ds-eyebrow">VOICE — BEFORE / AFTER</span>
+    <h2>The system speaks like a precision instrument.</h2>
+    <p>Each pair below is real. Left: actual copy from the 1.0 test page that graded D− on content. Right: the 2.0 voice contract applied to the same data.</p>
+  </header>
+
+  <div style="display: flex; flex-direction: column; gap: var(--ds-space-5);">
+
+    <div class="voice-grid">
+      <div class="voice-cell voice-cell--bad">
+        <span class="voice-cell__label">1.0 — verbose, status-meeting voice</span>
+        <span class="voice-cell__copy">"PRD to verified handoff, shown end to end."</span>
+      </div>
+      <div class="voice-cell voice-cell--good">
+        <span class="voice-cell__label">2.0 — verb-led, present tense</span>
+        <span class="voice-cell__copy">"Ten stages, four wired."</span>
+      </div>
+    </div>
+
+    <div class="voice-grid">
+      <div class="voice-cell voice-cell--bad">
+        <span class="voice-cell__label">1.0 — vague comparative, no subject</span>
+        <span class="voice-cell__copy">"Amber, stricter after diagnostics."</span>
+      </div>
+      <div class="voice-cell voice-cell--good">
+        <span class="voice-cell__label">2.0 — state word + verb-led clause</span>
+        <span class="voice-cell__copy">"Amber: diagnostics tightened the bar."</span>
+      </div>
+    </div>
+
+    <div class="voice-grid">
+      <div class="voice-cell voice-cell--bad">
+        <span class="voice-cell__label">1.0 — passive, narrating existence</span>
+        <span class="voice-cell__copy">"Stale handoffs are audited and retired from current-readiness claims."</span>
+      </div>
+      <div class="voice-cell voice-cell--good">
+        <span class="voice-cell__label">2.0 — subject-verb-object</span>
+        <span class="voice-cell__copy">"PR #17 retired stale handoffs."</span>
+      </div>
+    </div>
+
+    <div class="voice-grid">
+      <div class="voice-cell voice-cell--bad">
+        <span class="voice-cell__label">1.0 — file paths in body prose</span>
+        <span class="voice-cell__copy">"Receipts: consent_orders/docs/receipts/2026-04-28-smoke-matrix-expansion-receipt.md, …"</span>
+      </div>
+      <div class="voice-cell voice-cell--good">
+        <span class="voice-cell__label">2.0 — Citation chips, body reads clean</span>
+        <span class="voice-cell__copy">"Three receipts. See the ReceiptStack below."</span>
+      </div>
+    </div>
+
+    <div class="voice-grid">
+      <div class="voice-cell voice-cell--bad">
+        <span class="voice-cell__label">1.0 — editorial frame as h1</span>
+        <span class="voice-cell__copy">"Where we are going"</span>
+      </div>
+      <div class="voice-cell voice-cell--good">
+        <span class="voice-cell__label">2.0 — name the artifact</span>
+        <span class="voice-cell__copy">"Five phases. Three live, two queued."</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     BANNED PHRASES
+     ============================================================ -->
+<section>
+  <header>
+    <span class="ds-eyebrow">VOICE — BANNED CATALOGUE</span>
+    <h2>Ten phrases the system refuses.</h2>
+    <p>Detected statically by lint rule <code>CO11</code> (severity: info). Replace with the named substitute on the right.</p>
+  </header>
+  <table class="banned-table">
+    <thead>
+      <tr>
+        <th style="width: 50%;">Banned phrasing</th>
+        <th>Replace with</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="bad">"we are building…"</td><td class="good">name the artifact</td></tr>
+      <tr><td class="bad">"what we are working on"</td><td class="good">present-tense state</td></tr>
+      <tr><td class="bad">"things are stricter"</td><td class="good">name what got stricter and how</td></tr>
+      <tr><td class="bad">"main-branch truth" (as adjective)</td><td class="good">"lands on main"</td></tr>
+      <tr><td class="bad">"draft-PR truth" / "working-tree truth"</td><td class="good">name the actual state</td></tr>
+      <tr><td class="bad">"the project is not green because…"</td><td class="good">"green requires PR #N"</td></tr>
+      <tr><td class="bad">"where we are going"</td><td class="good">"five phases queued"</td></tr>
+      <tr><td class="bad">"what we are building"</td><td class="good">name the artifact</td></tr>
+      <tr><td class="bad">"in order to"</td><td class="good">"to"</td></tr>
+      <tr><td class="bad">"at this time"</td><td class="good">"now"</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================
+     INSTALL
+     ============================================================ -->
+<section>
+  <header>
+    <span class="ds-eyebrow">INSTALL</span>
+    <h2>Two commands.</h2>
+    <p>Wires <code>AGENTS.md</code> for Codex and Goose, <code>CLAUDE.md</code> + <code>.claude/skills/</code> for Claude Code, and <code>.cursor/rules/</code> for Cursor. Idempotent. Safe to re-run on upgrades.</p>
+  </header>
+  <div class="install">
+    <div class="install__cmd">npm install sous-ds &amp;&amp; npx sous-ds init</div>
+    <div class="install__links">
+      <a href="https://www.npmjs.com/package/sous-ds">npmjs / sous-ds</a>
+      <a href="https://github.com/SoheilOlia/sous_ds/releases/tag/v0.7.1">GitHub release v0.7.1</a>
+      <a href="./pipeline-status-2.0.html">Verification artifact →</a>
+      <a href="../docs/specs/sous-ds-v2.md">v2.0 spec</a>
+      <a href="../docs/specs/sous-ds-v2-composition-recipes.md">Recipe catalogue</a>
+      <a href="../docs/specs/sous-ds-v2-voice.md">Voice contract</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="page-foot">
+  <span>sous-ds 0.7.1 · composition contract</span>
+  <span>Apache 2.0</span>
+  <span>2026-05-01</span>
+</footer>
+
+</main>
+
+<script>
+// AgentStream demo — token-by-token reveal using the same algorithm
+// the published component runs (typewriter, opacity-blink cursor).
+(function () {
+  const host = document.getElementById("stream-host");
+  if (!host) return;
+
+  const text = "Indexing 188 Linear tickets. Resolved 54. Cross-referencing the canonical handoff manifest.";
+  const STEP_MS = 18;
+
+  // Cursor element built once; text node appended on each frame.
+  const textSpan = document.createElement("span");
+  const cursor = document.createElement("span");
+  cursor.className = "ds-agent-stream__cursor";
+  cursor.setAttribute("aria-hidden", "true");
+  cursor.textContent = "▍";
+  host.appendChild(textSpan);
+  host.appendChild(cursor);
+
+  const reduced = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reduced) {
+    textSpan.textContent = text;
+    return;
+  }
+
+  let i = 0;
+  function step() {
+    if (i >= text.length) {
+      // Pause, then restart the demo so the page is always alive.
+      setTimeout(() => { textSpan.textContent = ""; i = 0; step(); }, 4000);
+      return;
+    }
+    i++;
+    textSpan.textContent = text.slice(0, i);
+    setTimeout(step, STEP_MS);
+  }
+  step();
+})();
+
+// Citation popover — click toggles open state for touch devices that
+// don't surface :hover (the CSS handles hover/focus on pointer devices).
+(function () {
+  document.querySelectorAll(".ds-citation").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      const open = el.hasAttribute("data-open");
+      // Close any other open chip first.
+      document.querySelectorAll(".ds-citation[data-open]").forEach((other) => {
+        if (other !== el) other.removeAttribute("data-open");
+      });
+      if (open) el.removeAttribute("data-open");
+      else el.setAttribute("data-open", "");
+    });
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && el.hasAttribute("data-open")) {
+        el.removeAttribute("data-open");
+        el.blur();
+      }
+    });
+  });
+  // Click outside closes.
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".ds-citation")) {
+      document.querySelectorAll(".ds-citation[data-open]").forEach((el) => {
+        el.removeAttribute("data-open");
+      });
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -290,6 +290,7 @@ function ruleCL07_accentCarrier(src, file) {
         "preview.html",
         "examples/slop-vs-system.html",
         "examples/pipeline-status-2.0.html",
+        "examples/v2-upgrade.html",
         "refusals.json",
         "SKILL.md",
       ],
@@ -308,6 +309,7 @@ function ruleCL07_accentCarrier(src, file) {
         "preview.html",
         "examples/slop-vs-system.html",
         "examples/pipeline-status-2.0.html",
+        "examples/v2-upgrade.html",
         "refusals.json",
         "SKILL.md",
       ],
@@ -452,9 +454,9 @@ function ruleCO09_filePathInProse(src, file) {
 function ruleCO11_statusMeetingVoice(src, file) {
   const ext = path.extname(file);
   if (![".html", ".jsx", ".tsx"].includes(ext)) return [];
-  // Skip the verification artifact itself if it exists — it cites the
-  // banned phrases as before/after evidence and would self-flag.
-  if (/pipeline-status-2\.0\.html$/.test(file)) return [];
+  // Skip the teaching artifacts that cite the banned phrases as
+  // before/after evidence — they would self-flag.
+  if (/(pipeline-status-2\.0|v2-upgrade)\.html$/.test(file)) return [];
   const findings = [];
   const BANNED = [
     "we are building",
