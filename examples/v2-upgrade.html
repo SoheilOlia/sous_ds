@@ -215,7 +215,8 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
 }
 
 /* ============================================================
-   Component catalogue — one tile per component, live render
+   Component catalogue — one tile per component, faithful to the
+   actual sous-ds component CSS (selectors, animations, dimensions).
    ============================================================ */
 .catalogue { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--ds-space-4); }
 .tile {
@@ -225,7 +226,7 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   padding: var(--ds-space-5);
   display: flex; flex-direction: column;
   gap: var(--ds-space-4);
-  min-height: 220px;
+  min-height: 240px;
 }
 .tile__name {
   font-family: var(--ds-font-mono);
@@ -243,9 +244,9 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
 .tile__stage {
   flex: 1;
   display: flex; align-items: center; justify-content: center;
-  padding: var(--ds-space-4) 0;
+  padding: var(--ds-space-5) 0;
   position: relative;
-  min-height: 96px;
+  min-height: 110px;
 }
 .tile__role {
   font-family: var(--ds-font-sans);
@@ -255,331 +256,426 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   padding-top: var(--ds-space-3);
 }
 
-/* --- demo: Button --- */
-.demo-button-stack { display: flex; flex-direction: column; gap: 6px; align-items: stretch; width: 100%; max-width: 140px; }
-.btn {
-  height: 32px; padding: 0 12px;
-  border-radius: var(--ds-radius-sm);
-  font-family: var(--ds-font-sans); font-size: 12px; font-weight: 500;
+/* ---- Button (real .ds-btn structure) ----------------------- */
+.cat-btn-stack { display: flex; flex-direction: column; gap: 6px; align-items: stretch; width: 100%; max-width: 140px; }
+.cat-btn {
+  position: relative;
   display: inline-flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: opacity var(--ds-dur-micro) var(--ds-ease-out);
-}
-.btn--primary { background: var(--ds-text-primary); color: var(--ds-text-on-primary); border: 1px solid var(--ds-text-primary); }
-.btn--secondary { background: transparent; color: var(--ds-text-primary); border: 1px solid var(--ds-line-strong); }
-.btn--ghost { background: transparent; color: var(--ds-text-secondary); border: 1px solid transparent; }
-.btn:hover { opacity: 0.8; }
-
-/* --- demo: Card (mini) --- */
-.demo-card-mini {
-  width: 140px; height: 80px;
-  background: var(--ds-surface-raised);
-  border: 1px solid var(--ds-line-strong);
+  gap: var(--ds-space-3);
+  padding: 0 var(--ds-space-5);
+  height: 32px;
   border-radius: var(--ds-radius-sm);
-  padding: 12px;
-  display: flex; flex-direction: column; justify-content: space-between;
+  border: 1px solid transparent;
+  font-family: var(--ds-font-sans); font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition:
+    opacity var(--ds-dur-micro) var(--ds-ease-out),
+    background-color var(--ds-dur-micro) var(--ds-ease-out),
+    border-color var(--ds-dur-micro) var(--ds-ease-out);
 }
-.demo-card-mini span:first-child {
-  font-family: var(--ds-font-mono); font-size: 9px;
+.cat-btn[data-variant="primary"] { background: var(--ds-text-primary); color: var(--ds-text-on-primary); }
+.cat-btn[data-variant="primary"]:hover { opacity: 0.9; }
+.cat-btn[data-variant="secondary"] { background: transparent; color: var(--ds-text-primary); border-color: var(--ds-line-strong); }
+.cat-btn[data-variant="secondary"]:hover { background: var(--ds-surface-raised); }
+.cat-btn[data-variant="ghost"] { background: transparent; color: var(--ds-text-secondary); }
+.cat-btn[data-variant="ghost"]:hover { color: var(--ds-text-primary); background: var(--ds-surface-raised); }
+.cat-btn:active { transform: scale(0.97); }
+
+/* ---- Card (real .ds-card structure) ------------------------ */
+.cat-card {
+  width: 160px;
+  background: var(--ds-surface-raised);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-5);
+  display: flex; flex-direction: column;
+}
+.cat-card__head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: var(--ds-space-4);
+}
+.cat-card__num {
+  font-family: var(--ds-font-mono); font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ds-text-muted);
+}
+.cat-card__num b { color: var(--ds-text-primary); font-weight: 500; margin-left: 8px; }
+.cat-card__meta {
+  font-family: var(--ds-font-mono); font-size: 11px;
   letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--ds-text-muted);
 }
-.demo-card-mini span:last-child {
-  font-family: var(--ds-font-mono); font-size: 18px;
-  color: var(--ds-text-primary);
+.cat-card__title {
+  font-family: var(--ds-font-mono); font-size: 18px; line-height: 22px;
+  font-weight: 500; color: var(--ds-text-primary);
   font-variant-numeric: tabular-nums;
+  margin: 0;
 }
 
-/* --- demo: LiveDot --- */
-.demo-livedot {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-family: var(--ds-font-mono); font-size: 11px;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--ds-text-primary);
+/* ---- LiveDot (real .ds-livedot structure) ------------------ */
+.cat-livedot { display: inline-flex; align-items: center; gap: var(--ds-space-3); font-family: var(--ds-font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ds-text-secondary); }
+.cat-livedot__mark { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-accent-live); animation: ds-pulse 2s linear infinite; }
+
+/* ---- LiveBlock (a tiny BlockLoader: 12px footprint, 7 chasing 3px blocks) ---- */
+.cat-liveblock { display: inline-flex; align-items: center; gap: var(--ds-space-3); font-family: var(--ds-font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ds-text-secondary); --cat-lb-cell: 3px; --cat-lb-gap: 1px; --cat-lb-step: 4px; }
+.cat-liveblock__stage { width: 12px; height: 12px; flex: none; }
+.cat-liveblock__grid { position: relative; width: 12px; height: 12px; }
+.cat-liveblock__block { position: absolute; top: 0; left: 0; width: var(--cat-lb-cell); height: var(--cat-lb-cell); background: var(--ds-text-primary); animation: ds-liveblock-path 10000ms ease-in-out infinite both; }
+.cat-liveblock__block:nth-child(1) { animation-delay: 0s; }
+.cat-liveblock__block:nth-child(2) { animation-delay: -1.4285714286s; }
+.cat-liveblock__block:nth-child(3) { animation-delay: -2.8571428571s; }
+.cat-liveblock__block:nth-child(4) { animation-delay: -4.2857142857s; }
+.cat-liveblock__block:nth-child(5) { animation-delay: -5.7142857143s; }
+.cat-liveblock__block:nth-child(6) { animation-delay: -7.1428571429s; }
+.cat-liveblock__block:nth-child(7) { animation-delay: -8.5714285714s; }
+@keyframes ds-liveblock-path {
+  0%,   10.5% { transform: translate(0,                          0); }
+  12.5%, 23%  { transform: translate(var(--cat-lb-step),          0); }
+  25%,  35.5% { transform: translate(calc(var(--cat-lb-step)*2),  0); }
+  37.5%, 48%  { transform: translate(calc(var(--cat-lb-step)*2),  var(--cat-lb-step)); }
+  50%,  60.5% { transform: translate(var(--cat-lb-step),          var(--cat-lb-step)); }
+  62.5%, 73%  { transform: translate(var(--cat-lb-step),          calc(var(--cat-lb-step)*2)); }
+  75%,  85.5% { transform: translate(0,                          calc(var(--cat-lb-step)*2)); }
+  87.5%, 98%  { transform: translate(0,                          var(--cat-lb-step)); }
+  100%        { transform: translate(0,                          0); }
 }
-.demo-livedot__dot {
-  width: 6px; height: 6px; border-radius: 50%;
+
+/* ---- Toast (real .ds-toast structure with --ds-elev-1 shadow) ---- */
+.cat-toast {
+  position: relative;
+  display: flex; align-items: flex-start; gap: var(--ds-space-3);
+  padding: var(--ds-space-4) var(--ds-space-5);
+  background: var(--ds-surface-raised);
+  color: var(--ds-text-primary);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-md);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  font-family: var(--ds-font-sans); font-size: 13px; line-height: 20px;
+  min-width: 220px; max-width: 280px;
+}
+.cat-toast__dot {
+  width: 6px; height: 6px; margin-top: 7px; flex: none;
+  border-radius: 50%;
   background: var(--ds-accent-live);
   animation: ds-pulse 2s linear infinite;
 }
+.cat-toast__title { font-weight: 500; }
+.cat-toast__desc { color: var(--ds-text-secondary); margin-top: 2px; font-size: 12px; }
 
-/* --- demo: Toast (mini) --- */
-.demo-toast {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--ds-surface-raised);
-  border: 1px solid var(--ds-line);
-  border-radius: var(--ds-radius-md);
-  padding: 10px 14px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-  font-family: var(--ds-font-mono); font-size: 11px;
-  color: var(--ds-text-primary);
-  letter-spacing: 0.04em;
-  max-width: 200px;
-}
-.demo-toast::before {
-  content: ""; width: 4px; height: 12px;
-  background: var(--ds-text-primary);
-  border-radius: 1px;
-}
+/* ---- DottedChart (real .ds-chart bars; 6px dots, 4px gap) -- */
+.cat-chart { display: inline-flex; flex-direction: column; gap: var(--ds-space-3); }
+.cat-chart__bars { display: grid; grid-auto-flow: column; grid-auto-columns: 6px; gap: 8px; align-items: end; min-height: 64px; }
+.cat-chart__bar { display: flex; flex-direction: column-reverse; gap: 4px; align-items: center; }
+.cat-chart__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-text-muted); }
+.cat-chart__bar[data-active] .cat-chart__dot { background: var(--ds-text-primary); }
+.cat-chart__bar[data-success] .cat-chart__dot { background: var(--ds-accent-success); }
 
-/* --- demo: DottedChart --- */
-.demo-dotchart { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; height: 80px; }
-.demo-dotchart__bar { display: flex; flex-direction: column-reverse; gap: 2px; align-items: center; }
-.demo-dotchart__bar span { width: 4px; height: 4px; border-radius: 50%; background: var(--ds-text-muted); }
-.demo-dotchart__bar[data-active] span { background: var(--ds-text-primary); }
-.demo-dotchart__bar[data-success] span:last-child { background: var(--ds-accent-success); }
-
-/* --- demo: DotTimeline (mini) --- */
-.demo-timeline { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; width: 100%; }
-.demo-timeline__col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.demo-timeline__cells { display: flex; flex-direction: column; gap: 2px; min-height: 36px; align-items: center; justify-content: flex-end; }
-.demo-timeline__cell { width: 5px; height: 5px; border-radius: 50%; background: var(--ds-text-muted); }
-.demo-timeline__cell[data-state="active"] { background: var(--ds-text-primary); }
-.demo-timeline__cell[data-state="done"] { background: var(--ds-accent-success); }
-.demo-timeline__cell[data-state="live"] { background: var(--ds-accent-live); animation: ds-pulse 2s linear infinite; }
-.demo-timeline__lab { font-family: var(--ds-font-mono); font-size: 8px; letter-spacing: 0.04em; color: var(--ds-text-muted); text-transform: uppercase; }
-
-/* --- demo: PulseTrail (animated head sweep) --- */
-.demo-pulsetrail {
-  position: relative; width: 160px; height: 14px;
-  background: transparent;
+/* ---- DotTimeline (real .ds-dot-timeline; 6px dots, 8px gap, axis line) ---- */
+.cat-timeline {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 6px;
+  align-items: end; gap: 8px;
+  height: 64px; padding: 4px 0;
+  border-bottom: 1px solid var(--ds-line);
 }
-.demo-pulsetrail__track {
-  position: absolute; top: 50%; left: 0; right: 0;
-  transform: translateY(-50%);
-  display: flex; gap: 8px; align-items: center;
+.cat-timeline__col { position: relative; width: 6px; height: 100%; display: flex; flex-direction: column-reverse; align-items: center; gap: 4px; }
+.cat-timeline__d { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-text-muted); opacity: 0.55; }
+.cat-timeline__col[data-state="done"] .cat-timeline__d { background: var(--ds-accent-success); opacity: 1; }
+.cat-timeline__col[data-state="live"] .cat-timeline__d { background: var(--ds-accent-live); opacity: 1; animation: ds-livepulse 2s linear infinite; }
+.cat-timeline__col[data-state="active"] .cat-timeline__d { background: var(--ds-text-primary); opacity: 1; }
+@keyframes ds-livepulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+
+/* ---- PulseTrail (real .ds-pulse-trail; head 8px + halo, trail 6px, axis line) ---- */
+.cat-pt {
+  width: 100%; max-width: 200px;
+  display: flex; flex-direction: column; gap: var(--ds-space-3);
+  font-family: var(--ds-font-mono);
 }
-.demo-pulsetrail__track span {
-  width: 5px; height: 5px; border-radius: 50%;
+.cat-pt__canvas {
+  position: relative; height: 32px;
+  border-bottom: 1px solid var(--ds-line);
+}
+.cat-pt__d {
+  position: absolute; bottom: 4px;
+  width: 6px; height: 6px;
+  transform: translateX(-50%);
+  border-radius: 50%;
   background: var(--ds-text-muted);
 }
-.demo-pulsetrail__track span[data-state="done"] { background: var(--ds-accent-success); }
-.demo-pulsetrail__head {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: 7px; height: 7px; border-radius: 50%;
+.cat-pt__d[data-state="done"] { background: var(--ds-accent-success); }
+.cat-pt__head {
+  position: absolute; bottom: 3px; left: 0;
+  width: 8px; height: 8px;
+  border-radius: 50%;
   background: var(--ds-accent-live);
-  box-shadow: 0 0 0 2px rgba(229, 83, 60, 0.3);
-  animation: ds-pulsetrail-sweep 4s linear infinite, ds-pulse 2s linear infinite;
+  box-shadow: 0 0 0 3px rgba(229, 83, 60, 0.18);
+  transform: translateX(-50%);
+  z-index: 2;
+  animation:
+    ds-pt-sweep 4000ms linear infinite,
+    ds-pt-pulse 2000ms linear infinite;
 }
-@keyframes ds-pulsetrail-sweep {
-  0% { left: 0%; }
-  100% { left: calc(100% - 7px); }
+@keyframes ds-pt-sweep { 0%{left:0%} 100%{left:100%} }
+@keyframes ds-pt-pulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+.cat-pt__axis {
+  display: flex; justify-content: space-between;
+  font-family: var(--ds-font-mono); font-size: 11px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-muted);
 }
 
-/* --- demo: SegmentedBar --- */
-.demo-segbar { display: flex; gap: 2px; width: 100%; max-width: 180px; }
-.demo-segbar span {
-  flex: 1; height: 14px; border-radius: 1px;
-  background: var(--ds-line-strong);
-}
-.demo-segbar span[data-active] { background: var(--ds-text-primary); }
+/* ---- SegmentedBar (real .ds-segmented-bar; 4px×16px vertical pills) ---- */
+.cat-segbar { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 4px; gap: 4px; align-items: end; min-height: 16px; }
+.cat-segbar__seg { width: 4px; height: 16px; border-radius: 9999px; background: var(--ds-line-strong); }
+.cat-segbar__seg.is-active { background: var(--ds-text-primary); }
 
-/* --- demo: SegmentedControl --- */
-.demo-segctrl {
-  display: inline-flex; padding: 3px;
-  background: var(--ds-surface-raised);
+/* ---- SegmentedControl (real .ds-segmented-control; thumb under selected) ---- */
+.cat-segctrl {
+  position: relative;
+  display: inline-flex; align-items: center; gap: var(--ds-space-2);
+  padding: var(--ds-space-2);
   border: 1px solid var(--ds-line);
   border-radius: var(--ds-radius-pill);
+  background: var(--ds-surface-raised);
 }
-.demo-segctrl__opt {
-  height: 28px; padding: 0 12px;
+.cat-segctrl__btn {
+  position: relative; z-index: 1;
+  height: 32px; padding: 0 var(--ds-space-5);
   display: inline-flex; align-items: center;
-  font-family: var(--ds-font-mono); font-size: 11px;
-  letter-spacing: 0.04em; text-transform: uppercase;
-  color: var(--ds-text-muted);
+  border: 0; background: transparent;
+  color: var(--ds-text-secondary);
+  font-family: var(--ds-font-sans); font-size: 13px; font-weight: 500;
   border-radius: var(--ds-radius-pill);
   cursor: pointer;
 }
-.demo-segctrl__opt[data-active] {
-  background: var(--ds-text-primary);
+.cat-segctrl__btn[data-selected] {
   color: var(--ds-text-on-primary);
+  background: var(--ds-text-primary);
 }
 
-/* --- demo: InlineStatus --- */
-.demo-inlinestatus { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+/* ---- InlineStatus (real .ds-inline-status) ----------------- */
+.cat-inline-stack { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.cat-status { display: inline-flex; align-items: center; gap: 4px; font-family: var(--ds-font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ds-text-secondary); }
+.cat-status[data-tone="active"], .cat-status[data-tone="live"] { color: var(--ds-text-primary); }
+.cat-status__bracket { color: var(--ds-text-muted); }
+.cat-status__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-accent-live); animation: ds-pulse 2s linear infinite; }
 
-/* --- demo: MetricStat (mini) --- */
-.demo-metricstat { display: flex; flex-direction: column; gap: 6px; }
-.demo-metricstat__label {
-  font-family: var(--ds-font-mono); font-size: 10px;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--ds-text-muted);
-}
-.demo-metricstat__value {
-  font-family: var(--ds-font-mono); font-size: 32px; line-height: 36px;
-  font-weight: 500; color: var(--ds-text-primary);
+/* ---- MetricStat (real .ds-metric-stat; 72px value, suffix at 0.32em) ---- */
+.cat-metric { display: flex; flex-direction: column; gap: var(--ds-space-3); align-items: flex-start; }
+.cat-metric__label { font-family: var(--ds-font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ds-text-muted); }
+.cat-metric__value {
+  display: inline-flex; align-items: flex-start;
+  font-family: var(--ds-font-mono);
   font-variant-numeric: tabular-nums;
+  font-size: 56px; line-height: 60px;
+  font-weight: 500; letter-spacing: -0.03em;
+  color: var(--ds-text-primary);
 }
-.demo-metricstat__unit { font-size: 16px; color: var(--ds-text-secondary); margin-left: 2px; }
+.cat-metric__suffix { font-size: 0.32em; color: var(--ds-text-muted); margin-left: 4px; vertical-align: top; }
 
-/* --- demo: ToolCall (mini) --- */
-.demo-toolcall {
-  width: 100%; max-width: 220px;
+/* ---- ToolCall (real .ds-tool-call) ------------------------- */
+.cat-toolcall {
+  width: 100%; max-width: 240px;
   background: var(--ds-surface-raised);
   border: 1px solid var(--ds-line);
   border-radius: var(--ds-radius-md);
-  padding: 10px 12px;
-  display: flex; flex-direction: column; gap: 6px;
+  padding: var(--ds-space-4) var(--ds-space-5);
+  display: flex; flex-direction: column; gap: var(--ds-space-4);
 }
-.demo-toolcall__head {
-  display: flex; justify-content: space-between; align-items: center;
-  font-family: var(--ds-font-mono); font-size: 11px;
-  color: var(--ds-text-primary);
-}
-.demo-toolcall__detail {
-  font-family: var(--ds-font-sans); font-size: 11px; line-height: 16px;
-  color: var(--ds-text-secondary);
-}
+.cat-toolcall__head { display: flex; justify-content: space-between; align-items: center; gap: var(--ds-space-4); flex-wrap: wrap; }
+.cat-toolcall__name { font-family: var(--ds-font-mono); font-size: 13px; font-weight: 500; color: var(--ds-text-primary); }
+.cat-toolcall__meta { display: inline-flex; align-items: center; gap: var(--ds-space-3); }
+.cat-toolcall__dur { font-family: var(--ds-font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ds-text-muted); }
+.cat-toolcall__detail { font-family: var(--ds-font-sans); font-size: 13px; line-height: 20px; color: var(--ds-text-secondary); margin: 0; }
 
-/* --- demo: TetrisLoader (simplified static) --- */
-.demo-tetris {
-  display: grid;
-  grid-template-columns: repeat(6, 8px);
-  grid-template-rows: repeat(8, 8px);
-  gap: 1px;
-  padding: 6px;
-  background: var(--ds-surface-raised);
+/* ---- TetrisLoader (real .ds-tetris-loader playfield, 6×8 cells, 3 grayscale tones) ---- */
+.cat-tetris {
+  display: inline-flex; flex-direction: column; align-items: center;
+  gap: var(--ds-space-4);
+}
+.cat-tetris__frame {
+  display: flex; flex-direction: column;
+  padding: var(--ds-space-2);
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line-strong);
+  border-radius: var(--ds-radius-xs);
+}
+.cat-tetris__row { display: flex; }
+.cat-tetris__cell {
+  width: 8px; height: 8px; box-sizing: border-box;
   border: 1px solid var(--ds-line);
-  border-radius: var(--ds-radius-xs);
+  background: transparent;
+  transition: background var(--ds-dur-micro) var(--ds-ease-out);
 }
-.demo-tetris span { background: transparent; border-radius: 1px; }
-.demo-tetris span[data-tone="primary"] { background: var(--ds-text-primary); }
-.demo-tetris span[data-tone="secondary"] { background: var(--ds-text-secondary); }
-.demo-tetris span[data-tone="muted"] { background: var(--ds-text-muted); }
-
-/* --- demo: BoxLoader (4 isometric cubes; perspective rotation) --- */
-.demo-box-stage {
-  width: 80px; height: 60px;
-  perspective: 200px;
-  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
-  gap: 4px;
+.cat-tetris__cell[data-filled="primary"]   { background: var(--ds-text-primary);   border-color: var(--ds-text-primary); }
+.cat-tetris__cell[data-filled="secondary"] { background: var(--ds-text-secondary); border-color: var(--ds-text-secondary); }
+.cat-tetris__cell[data-filled="muted"]     { background: var(--ds-text-muted);     border-color: var(--ds-text-muted); }
+.cat-tetris__cell[data-clearing]           { background: var(--ds-accent-success); border-color: var(--ds-accent-success); animation: cat-tetris-flash var(--ds-dur-standard) var(--ds-ease-out); }
+@keyframes cat-tetris-flash {
+  0%   { box-shadow: 0 0 0 2px var(--ds-accent-success); }
+  100% { box-shadow: 0 0 0 0 transparent; }
 }
-.demo-box-cube {
-  position: relative; transform-style: preserve-3d;
-  animation: ds-box-rotate 2s ease-in-out infinite;
-}
-.demo-box-cube:nth-child(1) { animation-delay: 0s; }
-.demo-box-cube:nth-child(2) { animation-delay: 0.5s; }
-.demo-box-cube:nth-child(3) { animation-delay: 1s; }
-.demo-box-cube:nth-child(4) { animation-delay: 1.5s; }
-.demo-box-cube::before {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(var(--ds-text-primary), var(--ds-text-secondary) 60%, var(--ds-text-muted));
-  border-radius: 1px;
-}
-@keyframes ds-box-rotate {
-  0%, 100% { transform: rotateY(0deg); }
-  50% { transform: rotateY(180deg); }
+.cat-tetris__label {
+  font-family: var(--ds-font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
-/* --- demo: DotLoader (7x7 dot grid; CSS-only "snake" via animation-delay) --- */
-.demo-dotloader {
-  display: grid;
-  grid-template-columns: repeat(7, 4px);
-  grid-template-rows: repeat(7, 4px);
-  gap: 4px;
+/* ---- BoxLoader (real .ds-box-loader: iso 30/45 rotation, 4 cubes in 3×2) ---- */
+.cat-box {
+  display: inline-flex; flex-direction: column; align-items: center; gap: var(--ds-space-5);
+  --cat-bx-edge: 14px;
 }
-.demo-dotloader span {
-  width: 4px; height: 4px; border-radius: 50%;
-  background: var(--ds-line-strong);
-  animation: ds-dotloader-pulse 2.5s ease-in-out infinite;
+.cat-box__stage {
+  width: calc(var(--cat-bx-edge) * 5);
+  height: calc(var(--cat-bx-edge) * 4);
+  perspective: 400px;
+  display: flex; align-items: center; justify-content: center;
 }
-@keyframes ds-dotloader-pulse {
-  0%, 100% { background: var(--ds-line-strong); }
-  50% { background: var(--ds-text-primary); }
-}
-
-/* --- demo: ThinkingCube (single rotating 3D-feel cube) --- */
-.demo-thinkcube-wrap {
-  display: flex; flex-direction: column; gap: 8px; align-items: center;
-}
-.demo-thinkcube {
-  width: 16px; height: 16px;
+.cat-box__field {
   position: relative;
+  width: calc(var(--cat-bx-edge) * 3);
+  height: calc(var(--cat-bx-edge) * 2);
   transform-style: preserve-3d;
-  animation: ds-thinkcube-flip 2s steps(4) infinite;
+  transform: rotateX(-30deg) rotateY(-45deg);
 }
-.demo-thinkcube::before, .demo-thinkcube::after {
-  content: ""; position: absolute; inset: 0;
-  background: var(--ds-text-primary);
-  border-radius: 1px;
+.cat-box__box {
+  position: absolute; top: 0; left: 0;
+  width: var(--cat-bx-edge); height: var(--cat-bx-edge);
+  transform-style: preserve-3d;
 }
-.demo-thinkcube::after {
-  background: var(--ds-text-secondary);
-  transform: translateZ(-1px) rotateY(90deg);
+.cat-box__face {
+  position: absolute; top: 0; left: 0;
+  width: var(--cat-bx-edge); height: var(--cat-bx-edge);
+  outline: 1px solid var(--ds-line-strong);
+  outline-offset: -1px;
 }
-@keyframes ds-thinkcube-flip {
-  0% { transform: rotateY(0deg) rotateX(-8deg); }
-  25% { transform: rotateY(90deg) rotateX(-8deg); }
-  50% { transform: rotateY(180deg) rotateX(-8deg); }
-  75% { transform: rotateY(270deg) rotateX(-8deg); }
-  100% { transform: rotateY(360deg) rotateX(-8deg); }
-}
-.demo-thinkcube-label {
-  font-family: var(--ds-font-mono); font-size: 11px;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--ds-text-secondary);
-}
+.cat-box__face--front { background: var(--ds-text-secondary); transform: translateZ(calc(var(--cat-bx-edge) / 2)); }
+.cat-box__face--back  { background: var(--ds-text-muted); transform: rotateY(180deg) translateZ(calc(var(--cat-bx-edge) / 2)); }
+.cat-box__face--right { background: var(--ds-text-muted); transform: rotateY(90deg) translateZ(calc(var(--cat-bx-edge) / 2)); }
+.cat-box__face--top   { background: var(--ds-text-primary); transform: rotateX(90deg) translateZ(calc(var(--cat-bx-edge) / 2)); }
+.cat-box__box--1 { animation: cat-box-1 2000ms ease-in-out infinite; }
+.cat-box__box--2 { animation: cat-box-2 2000ms ease-in-out infinite; }
+.cat-box__box--3 { animation: cat-box-3 2000ms ease-in-out infinite; }
+.cat-box__box--4 { animation: cat-box-4 2000ms ease-in-out infinite; }
+@keyframes cat-box-1 { 0%,50% { transform: translate(100%, 0); } 100% { transform: translate(200%, 0); } }
+@keyframes cat-box-2 { 0% { transform: translate(0, 100%); } 50% { transform: translate(0, 0); } 100% { transform: translate(100%, 0); } }
+@keyframes cat-box-3 { 0%,50% { transform: translate(100%, 100%); } 100% { transform: translate(0, 100%); } }
+@keyframes cat-box-4 { 0% { transform: translate(200%, 0); } 50% { transform: translate(200%, 100%); } 100% { transform: translate(100%, 100%); } }
+.cat-box__label { font-family: var(--ds-font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ds-text-secondary); font-variant-numeric: tabular-nums; }
 
-/* --- demo: BlockLoader (7 white blocks chasing on a 3x3 path) --- */
-.demo-blockloader {
-  position: relative;
-  width: 56px; height: 56px;
+/* ---- DotLoader (real .ds-dot-loader; 7×7 grid, square 6px dots, frame snap) ---- */
+.cat-dotloader {
+  display: grid;
+  grid-template-columns: repeat(7, 6px);
+  gap: 2px;
+  width: fit-content;
 }
-.demo-blockloader span {
-  position: absolute;
-  width: 12px; height: 12px;
-  background: var(--ds-text-primary);
-  border-radius: 1px;
-  animation: ds-blockloader-chase 7s linear infinite;
-}
-.demo-blockloader span:nth-child(1) { animation-delay: 0s; }
-.demo-blockloader span:nth-child(2) { animation-delay: -1s; }
-.demo-blockloader span:nth-child(3) { animation-delay: -2s; }
-.demo-blockloader span:nth-child(4) { animation-delay: -3s; }
-.demo-blockloader span:nth-child(5) { animation-delay: -4s; }
-.demo-blockloader span:nth-child(6) { animation-delay: -5s; }
-.demo-blockloader span:nth-child(7) { animation-delay: -6s; }
-@keyframes ds-blockloader-chase {
-  0%   { top: 0;    left: 0; }
-  12.5% { top: 0;    left: 22px; }
-  25%  { top: 0;    left: 44px; }
-  37.5% { top: 22px; left: 44px; }
-  50%  { top: 44px; left: 44px; }
-  62.5% { top: 44px; left: 22px; }
-  75%  { top: 44px; left: 0; }
-  87.5% { top: 22px; left: 0; }
-  100% { top: 0;    left: 0; }
-}
-
-/* --- demo: AgentStream (mini, looped) --- */
-.demo-agentstream-stage {
-  font-family: var(--ds-font-mono); font-size: 12px;
-  color: var(--ds-text-primary);
-  width: 100%;
-  white-space: pre-wrap;
-  text-align: left;
-}
-
-/* --- demo: Citation (inline chip) --- */
-.demo-citation-stage {
-  display: flex; align-items: center; gap: 8px;
-  font-family: var(--ds-font-sans); font-size: 12px;
-  color: var(--ds-text-secondary);
-}
-
-/* --- demo: LiveBlock --- */
-.demo-liveblock {
-  display: inline-flex; align-items: center;
-  font-family: var(--ds-font-mono); font-size: 11px; font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--ds-text-on-primary);
-  background: var(--ds-accent-success);
-  height: 24px; padding: 0 12px;
+.cat-dotloader span {
+  width: 6px; height: 6px;
   border-radius: var(--ds-radius-xs);
+  background: var(--ds-line-strong);
+}
+.cat-dotloader span.active { background: var(--ds-text-primary); }
+
+/* ---- ThinkingCube (real .ds-thinking-cube; iso tilt + 4-step face flip + caret) ---- */
+.cat-think {
+  display: inline-flex; align-items: center; gap: var(--ds-space-3);
+  font-family: var(--ds-font-mono); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ds-text-secondary);
+  --cat-tc-edge: 16px;
+}
+.cat-think__stage {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: calc(var(--cat-tc-edge) * 1.5);
+  height: calc(var(--cat-tc-edge) * 1.5);
+  perspective: 120px;
+}
+.cat-think__cube {
+  position: relative;
+  width: var(--cat-tc-edge); height: var(--cat-tc-edge);
+  transform-style: preserve-3d;
+  animation: cat-think-rotate 2000ms linear infinite;
+}
+.cat-think__face {
+  position: absolute; top: 0; left: 0;
+  width: var(--cat-tc-edge); height: var(--cat-tc-edge);
+  outline: 1px solid var(--ds-line-strong);
+  outline-offset: -1px;
+}
+.cat-think__face--front  { background: var(--ds-text-secondary); transform: translateZ(calc(var(--cat-tc-edge) / 2)); }
+.cat-think__face--back   { background: var(--ds-text-muted); transform: rotateY(180deg) translateZ(calc(var(--cat-tc-edge) / 2)); }
+.cat-think__face--right  { background: var(--ds-text-muted); transform: rotateY(90deg) translateZ(calc(var(--cat-tc-edge) / 2)); }
+.cat-think__face--left   { background: var(--ds-text-muted); transform: rotateY(-90deg) translateZ(calc(var(--cat-tc-edge) / 2)); }
+.cat-think__face--top    { background: var(--ds-text-primary); transform: rotateX(90deg) translateZ(calc(var(--cat-tc-edge) / 2)); }
+.cat-think__face--bottom { background: var(--ds-text-muted); transform: rotateX(-90deg) translateZ(calc(var(--cat-tc-edge) / 2)); }
+@keyframes cat-think-rotate {
+  0%,  20% { transform: rotateX(-8deg) rotateY(  0deg); }
+  25%, 45% { transform: rotateX(-8deg) rotateY(-90deg); }
+  50%, 70% { transform: rotateX(-8deg) rotateY(-180deg); }
+  75%, 95% { transform: rotateX(-8deg) rotateY(-270deg); }
+  100%     { transform: rotateX(-8deg) rotateY(-360deg); }
+}
+.cat-think__caret {
+  display: inline-block; width: 1px; height: 1em;
+  margin-left: 2px;
+  background: currentColor;
+  vertical-align: -0.12em;
+  animation: cat-think-blink 1000ms steps(2, start) infinite;
+}
+@keyframes cat-think-blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+
+/* ---- BlockLoader (real .ds-block-loader; 8-position 3×3 path INCLUDING center) ---- */
+.cat-block {
+  --cat-bl-cell: 12px;
+  --cat-bl-gap: 4px;
+  --cat-bl-step: 16px; /* cell + gap */
+}
+.cat-block__stage {
+  width: calc(var(--cat-bl-step) * 3);
+  height: calc(var(--cat-bl-step) * 3);
+  display: flex; align-items: center; justify-content: center;
+}
+.cat-block__grid {
+  position: relative;
+  width: calc(var(--cat-bl-step) * 3);
+  height: calc(var(--cat-bl-step) * 3);
+}
+.cat-block__b {
+  position: absolute; top: 2px; left: 2px;
+  width: var(--cat-bl-cell); height: var(--cat-bl-cell);
+  background: var(--ds-text-primary);
+  animation: cat-block-path 10000ms ease-in-out infinite both;
+}
+.cat-block__b:nth-child(1) { animation-delay: 0s; }
+.cat-block__b:nth-child(2) { animation-delay: -1.4285714286s; }
+.cat-block__b:nth-child(3) { animation-delay: -2.8571428571s; }
+.cat-block__b:nth-child(4) { animation-delay: -4.2857142857s; }
+.cat-block__b:nth-child(5) { animation-delay: -5.7142857143s; }
+.cat-block__b:nth-child(6) { animation-delay: -7.1428571429s; }
+.cat-block__b:nth-child(7) { animation-delay: -8.5714285714s; }
+@keyframes cat-block-path {
+  /*    Path: TL → TM → TR → MR → CENTER → MB → BL → ML → TL  */
+  0%,   10.5% { transform: translate(0, 0); }
+  12.5%, 23%  { transform: translate(var(--cat-bl-step), 0); }
+  25%,  35.5% { transform: translate(calc(var(--cat-bl-step) * 2), 0); }
+  37.5%, 48%  { transform: translate(calc(var(--cat-bl-step) * 2), var(--cat-bl-step)); }
+  50%,  60.5% { transform: translate(var(--cat-bl-step), var(--cat-bl-step)); }
+  62.5%, 73%  { transform: translate(var(--cat-bl-step), calc(var(--cat-bl-step) * 2)); }
+  75%,  85.5% { transform: translate(0, calc(var(--cat-bl-step) * 2)); }
+  87.5%, 98%  { transform: translate(0, var(--cat-bl-step)); }
+  100%        { transform: translate(0, 0); }
 }
 
-/* --- demo: Pill row --- */
-.demo-pill-row { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+/* ---- AgentStream (real .ds-agent-stream pattern) ---------- */
+.cat-stream-stage { font-family: var(--ds-font-mono); font-size: 13px; line-height: 20px; color: var(--ds-text-primary); width: 100%; white-space: pre-wrap; text-align: left; }
+
+/* ---- Citation (uses the existing .ds-citation popover styles above) ---- */
+.cat-citation-stage { display: flex; align-items: center; gap: 8px; font-family: var(--ds-font-sans); font-size: 13px; color: var(--ds-text-secondary); }
+
+/* ---- Pill row ---------------------------------------------- */
+.cat-pill-stack { display: flex; flex-direction: column; gap: 6px; align-items: center; }
 
 /* ============================================================
    Recipe gallery
@@ -956,147 +1052,186 @@ footer.page-foot {
     <article class="tile">
       <div class="tile__name"><span>Button</span><span class="tile__index">01</span></div>
       <div class="tile__stage">
-        <div class="demo-button-stack">
-          <button class="btn btn--primary">Save</button>
-          <button class="btn btn--secondary">Cancel</button>
-          <button class="btn btn--ghost">Skip</button>
+        <div class="cat-btn-stack">
+          <button class="cat-btn" data-variant="primary">Save</button>
+          <button class="cat-btn" data-variant="secondary">Cancel</button>
+          <button class="cat-btn" data-variant="ghost">Skip</button>
         </div>
       </div>
-      <p class="tile__role">Three variants. One primary action per view.</p>
+      <p class="tile__role">Three variants. One primary action per view. <code>:active</code> scales to 0.97.</p>
     </article>
 
     <!-- 2. Card -->
     <article class="tile">
       <div class="tile__name"><span>Card</span><span class="tile__index">02</span></div>
       <div class="tile__stage">
-        <div class="demo-card-mini">
-          <span>Bar confidence</span>
-          <span>78%</span>
+        <div class="cat-card">
+          <div class="cat-card__head">
+            <span class="cat-card__num">01<b>10</b></span>
+            <span class="cat-card__meta">Live</span>
+          </div>
+          <h3 class="cat-card__title">Bar confidence 78%</h3>
         </div>
       </div>
-      <p class="tile__role">Single variant. 1px border, no shadow.</p>
+      <p class="tile__role">Single variant. 1px border, no shadow. Padding sm/md/lg.</p>
     </article>
 
     <!-- 3. Pill -->
     <article class="tile">
       <div class="tile__name"><span>Pill</span><span class="tile__index">03</span></div>
       <div class="tile__stage">
-        <div class="demo-pill-row">
+        <div class="cat-pill-stack">
           <span class="ds-pill" data-variant="filled"><span class="ds-pill__dot"></span>Live</span>
           <span class="ds-pill" data-variant="filled">Merged</span>
           <span class="ds-pill" data-variant="outline">Draft</span>
         </div>
       </div>
-      <p class="tile__role">Status atoms. Cap at 3 per card.</p>
+      <p class="tile__role">Filled (active) + outline (draft). Dashed border = impermanent.</p>
     </article>
 
     <!-- 4. LiveDot -->
     <article class="tile">
       <div class="tile__name"><span>LiveDot</span><span class="tile__index">04</span></div>
       <div class="tile__stage">
-        <span class="demo-livedot"><span class="demo-livedot__dot"></span>Streaming</span>
+        <span class="cat-livedot"><span class="cat-livedot__mark"></span>Streaming</span>
       </div>
-      <p class="tile__role">6px pulse. The "alive now" carrier.</p>
+      <p class="tile__role">6px <code>--ds-accent-live</code> dot pulsing on a 2s linear loop.</p>
     </article>
 
     <!-- 5. LiveBlock -->
     <article class="tile">
       <div class="tile__name"><span>LiveBlock</span><span class="tile__index">05</span></div>
       <div class="tile__stage">
-        <span class="demo-liveblock">SHIPPED</span>
+        <span class="cat-liveblock">
+          <span class="cat-liveblock__stage" aria-hidden="true">
+            <span class="cat-liveblock__grid">
+              <span class="cat-liveblock__block"></span>
+              <span class="cat-liveblock__block"></span>
+              <span class="cat-liveblock__block"></span>
+              <span class="cat-liveblock__block"></span>
+              <span class="cat-liveblock__block"></span>
+              <span class="cat-liveblock__block"></span>
+              <span class="cat-liveblock__block"></span>
+            </span>
+          </span>
+          <span>Indexing</span>
+        </span>
       </div>
-      <p class="tile__role">State word for RAG-style callouts.</p>
+      <p class="tile__role">Inline 12px chasing-blocks indicator. Sibling of <code>&lt;LiveDot&gt;</code>.</p>
     </article>
 
     <!-- 6. Toast -->
     <article class="tile">
       <div class="tile__name"><span>Toast</span><span class="tile__index">06</span></div>
       <div class="tile__stage">
-        <div class="demo-toast">PR #17 merged.</div>
+        <div class="cat-toast">
+          <span class="cat-toast__dot" aria-hidden="true"></span>
+          <div>
+            <div class="cat-toast__title">PR #17 merged.</div>
+            <div class="cat-toast__desc">Stale handoffs retired.</div>
+          </div>
+        </div>
       </div>
-      <p class="tile__role">Sonner conventions. Bottom-right stack.</p>
+      <p class="tile__role">Sonner conventions. Bottom-right stack, max 3 visible.</p>
     </article>
 
     <!-- 7. DottedChart -->
     <article class="tile">
       <div class="tile__name"><span>DottedChart</span><span class="tile__index">07</span></div>
       <div class="tile__stage">
-        <div class="demo-dotchart">
-          <div class="demo-dotchart__bar" data-active><span></span><span></span><span></span></div>
-          <div class="demo-dotchart__bar" data-active><span></span><span></span><span></span><span></span></div>
-          <div class="demo-dotchart__bar" data-active><span></span><span></span></div>
-          <div class="demo-dotchart__bar" data-active><span></span><span></span><span></span><span></span><span></span></div>
-          <div class="demo-dotchart__bar" data-active data-success><span></span><span></span><span></span><span></span><span></span><span></span></div>
-          <div class="demo-dotchart__bar"><span></span><span></span><span></span></div>
+        <div class="cat-chart">
+          <div class="cat-chart__bars">
+            <div class="cat-chart__bar" data-active><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span></div>
+            <div class="cat-chart__bar" data-active><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span></div>
+            <div class="cat-chart__bar" data-active><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span></div>
+            <div class="cat-chart__bar" data-active><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span></div>
+            <div class="cat-chart__bar" data-success><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span></div>
+            <div class="cat-chart__bar"><span class="cat-chart__dot"></span><span class="cat-chart__dot"></span></div>
+          </div>
         </div>
       </div>
-      <p class="tile__role">Bars built from stacked dots. The motif.</p>
+      <p class="tile__role">Bars built from stacked 6px dots. The system's signature motif.</p>
     </article>
 
     <!-- 8. DotTimeline -->
     <article class="tile">
       <div class="tile__name"><span>DotTimeline</span><span class="tile__index">08</span></div>
       <div class="tile__stage">
-        <div class="demo-timeline">
-          <div class="demo-timeline__col"><div class="demo-timeline__cells"><span class="demo-timeline__cell" data-state="done"></span><span class="demo-timeline__cell" data-state="done"></span></div><span class="demo-timeline__lab">M1</span></div>
-          <div class="demo-timeline__col"><div class="demo-timeline__cells"><span class="demo-timeline__cell" data-state="done"></span><span class="demo-timeline__cell" data-state="done"></span><span class="demo-timeline__cell" data-state="done"></span></div><span class="demo-timeline__lab">M2</span></div>
-          <div class="demo-timeline__col"><div class="demo-timeline__cells"><span class="demo-timeline__cell" data-state="active"></span><span class="demo-timeline__cell" data-state="active"></span></div><span class="demo-timeline__lab">M3</span></div>
-          <div class="demo-timeline__col"><div class="demo-timeline__cells"><span class="demo-timeline__cell" data-state="live"></span></div><span class="demo-timeline__lab">M4</span></div>
-          <div class="demo-timeline__col"><div class="demo-timeline__cells"><span class="demo-timeline__cell"></span></div><span class="demo-timeline__lab">M5</span></div>
+        <div class="cat-timeline">
+          <div class="cat-timeline__col" data-state="done"><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span></div>
+          <div class="cat-timeline__col" data-state="done"><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span></div>
+          <div class="cat-timeline__col" data-state="done"><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span></div>
+          <div class="cat-timeline__col" data-state="active"><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span></div>
+          <div class="cat-timeline__col" data-state="live"><span class="cat-timeline__d"></span></div>
+          <div class="cat-timeline__col"><span class="cat-timeline__d"></span></div>
+          <div class="cat-timeline__col"><span class="cat-timeline__d"></span></div>
         </div>
       </div>
-      <p class="tile__role">Time-ordered stages. Live + done states per column.</p>
+      <p class="tile__role">Stages from the bottom up. Carries <em>both</em> accents in different columns.</p>
     </article>
 
     <!-- 9. PulseTrail -->
     <article class="tile">
       <div class="tile__name"><span>PulseTrail</span><span class="tile__index">09</span></div>
       <div class="tile__stage">
-        <div class="demo-pulsetrail">
-          <div class="demo-pulsetrail__track">
-            <span data-state="done"></span><span data-state="done"></span>
-            <span data-state="done"></span><span></span><span></span>
-            <span></span><span></span><span></span>
+        <div class="cat-pt">
+          <div class="cat-pt__canvas">
+            <span class="cat-pt__d" data-state="done" style="left: 12%;  bottom: 16px;"></span>
+            <span class="cat-pt__d" data-state="done" style="left: 26%;  bottom: 9px;"></span>
+            <span class="cat-pt__d" data-state="done" style="left: 40%;  bottom: 19px;"></span>
+            <span class="cat-pt__d"                   style="left: 54%;  bottom: 7px;"></span>
+            <span class="cat-pt__d"                   style="left: 68%;  bottom: 12px;"></span>
+            <span class="cat-pt__head" aria-hidden="true"></span>
           </div>
-          <span class="demo-pulsetrail__head"></span>
+          <div class="cat-pt__axis"><span>Past</span><span>Live</span></div>
         </div>
       </div>
-      <p class="tile__role">Sweeping head + trail. The "live now" feel.</p>
+      <p class="tile__role">Head sweeps left→right over 4s with halo + 2s pulse. Trail dots are static markers.</p>
     </article>
 
     <!-- 10. SegmentedBar -->
     <article class="tile">
       <div class="tile__name"><span>SegmentedBar</span><span class="tile__index">10</span></div>
       <div class="tile__stage">
-        <div class="demo-segbar">
-          <span data-active></span><span data-active></span><span data-active></span>
-          <span data-active></span><span data-active></span><span></span><span></span>
+        <div class="cat-segbar">
+          <span class="cat-segbar__seg is-active"></span>
+          <span class="cat-segbar__seg is-active"></span>
+          <span class="cat-segbar__seg is-active"></span>
+          <span class="cat-segbar__seg is-active"></span>
+          <span class="cat-segbar__seg is-active"></span>
+          <span class="cat-segbar__seg"></span>
+          <span class="cat-segbar__seg"></span>
+          <span class="cat-segbar__seg"></span>
+          <span class="cat-segbar__seg"></span>
+          <span class="cat-segbar__seg"></span>
+          <span class="cat-segbar__seg"></span>
+          <span class="cat-segbar__seg"></span>
         </div>
       </div>
-      <p class="tile__role">Discrete progress. Hardware-instrument honesty.</p>
+      <p class="tile__role">Discrete vertical pills (4×16). At <code>value === total</code>, switches to accent-success.</p>
     </article>
 
     <!-- 11. SegmentedControl -->
     <article class="tile">
       <div class="tile__name"><span>SegmentedControl</span><span class="tile__index">11</span></div>
       <div class="tile__stage">
-        <div class="demo-segctrl">
-          <span class="demo-segctrl__opt">All</span>
-          <span class="demo-segctrl__opt" data-active>Live</span>
-          <span class="demo-segctrl__opt">Done</span>
+        <div class="cat-segctrl">
+          <button class="cat-segctrl__btn">All</button>
+          <button class="cat-segctrl__btn" data-selected>Live</button>
+          <button class="cat-segctrl__btn">Done</button>
         </div>
       </div>
-      <p class="tile__role">Compact tab/scope/filter switcher.</p>
+      <p class="tile__role">Compact filter switcher. Pill track, filled-thumb selection.</p>
     </article>
 
     <!-- 12. InlineStatus -->
     <article class="tile">
       <div class="tile__name"><span>InlineStatus</span><span class="tile__index">12</span></div>
       <div class="tile__stage">
-        <div class="demo-inlinestatus">
-          <span class="ds-inline-status">[QUEUED]</span>
-          <span class="ds-inline-status" data-tone="active">[LOADING 00:03]</span>
-          <span class="ds-inline-status" data-tone="live">[LIVE]</span>
+        <div class="cat-inline-stack">
+          <span class="cat-status"><span class="cat-status__bracket">[</span>QUEUED<span class="cat-status__bracket">]</span></span>
+          <span class="cat-status" data-tone="active"><span class="cat-status__bracket">[</span>LOADING 00:03<span class="cat-status__bracket">]</span></span>
+          <span class="cat-status" data-tone="live"><span class="cat-status__bracket">[</span><span class="cat-status__dot"></span>LIVE<span class="cat-status__bracket">]</span></span>
         </div>
       </div>
       <p class="tile__role">Bracketed mono state. The non-placeholder loading carrier.</p>
@@ -1106,43 +1241,46 @@ footer.page-foot {
     <article class="tile">
       <div class="tile__name"><span>MetricStat</span><span class="tile__index">13</span></div>
       <div class="tile__stage">
-        <div class="demo-metricstat">
-          <span class="demo-metricstat__label">Evidence</span>
-          <span class="demo-metricstat__value">74<span class="demo-metricstat__unit">%</span></span>
+        <div class="cat-metric">
+          <span class="cat-metric__label">Evidence</span>
+          <span class="cat-metric__value">74<span class="cat-metric__suffix">%</span></span>
         </div>
       </div>
-      <p class="tile__role">The number is the hero. Mono + tabular-nums.</p>
+      <p class="tile__role">The number is the hero. Mono + tabular-nums + suffix at 0.32em.</p>
     </article>
 
     <!-- 14. ToolCall -->
     <article class="tile">
       <div class="tile__name"><span>ToolCall</span><span class="tile__index">14</span></div>
       <div class="tile__stage">
-        <div class="demo-toolcall">
-          <div class="demo-toolcall__head">
-            <span>fetch_tickets</span>
-            <span class="ds-inline-status" data-tone="active">Done</span>
+        <div class="cat-toolcall">
+          <div class="cat-toolcall__head">
+            <span class="cat-toolcall__name">fetch_tickets</span>
+            <span class="cat-toolcall__meta">
+              <span class="cat-toolcall__dur">00:08.4</span>
+              <span class="cat-status" data-tone="active"><span class="cat-status__bracket">[</span>DONE<span class="cat-status__bracket">]</span></span>
+            </span>
           </div>
-          <div class="demo-toolcall__detail"><code>54</code> of <code>188</code> indexed.</div>
+          <p class="cat-toolcall__detail"><code>54</code> of <code>188</code> indexed.</p>
         </div>
       </div>
-      <p class="tile__role">AI-native execution row. Tool name + state + duration.</p>
+      <p class="tile__role">AI-native execution row. Tool name + duration + state.</p>
     </article>
 
     <!-- 15. AgentStream -->
     <article class="tile">
       <div class="tile__name"><span>AgentStream</span><span class="tile__index">15</span></div>
       <div class="tile__stage">
-        <span id="cat-stream" class="demo-agentstream-stage"></span>
+        <span id="cat-stream" class="cat-stream-stage"></span>
       </div>
-      <p class="tile__role">Token-by-token reveal. Composes <code>typewriter</code>.</p>
+      <p class="tile__role">Token-by-token reveal. Composes <code>typewriter</code>. <code>▍</code> cursor blinks.</p>
     </article>
 
     <!-- 16. Citation -->
     <article class="tile">
       <div class="tile__name"><span>Citation</span><span class="tile__index">16</span></div>
       <div class="tile__stage">
-        <div class="demo-citation-stage">
+        <div class="cat-citation-stage">
           <span>See</span>
           <a class="ds-citation" href="#" tabindex="0">
             <span>Receipt</span>
@@ -1154,72 +1292,109 @@ footer.page-foot {
           </a>
         </div>
       </div>
-      <p class="tile__role">Inline source chip. Hover or focus for the popover.</p>
+      <p class="tile__role">Inline source chip. Hover, focus, or click for the popover.</p>
     </article>
 
     <!-- 17. TetrisLoader -->
     <article class="tile">
       <div class="tile__name"><span>TetrisLoader</span><span class="tile__index">17</span></div>
       <div class="tile__stage">
-        <div class="demo-tetris" aria-hidden="true">
-          <!-- Row-major: 6 cols × 8 rows. Pieces stacked at bottom. -->
-          <span></span><span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span data-tone="muted"></span><span data-tone="muted"></span><span></span><span></span>
-          <span></span><span data-tone="secondary"></span><span data-tone="muted"></span><span data-tone="muted"></span><span data-tone="primary"></span><span></span>
-          <span data-tone="primary"></span><span data-tone="secondary"></span><span data-tone="secondary"></span><span data-tone="primary"></span><span data-tone="primary"></span><span data-tone="secondary"></span>
-          <span data-tone="primary"></span><span data-tone="primary"></span><span data-tone="secondary"></span><span data-tone="muted"></span><span data-tone="primary"></span><span data-tone="secondary"></span>
+        <div class="cat-tetris">
+          <div class="cat-tetris__frame" id="cat-tetris-frame" aria-hidden="true"></div>
+          <span class="cat-tetris__label">[Loading…]</span>
         </div>
       </div>
-      <p class="tile__role">Percussive indeterminate loader. Stepped, no springs.</p>
+      <p class="tile__role">Percussive playfield. Three grayscale tones; line-clear flashes accent-success.</p>
     </article>
 
     <!-- 18. BoxLoader -->
     <article class="tile">
       <div class="tile__name"><span>BoxLoader</span><span class="tile__index">18</span></div>
       <div class="tile__stage">
-        <div class="demo-box-stage" aria-hidden="true">
-          <div class="demo-box-cube"></div>
-          <div class="demo-box-cube"></div>
-          <div class="demo-box-cube"></div>
-          <div class="demo-box-cube"></div>
+        <div class="cat-box">
+          <div class="cat-box__stage" aria-hidden="true">
+            <div class="cat-box__field">
+              <div class="cat-box__box cat-box__box--1">
+                <div class="cat-box__face cat-box__face--front"></div>
+                <div class="cat-box__face cat-box__face--back"></div>
+                <div class="cat-box__face cat-box__face--right"></div>
+                <div class="cat-box__face cat-box__face--top"></div>
+              </div>
+              <div class="cat-box__box cat-box__box--2">
+                <div class="cat-box__face cat-box__face--front"></div>
+                <div class="cat-box__face cat-box__face--back"></div>
+                <div class="cat-box__face cat-box__face--right"></div>
+                <div class="cat-box__face cat-box__face--top"></div>
+              </div>
+              <div class="cat-box__box cat-box__box--3">
+                <div class="cat-box__face cat-box__face--front"></div>
+                <div class="cat-box__face cat-box__face--back"></div>
+                <div class="cat-box__face cat-box__face--right"></div>
+                <div class="cat-box__face cat-box__face--top"></div>
+              </div>
+              <div class="cat-box__box cat-box__box--4">
+                <div class="cat-box__face cat-box__face--front"></div>
+                <div class="cat-box__face cat-box__face--back"></div>
+                <div class="cat-box__face cat-box__face--right"></div>
+                <div class="cat-box__face cat-box__face--top"></div>
+              </div>
+            </div>
+          </div>
+          <span class="cat-box__label">[Loading…]</span>
         </div>
       </div>
-      <p class="tile__role">Four isometric cubes. 2s ease-in-out cycle.</p>
+      <p class="tile__role">Four real iso cubes (4 faces each) cycle a 3×2 grid on a 2s ease-in-out loop.</p>
     </article>
 
     <!-- 19. DotLoader -->
     <article class="tile">
       <div class="tile__name"><span>DotLoader</span><span class="tile__index">19</span></div>
       <div class="tile__stage">
-        <div class="demo-dotloader" id="cat-dotloader" aria-hidden="true"></div>
+        <div class="cat-dotloader" id="cat-dotloader" aria-hidden="true"></div>
       </div>
-      <p class="tile__role">7×7 grid driven by a frame list.</p>
+      <p class="tile__role">7×7 grid driven by a frame list. Snaps between frames — no transition.</p>
     </article>
 
     <!-- 20. ThinkingCube -->
     <article class="tile">
       <div class="tile__name"><span>ThinkingCube</span><span class="tile__index">20</span></div>
       <div class="tile__stage">
-        <div class="demo-thinkcube-wrap">
-          <div class="demo-thinkcube" aria-hidden="true"></div>
-          <span class="demo-thinkcube-label">Thinking…</span>
-        </div>
+        <span class="cat-think">
+          <span class="cat-think__stage" aria-hidden="true">
+            <span class="cat-think__cube">
+              <span class="cat-think__face cat-think__face--front"></span>
+              <span class="cat-think__face cat-think__face--back"></span>
+              <span class="cat-think__face cat-think__face--right"></span>
+              <span class="cat-think__face cat-think__face--left"></span>
+              <span class="cat-think__face cat-think__face--top"></span>
+              <span class="cat-think__face cat-think__face--bottom"></span>
+            </span>
+          </span>
+          <span>Thinking<span class="cat-think__caret"></span></span>
+        </span>
       </div>
-      <p class="tile__role">Dimensional alternative to <code>&lt;LiveDot&gt;</code> labels.</p>
+      <p class="tile__role">16px iso cube with stepped 90° face turns + blinking caret + label.</p>
     </article>
 
     <!-- 21. BlockLoader -->
     <article class="tile">
       <div class="tile__name"><span>BlockLoader</span><span class="tile__index">21</span></div>
       <div class="tile__stage">
-        <div class="demo-blockloader" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <div class="cat-block">
+          <div class="cat-block__stage" aria-hidden="true">
+            <div class="cat-block__grid">
+              <span class="cat-block__b"></span>
+              <span class="cat-block__b"></span>
+              <span class="cat-block__b"></span>
+              <span class="cat-block__b"></span>
+              <span class="cat-block__b"></span>
+              <span class="cat-block__b"></span>
+              <span class="cat-block__b"></span>
+            </div>
+          </div>
         </div>
       </div>
-      <p class="tile__role">Seven blocks chase a 3×3 path. 7s linear loop.</p>
+      <p class="tile__role">Seven blocks chase an 8-position path on a 3×3 grid <em>including the center</em>.</p>
     </article>
 
   </div>
@@ -1440,7 +1615,8 @@ footer.page-foot {
 </main>
 
 <script>
-// Catalogue: build the 49-cell DotLoader grid + run a snake pattern.
+// Catalogue: build the 49-cell DotLoader grid + run a frame snake.
+// Frame snap (no CSS transition) — matches the real component.
 (function () {
   const host = document.getElementById("cat-dotloader");
   if (!host) return;
@@ -1450,7 +1626,6 @@ footer.page-foot {
     cells.push(s);
     host.appendChild(s);
   }
-  // Snake path through a 7x7 grid (boustrophedon).
   const order = [];
   for (let r = 0; r < 7; r++) {
     for (let c = 0; c < 7; c++) {
@@ -1460,21 +1635,142 @@ footer.page-foot {
   const reduced = window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduced) {
-    cells.forEach((c) => { c.style.background = "var(--ds-text-primary)"; });
+    cells.forEach((c) => c.classList.add("active"));
     return;
   }
   let i = 0;
   setInterval(() => {
-    cells.forEach((c) => { c.style.background = "var(--ds-line-strong)"; });
-    // light up a 5-cell trail at the head of the snake
+    cells.forEach((c) => c.classList.remove("active"));
+    // 5-cell trail head — last is brightest, fades back via inline opacity
     for (let k = 0; k < 5; k++) {
       const idx = order[(i - k + order.length) % order.length];
-      const opacity = 1 - k * 0.18;
-      cells[idx].style.background = "var(--ds-text-primary)";
-      cells[idx].style.opacity = String(opacity);
+      cells[idx].classList.add("active");
+      cells[idx].style.opacity = String(1 - k * 0.18);
     }
     i = (i + 1) % order.length;
-  }, 80);
+  }, 100);
+})();
+
+// Catalogue: TetrisLoader — build a 6×8 frame, animate piece drops + line
+// clears against the real .ds-tetris-loader visual contract.
+(function () {
+  const host = document.getElementById("cat-tetris-frame");
+  if (!host) return;
+  const COLS = 6, ROWS = 8;
+  const cells = [];
+  for (let r = 0; r < ROWS; r++) {
+    const row = document.createElement("div");
+    row.className = "cat-tetris__row";
+    for (let c = 0; c < COLS; c++) {
+      const cell = document.createElement("span");
+      cell.className = "cat-tetris__cell";
+      row.appendChild(cell);
+      cells.push(cell);
+    }
+    host.appendChild(row);
+  }
+  // Index helper: row r, column c → flat index.
+  const at = (r, c) => cells[r * COLS + c];
+
+  // A small palette of tetromino shapes (relative offsets) + tone tier.
+  // Tone tier matches the real component: I/O = primary, T/L/J = secondary,
+  // S/Z = muted.
+  const PIECES = [
+    { name: "I", tone: "primary",   cells: [[0,0],[0,1],[0,2],[0,3]] },
+    { name: "O", tone: "primary",   cells: [[0,0],[0,1],[1,0],[1,1]] },
+    { name: "T", tone: "secondary", cells: [[0,0],[0,1],[0,2],[1,1]] },
+    { name: "L", tone: "secondary", cells: [[0,0],[1,0],[2,0],[2,1]] },
+    { name: "J", tone: "secondary", cells: [[0,1],[1,1],[2,1],[2,0]] },
+    { name: "S", tone: "muted",     cells: [[0,1],[0,2],[1,0],[1,1]] },
+    { name: "Z", tone: "muted",     cells: [[0,0],[0,1],[1,1],[1,2]] },
+  ];
+
+  // Logical board: 8 rows × 6 cols of tone strings or null.
+  let board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+
+  function render() {
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const v = board[r][c];
+        const cell = at(r, c);
+        if (v) cell.setAttribute("data-filled", v);
+        else cell.removeAttribute("data-filled");
+        cell.removeAttribute("data-clearing");
+      }
+    }
+  }
+
+  function dropPiece() {
+    const piece = PIECES[Math.floor(Math.random() * PIECES.length)];
+    const minC = Math.min(...piece.cells.map(([, c]) => c));
+    const maxC = Math.max(...piece.cells.map(([, c]) => c));
+    const minR = Math.min(...piece.cells.map(([r]) => r));
+    const maxR = Math.max(...piece.cells.map(([r]) => r));
+    const width = maxC - minC + 1;
+    const startCol = Math.floor(Math.random() * (COLS - width + 1)) - minC;
+    // Find lowest row the piece can sit at without overlapping existing cells.
+    let row = -minR;
+    while (row + maxR < ROWS) {
+      const wouldHit = piece.cells.some(([dr, dc]) => {
+        const r = row + dr + 1;
+        const c = startCol + dc;
+        if (r >= ROWS) return true;
+        return board[r][c] !== null;
+      });
+      if (wouldHit) break;
+      row++;
+    }
+    // Place
+    piece.cells.forEach(([dr, dc]) => {
+      const r = row + dr;
+      const c = startCol + dc;
+      if (r >= 0 && r < ROWS && c >= 0 && c < COLS) board[r][c] = piece.tone;
+    });
+  }
+
+  function clearLines() {
+    const fullRows = [];
+    for (let r = 0; r < ROWS; r++) {
+      if (board[r].every((v) => v !== null)) fullRows.push(r);
+    }
+    if (fullRows.length === 0) return false;
+    // Flash, then drop above rows down.
+    fullRows.forEach((r) => {
+      for (let c = 0; c < COLS; c++) {
+        at(r, c).setAttribute("data-clearing", "");
+      }
+    });
+    setTimeout(() => {
+      fullRows.forEach((r) => board.splice(r, 1));
+      while (board.length < ROWS) board.unshift(Array(COLS).fill(null));
+      render();
+    }, 220);
+    return true;
+  }
+
+  const reduced = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Pre-fill an interesting initial state so the tile shows real content
+  // even before the first drop.
+  for (let i = 0; i < 4; i++) dropPiece();
+  render();
+
+  if (reduced) return;
+
+  setInterval(() => {
+    // If stack got too tall, clear half the board to reset.
+    const topFilled = board[1].some((v) => v !== null);
+    if (topFilled) {
+      board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+      for (let i = 0; i < 3; i++) dropPiece();
+      render();
+      return;
+    }
+    dropPiece();
+    render();
+    clearLines();
+  }, 700);
 })();
 
 // Catalogue: mini AgentStream (separate instance from the big demo).
