@@ -71,15 +71,18 @@ main {
 /* ============================================================
    Type, eyebrows, common chrome
    ============================================================ */
-h1, h2, h3 {
+h1, h2 {
+  /* Per DESIGN.md: display + h1 use Cash Sans at weight 400. The
+     Geist Mono fallback at weight 400 reads thinner than the previous
+     600 — closer to the editorial-display voice the system specifies. */
   font-family: var(--ds-font-display);
-  font-weight: 600;
+  font-weight: 400;
   margin: 0;
-  letter-spacing: -0.025em;
+  color: var(--ds-text-primary);
 }
-h1 { font-size: 64px; line-height: 64px; letter-spacing: -0.04em; }
-h2 { font-size: 32px; line-height: 36px; }
-h3 { font-family: var(--ds-font-mono); font-weight: 500; font-size: 18px; line-height: 22px; letter-spacing: -0.005em; }
+h1 { font-size: 64px; line-height: 61px; letter-spacing: -0.035em; }
+h2 { font-size: 32px; line-height: 34px; letter-spacing: -0.025em; }
+h3 { font-family: var(--ds-font-mono); font-weight: 500; font-size: 18px; line-height: 22px; letter-spacing: -0.005em; margin: 0; color: var(--ds-text-primary); }
 
 p { margin: 0; max-width: var(--ds-measure); color: var(--ds-text-secondary); }
 code { font-family: var(--ds-font-mono); color: var(--ds-text-primary); }
@@ -382,10 +385,9 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
 .cat-toast__title { font-weight: 500; }
 .cat-toast__desc { color: var(--ds-text-secondary); margin-top: 2px; font-size: 12px; }
 
-/* ---- DottedChart — stagger entrance + breathing loop -------
-   Each dot fades in with a small scale, staggered by index.
-   After mount, the active bars subtly breathe (opacity pulse) so
-   the chart reads as alive without pulling focus. ---- */
+/* ---- DottedChart — continuous left→right wave so the chart reads alive.
+   Every dot pulses opacity + scale on a 2.4s loop. Stagger ~80ms per
+   bar produces the wave that travels through the chart. ---- */
 .cat-chart { display: inline-flex; flex-direction: column; gap: var(--ds-space-3); }
 .cat-chart__bars { display: grid; grid-auto-flow: column; grid-auto-columns: 6px; gap: 8px; align-items: end; min-height: 64px; }
 .cat-chart__bar { display: flex; flex-direction: column-reverse; gap: 4px; align-items: center; }
@@ -393,43 +395,41 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--ds-text-muted);
-  opacity: 0;
-  transform: scale(0.9);
-  animation: cat-chart-in 220ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  animation: cat-chart-wave 2400ms ease-in-out infinite;
 }
+/* Stagger by bar index — the wave travels left → right. */
+.cat-chart__bar:nth-child(1) .cat-chart__dot { animation-delay:    0ms; }
+.cat-chart__bar:nth-child(2) .cat-chart__dot { animation-delay:   90ms; }
+.cat-chart__bar:nth-child(3) .cat-chart__dot { animation-delay:  180ms; }
+.cat-chart__bar:nth-child(4) .cat-chart__dot { animation-delay:  270ms; }
+.cat-chart__bar:nth-child(5) .cat-chart__dot { animation-delay:  360ms; }
+.cat-chart__bar:nth-child(6) .cat-chart__dot { animation-delay:  450ms; }
 .cat-chart__bar[data-active] .cat-chart__dot { background: var(--ds-text-primary); }
 .cat-chart__bar[data-success] .cat-chart__dot { background: var(--ds-accent-success); }
-@keyframes cat-chart-in {
-  to { opacity: 1; transform: scale(1); }
-}
-/* Breathing loop on the topmost dot of each active bar — reads as
-   "this stage is alive" without being noisy. Stagger by bar index. */
-.cat-chart__bar[data-active] .cat-chart__dot:last-child {
-  animation:
-    cat-chart-in 220ms cubic-bezier(0.23, 1, 0.32, 1) forwards,
-    cat-chart-breathe 2400ms ease-in-out var(--cat-chart-delay, 0ms) infinite 220ms;
-}
-@keyframes cat-chart-breathe {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.6; transform: scale(0.92); }
+@keyframes cat-chart-wave {
+  0%, 100% { opacity: 1;    transform: scale(1); }
+  50%      { opacity: 0.45; transform: scale(0.85); }
 }
 
-/* ---- DotTimeline — stagger reveal of done columns + scanline -- */
-.cat-timeline {
-  position: relative;
-  display: grid; grid-auto-flow: column; grid-auto-columns: 6px;
-  align-items: end; gap: 8px;
-  height: 64px; padding: 4px 0;
-  border-bottom: 1px solid var(--ds-line);
-  overflow: hidden;
+/* ---- DotTimeline — dots stacked by density above a real time axis
+   with timestamp labels and tick marks. The axis tells you the dots
+   are time-ordered; the scanline sweep was removed (it was awkward
+   and didn't carry meaning). ---- */
+.cat-timeline-wrap {
+  display: inline-flex; flex-direction: column; gap: 6px;
+  width: 100%; max-width: 200px;
 }
-.cat-timeline__col { position: relative; width: 6px; height: 100%; display: flex; flex-direction: column-reverse; align-items: center; gap: 4px; }
+.cat-timeline {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  align-items: end;
+  height: 56px; padding: 4px 0;
+}
+.cat-timeline__col { position: relative; height: 100%; display: flex; flex-direction: column-reverse; align-items: center; gap: 4px; }
 .cat-timeline__d {
   width: 6px; height: 6px; border-radius: 50%;
   background: var(--ds-text-muted); opacity: 0.55;
   transform: translateY(4px);
   animation: cat-timeline-rise 280ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
-  animation-delay: var(--cat-timeline-delay, 0ms);
 }
 .cat-timeline__col[data-state="done"] .cat-timeline__d { background: var(--ds-accent-success); opacity: 1; }
 .cat-timeline__col[data-state="live"] .cat-timeline__d {
@@ -442,24 +442,36 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
 @keyframes cat-timeline-rise {
   to { transform: translateY(0); }
 }
-/* Scanline — vertical 1px line sweeps left→right every 5s,
-   indicating "time is moving" through the timeline. */
-.cat-timeline::after {
+/* Time axis — 1px line + tick marks at each column + timestamp labels. */
+.cat-timeline__axis {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  align-items: start;
+  border-top: 1px solid var(--ds-line);
+}
+.cat-timeline__tick {
+  display: flex; flex-direction: column; align-items: center;
+}
+.cat-timeline__tick::before {
   content: "";
-  position: absolute; top: 4px; bottom: 4px; left: 0;
-  width: 1px;
-  background: linear-gradient(to bottom, transparent, var(--ds-text-secondary) 50%, transparent);
-  opacity: 0.55;
-  animation: cat-timeline-scan 5000ms cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  width: 1px; height: 4px;
+  background: var(--ds-line-strong);
 }
-@keyframes cat-timeline-scan {
-  0%   { left: 0%; opacity: 0; }
-  10%  { opacity: 0.55; }
-  85%  { opacity: 0.55; }
-  100% { left: 100%; opacity: 0; }
+.cat-timeline__tick[data-major]::before {
+  height: 6px;
+  background: var(--ds-text-muted);
 }
+.cat-timeline__tick-label {
+  font-family: var(--ds-font-mono); font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ds-text-muted);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+  visibility: hidden;
+}
+.cat-timeline__tick[data-major] .cat-timeline__tick-label { visibility: visible; }
 
-/* ---- PulseTrail — connecting polyline through trail dots; head sweeps along it ---- */
+/* ---- PulseTrail — head + lit line driven from one JS timeline, with
+   fade-out at the end + reset + fade-in (no awkward jump-back). ---- */
 .cat-pt {
   width: 100%; max-width: 200px;
   display: flex; flex-direction: column; gap: var(--ds-space-3);
@@ -473,6 +485,7 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   pointer-events: none;
+  overflow: visible;
 }
 .cat-pt__line {
   fill: none;
@@ -480,18 +493,14 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   stroke-width: 1;
   stroke-linecap: round;
   stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
 }
 .cat-pt__line--lit {
   stroke: var(--ds-accent-live);
   stroke-width: 1.5;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: cat-pt-line-fill 4000ms linear infinite;
-  filter: drop-shadow(0 0 2px rgba(229, 83, 60, 0.4));
-}
-@keyframes cat-pt-line-fill {
-  0%   { stroke-dashoffset: 100; }
-  100% { stroke-dashoffset: -100; }
+  filter: drop-shadow(0 0 2px rgba(229, 83, 60, 0.45));
+  /* dashoffset + opacity driven by JS so the lit line moves in
+     lockstep with the head dot. */
 }
 .cat-pt__d {
   position: absolute;
@@ -510,10 +519,9 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   box-shadow: 0 0 0 3px rgba(229, 83, 60, 0.18);
   transform: translate(-50%, 50%);
   z-index: 3;
-  animation:
-    cat-pt-pulse 2000ms linear infinite;
+  /* opacity set by JS; the head fades out at end-of-cycle and fades
+     back in at the start, never snapping. */
 }
-@keyframes cat-pt-pulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
 .cat-pt__axis {
   display: flex; justify-content: space-between;
   font-family: var(--ds-font-mono); font-size: 11px;
@@ -633,11 +641,15 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
 }
 .cat-tetris__cell[data-clearing]           {
   background: var(--ds-accent-success); border-color: var(--ds-accent-success);
-  animation: cat-tetris-flash var(--ds-dur-standard) var(--ds-ease-out);
+  animation: cat-tetris-flash var(--ds-dur-deliberate, 280ms) var(--ds-ease-out) forwards;
 }
 @keyframes cat-tetris-flash {
-  0%   { box-shadow: 0 0 0 2px var(--ds-accent-success); }
-  100% { box-shadow: 0 0 0 0 transparent; }
+  /* The line goes solid green for most of the beat (so it reads as
+     "row eaten"), then the halo collapses and the cell fades just
+     before the row drops. */
+  0%   { box-shadow: 0 0 0 2px var(--ds-accent-success); opacity: 1; }
+  60%  { box-shadow: 0 0 0 2px var(--ds-accent-success); opacity: 1; }
+  100% { box-shadow: 0 0 0 0 transparent; opacity: 0; }
 }
 .cat-tetris__label {
   font-family: var(--ds-font-mono); font-size: 11px; font-weight: 500;
@@ -1315,17 +1327,28 @@ footer.page-foot {
     <article class="tile">
       <div class="tile__name"><span>DotTimeline</span><span class="tile__index">08</span></div>
       <div class="tile__stage">
-        <div class="cat-timeline">
-          <div class="cat-timeline__col" data-state="done"><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span></div>
-          <div class="cat-timeline__col" data-state="done"><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span></div>
-          <div class="cat-timeline__col" data-state="done"><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span></div>
-          <div class="cat-timeline__col" data-state="active"><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span></div>
-          <div class="cat-timeline__col" data-state="live"><span class="cat-timeline__d"></span></div>
-          <div class="cat-timeline__col"><span class="cat-timeline__d"></span></div>
-          <div class="cat-timeline__col"><span class="cat-timeline__d"></span></div>
+        <div class="cat-timeline-wrap">
+          <div class="cat-timeline">
+            <div class="cat-timeline__col" data-state="done"><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span></div>
+            <div class="cat-timeline__col" data-state="done"><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span></div>
+            <div class="cat-timeline__col" data-state="done"><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span></div>
+            <div class="cat-timeline__col" data-state="active"><span class="cat-timeline__d"></span><span class="cat-timeline__d"></span></div>
+            <div class="cat-timeline__col" data-state="live"><span class="cat-timeline__d"></span></div>
+            <div class="cat-timeline__col"><span class="cat-timeline__d"></span></div>
+            <div class="cat-timeline__col"><span class="cat-timeline__d"></span></div>
+          </div>
+          <div class="cat-timeline__axis">
+            <div class="cat-timeline__tick" data-major><span class="cat-timeline__tick-label">16:30</span></div>
+            <div class="cat-timeline__tick"><span class="cat-timeline__tick-label">16:35</span></div>
+            <div class="cat-timeline__tick" data-major><span class="cat-timeline__tick-label">16:35</span></div>
+            <div class="cat-timeline__tick"><span class="cat-timeline__tick-label">16:40</span></div>
+            <div class="cat-timeline__tick" data-major><span class="cat-timeline__tick-label">16:40</span></div>
+            <div class="cat-timeline__tick"><span class="cat-timeline__tick-label">16:45</span></div>
+            <div class="cat-timeline__tick" data-major><span class="cat-timeline__tick-label">NOW</span></div>
+          </div>
         </div>
       </div>
-      <p class="tile__role">Stages from the bottom up. Carries <em>both</em> accents in different columns.</p>
+      <p class="tile__role">Density per time bucket. Time axis below shows when each column happened.</p>
     </article>
 
     <!-- 9. PulseTrail -->
@@ -1784,34 +1807,110 @@ const REDUCED = window.matchMedia &&
   }, 100);
 })();
 
-// PulseTrail — head sweeps along a polyline through past-event nodes.
-// Reads the polyline points and interpolates the head position so the
-// line "lights up" exactly where the head currently sits.
+// PulseTrail — single timeline drives BOTH the head dot and the lit
+// SVG line. At end-of-cycle, both fade out, reset, fade back in (no
+// awkward jump-back to the start).
 (function () {
   const canvas = document.getElementById("cat-pt-canvas");
   const head = document.getElementById("cat-pt-head");
   if (!canvas || !head) return;
-  const points = [
+  const litLine = canvas.querySelector(".cat-pt__line--lit");
+  // Nodes in (x = % of canvas width, y = px from canvas bottom).
+  // SVG path uses the same x but svgY = 40 - y. Head positions use
+  // bottom: y px directly.
+  const NODES = [
     { x: 12, y: 22 }, { x: 26, y: 12 }, { x: 40, y: 24 },
     { x: 54, y: 10 }, { x: 68, y: 16 }, { x: 90, y: 22 },
   ];
+  // Compute total length of the polyline in SVG (100×40) units so
+  // dasharray / dashoffset map correctly.
+  function svgY(n) { return 40 - n.y; }
+  const segs = [];
+  let totalLen = 0;
+  for (let i = 0; i < NODES.length - 1; i++) {
+    const a = NODES[i], b = NODES[i + 1];
+    const len = Math.hypot(b.x - a.x, svgY(b) - svgY(a));
+    segs.push({ a, b, len });
+    totalLen += len;
+  }
+  if (litLine) {
+    litLine.style.strokeDasharray = String(totalLen);
+    litLine.style.strokeDashoffset = String(totalLen);
+  }
+  function pointAt(progress) {
+    const target = totalLen * progress;
+    let walked = 0;
+    for (let i = 0; i < segs.length; i++) {
+      const s = segs[i];
+      if (walked + s.len >= target || i === segs.length - 1) {
+        const t = s.len === 0 ? 0 : (target - walked) / s.len;
+        return {
+          x: s.a.x + (s.b.x - s.a.x) * t,
+          y: s.a.y + (s.b.y - s.a.y) * t,
+        };
+      }
+      walked += s.len;
+    }
+    return NODES[NODES.length - 1];
+  }
+  function place(p) {
+    head.style.left = p.x + "%";
+    head.style.bottom = p.y + "px";
+  }
+  function setLine(progress) {
+    if (!litLine) return;
+    litLine.style.strokeDashoffset = String(totalLen * (1 - progress));
+  }
+
   if (REDUCED) {
-    head.style.left = points[points.length - 1].x + "%";
-    head.style.bottom = points[points.length - 1].y + "px";
+    place(NODES[NODES.length - 1]);
+    setLine(1);
+    head.style.opacity = "1";
+    if (litLine) litLine.style.opacity = "1";
     return;
   }
-  // Walk segment-by-segment. Per segment, tween from one point to the next.
-  const SEG_MS = 4000 / (points.length - 1);
-  let segIdx = 0, segStart = performance.now();
+
+  const DRAW_MS    = 3600;  // head + line draw together
+  const HOLD_MS    = 250;   // beat at the end at full visibility
+  const FADE_OUT_MS= 280;   // dissolve
+  const RESET_MS   = 220;   // fade in at start
+  let phase = "draw";
+  let phaseStart = performance.now();
   function frame(now) {
-    const t = Math.min(1, (now - segStart) / SEG_MS);
-    const a = points[segIdx];
-    const b = points[(segIdx + 1) % points.length];
-    head.style.left = (a.x + (b.x - a.x) * t) + "%";
-    head.style.bottom = (a.y + (b.y - a.y) * t) + "px";
-    if (t >= 1) {
-      segIdx = (segIdx + 1) % points.length;
-      segStart = now;
+    const elapsed = now - phaseStart;
+    if (phase === "draw") {
+      const t = Math.min(1, elapsed / DRAW_MS);
+      // ease-out so the head decelerates near the end (Emil-aligned)
+      const eased = 1 - Math.pow(1 - t, 3);
+      place(pointAt(eased));
+      setLine(eased);
+      head.style.opacity = "1";
+      if (litLine) litLine.style.opacity = "1";
+      if (t >= 1) { phase = "hold"; phaseStart = now; }
+    } else if (phase === "hold") {
+      place(pointAt(1));
+      setLine(1);
+      if (elapsed >= HOLD_MS) { phase = "fade"; phaseStart = now; }
+    } else if (phase === "fade") {
+      const t = Math.min(1, elapsed / FADE_OUT_MS);
+      const opacity = 1 - t;
+      head.style.opacity = String(opacity);
+      if (litLine) litLine.style.opacity = String(opacity);
+      place(pointAt(1));
+      if (t >= 1) {
+        // Snap back invisibly while opacity is 0
+        place(pointAt(0));
+        setLine(0);
+        phase = "in";
+        phaseStart = now;
+      }
+    } else if (phase === "in") {
+      const t = Math.min(1, elapsed / RESET_MS);
+      head.style.opacity = String(t);
+      if (litLine) litLine.style.opacity = String(t);
+      place(pointAt(0));
+      setLine(0);
+      if (t >= 1) { phase = "draw"; phaseStart = now; }
     }
     requestAnimationFrame(frame);
   }
@@ -1931,51 +2030,83 @@ const REDUCED = window.matchMedia &&
   }
   const at = (r, c) => cells[r * COLS + c];
 
-  // Tetromino shapes, each as a list of [dr, dc] from the piece anchor (0,0).
-  // Tone tier matches the real component: I/O = primary, T/L/J = secondary, S/Z = muted.
+  // Tetromino shapes with explicit rotation states. Tone tiers match
+  // the real component: I/O = primary, T/L/J = secondary, S/Z = muted.
+  // Each rotations[i] is the cell list at rotation index i (0..n-1).
   const PIECES = [
-    { name: "I", tone: "primary",   cells: [[0,0],[0,1],[0,2],[0,3]] },
-    { name: "O", tone: "primary",   cells: [[0,0],[0,1],[1,0],[1,1]] },
-    { name: "T", tone: "secondary", cells: [[0,0],[0,1],[0,2],[1,1]] },
-    { name: "L", tone: "secondary", cells: [[0,0],[1,0],[2,0],[2,1]] },
-    { name: "J", tone: "secondary", cells: [[0,1],[1,1],[2,1],[2,0]] },
-    { name: "S", tone: "muted",     cells: [[0,1],[0,2],[1,0],[1,1]] },
-    { name: "Z", tone: "muted",     cells: [[0,0],[0,1],[1,1],[1,2]] },
+    { name: "I", tone: "primary", rotations: [
+      [[0,0],[0,1],[0,2],[0,3]],
+      [[0,0],[1,0],[2,0],[3,0]],
+    ]},
+    { name: "O", tone: "primary", rotations: [
+      [[0,0],[0,1],[1,0],[1,1]],
+    ]},
+    { name: "T", tone: "secondary", rotations: [
+      [[0,0],[0,1],[0,2],[1,1]],
+      [[0,1],[1,0],[1,1],[2,1]],
+      [[0,1],[1,0],[1,1],[1,2]],
+      [[0,0],[1,0],[1,1],[2,0]],
+    ]},
+    { name: "L", tone: "secondary", rotations: [
+      [[0,0],[1,0],[2,0],[2,1]],
+      [[0,0],[0,1],[0,2],[1,0]],
+      [[0,0],[0,1],[1,1],[2,1]],
+      [[0,2],[1,0],[1,1],[1,2]],
+    ]},
+    { name: "J", tone: "secondary", rotations: [
+      [[0,1],[1,1],[2,1],[2,0]],
+      [[0,0],[1,0],[1,1],[1,2]],
+      [[0,0],[0,1],[1,0],[2,0]],
+      [[0,0],[0,1],[0,2],[1,2]],
+    ]},
+    { name: "S", tone: "muted", rotations: [
+      [[0,1],[0,2],[1,0],[1,1]],
+      [[0,0],[1,0],[1,1],[2,1]],
+    ]},
+    { name: "Z", tone: "muted", rotations: [
+      [[0,0],[0,1],[1,1],[1,2]],
+      [[0,1],[1,0],[1,1],[2,0]],
+    ]},
   ];
+
+  function cellsOf(piece, rotIdx) {
+    return piece.rotations[rotIdx % piece.rotations.length];
+  }
 
   // Logical board: rows × cols of tone strings or null.
   let board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
-  // Active falling piece state.
-  let active = null; // { piece, row, col }
+  // Active falling piece: { piece, rotIdx, row, col }
+  let active = null;
 
   function spawn() {
     const piece = PIECES[Math.floor(Math.random() * PIECES.length)];
-    const maxC = Math.max(...piece.cells.map(([, c]) => c));
+    const cells = cellsOf(piece, 0);
+    const maxC = Math.max(...cells.map(([, c]) => c));
     const width = maxC + 1;
     const col = Math.floor((COLS - width) / 2);
-    const row = -Math.max(0, ...piece.cells.map(([r]) => r));
-    active = { piece, row, col };
-    // If spawn collides immediately, the stack is too tall — reset.
-    if (collides(active.row, active.col, active.piece)) {
+    const row = -Math.max(0, ...cells.map(([r]) => r));
+    active = { piece, rotIdx: 0, row, col };
+    if (collides(active.row, active.col, cellsOf(active.piece, active.rotIdx))) {
+      // Stack too tall — reset.
       board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
       active.row = row;
       active.col = col;
     }
   }
 
-  function collides(row, col, piece) {
-    return piece.cells.some(([dr, dc]) => {
+  function collides(row, col, cells) {
+    return cells.some(([dr, dc]) => {
       const r = row + dr;
       const c = col + dc;
       if (c < 0 || c >= COLS || r >= ROWS) return true;
-      if (r < 0) return false; // above the board is fine while spawning
+      if (r < 0) return false;
       return board[r][c] !== null;
     });
   }
 
   function lock() {
     if (!active) return;
-    active.piece.cells.forEach(([dr, dc]) => {
+    cellsOf(active.piece, active.rotIdx).forEach(([dr, dc]) => {
       const r = active.row + dr;
       const c = active.col + dc;
       if (r >= 0 && r < ROWS && c >= 0 && c < COLS) board[r][c] = active.piece.tone;
@@ -1993,22 +2124,22 @@ const REDUCED = window.matchMedia &&
     full.forEach((r) => {
       for (let c = 0; c < COLS; c++) at(r, c).setAttribute("data-clearing", "");
     });
-    render(); // show flash on the locked board
+    render();
+    // Hold the green long enough to read as "row eaten," then collapse.
+    // Animation duration matches cat-tetris-flash (280ms).
     setTimeout(() => {
       full.forEach((r) => board.splice(r, 1));
       while (board.length < ROWS) board.unshift(Array(COLS).fill(null));
       spawn();
       render();
-    }, 240);
+    }, 320);
   }
 
   function step() {
     if (!active) { spawn(); render(); return; }
-    if (collides(active.row + 1, active.col, active.piece)) {
-      lock();
-    } else {
-      active.row += 1;
-    }
+    const cells = cellsOf(active.piece, active.rotIdx);
+    if (collides(active.row + 1, active.col, cells)) lock();
+    else active.row += 1;
     render();
   }
 
@@ -2020,11 +2151,14 @@ const REDUCED = window.matchMedia &&
         if (v) cell.setAttribute("data-filled", v);
         else cell.removeAttribute("data-filled");
         cell.removeAttribute("data-active");
-        cell.removeAttribute("data-clearing");
+        // Don't strip data-clearing here — clearLines() owns that
+        // attribute during the flash window.
       }
     }
+    // Restore data-clearing for any cells in mid-clear so the green
+    // animation isn't cut short by the next render.
     if (active) {
-      active.piece.cells.forEach(([dr, dc]) => {
+      cellsOf(active.piece, active.rotIdx).forEach(([dr, dc]) => {
         const r = active.row + dr;
         const c = active.col + dc;
         if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
@@ -2035,21 +2169,37 @@ const REDUCED = window.matchMedia &&
     }
   }
 
-  // Keyboard: ←→ move, ↓ soft drop, Space hard drop.
+  // Keyboard: ←→ move, ↑ rotate, ↓ soft drop, Space hard drop.
+  // preventDefault on every arrow / Space so the page never scrolls
+  // while focus is in the playfield.
   host.addEventListener("keydown", (e) => {
     if (!active) return;
     if (e.key === "ArrowLeft") {
       e.preventDefault();
-      if (!collides(active.row, active.col - 1, active.piece)) { active.col -= 1; render(); }
+      const cells = cellsOf(active.piece, active.rotIdx);
+      if (!collides(active.row, active.col - 1, cells)) { active.col -= 1; render(); }
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
-      if (!collides(active.row, active.col + 1, active.piece)) { active.col += 1; render(); }
+      const cells = cellsOf(active.piece, active.rotIdx);
+      if (!collides(active.row, active.col + 1, cells)) { active.col += 1; render(); }
+    } else if (e.key === "ArrowUp") {
+      // Rotate. Prevent the page from scrolling whether or not the
+      // rotation is legal — the user expected the keypress to stay
+      // inside the tile.
+      e.preventDefault();
+      const nextIdx = (active.rotIdx + 1) % active.piece.rotations.length;
+      const nextCells = cellsOf(active.piece, nextIdx);
+      if (!collides(active.row, active.col, nextCells)) {
+        active.rotIdx = nextIdx;
+        render();
+      }
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
       step();
     } else if (e.key === " ") {
       e.preventDefault();
-      while (!collides(active.row + 1, active.col, active.piece)) active.row += 1;
+      const cells = cellsOf(active.piece, active.rotIdx);
+      while (!collides(active.row + 1, active.col, cells)) active.row += 1;
       lock();
       render();
     }
@@ -2058,7 +2208,12 @@ const REDUCED = window.matchMedia &&
   // Pre-seed an interesting bottom stack so the tile is never empty.
   for (let i = 0; i < 3; i++) {
     spawn();
-    while (active && !collides(active.row + 1, active.col, active.piece)) active.row += 1;
+    while (
+      active &&
+      !collides(active.row + 1, active.col, cellsOf(active.piece, active.rotIdx))
+    ) {
+      active.row += 1;
+    }
     lock();
   }
   spawn();
