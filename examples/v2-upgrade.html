@@ -185,11 +185,16 @@ header.page-head .head-meta { display: flex; flex-direction: column; gap: var(--
 header.page-head .pills { display: flex; gap: var(--ds-space-3); }
 
 /* ============================================================
-   Hero: RAGStatus
+   Hero — eyebrow / SHIPPED pill / 84px title / body
    ============================================================ */
-.hero { display: flex; flex-direction: column; gap: var(--ds-space-6); margin-bottom: var(--ds-space-10); }
-.hero .rag-row { display: flex; align-items: center; gap: var(--ds-space-5); flex-wrap: wrap; }
-.hero h1 { max-width: 18ch; }
+.hero { display: flex; flex-direction: column; gap: var(--ds-space-5); margin-bottom: var(--ds-space-10); align-items: flex-start; }
+.hero__pill { /* SHIPPED block sits on its own line between eyebrow and title */ }
+.hero__title {
+  font-size: 84px; line-height: 80px; letter-spacing: -0.045em;
+  font-weight: 400;
+  margin-top: var(--ds-space-2);
+  margin-bottom: var(--ds-space-3);
+}
 .hero p { max-width: 60ch; }
 
 /* ============================================================
@@ -641,15 +646,15 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
 }
 .cat-tetris__cell[data-clearing]           {
   background: var(--ds-accent-success); border-color: var(--ds-accent-success);
-  animation: cat-tetris-flash var(--ds-dur-deliberate, 280ms) var(--ds-ease-out) forwards;
+  animation: cat-tetris-flash 280ms var(--ds-ease-out) forwards;
 }
+/* The cell stays solid green for the full beat — it's the row-splice
+   in JS that makes the row "disappear," not an opacity fade. The halo
+   pulses out as a percussive accent. */
 @keyframes cat-tetris-flash {
-  /* The line goes solid green for most of the beat (so it reads as
-     "row eaten"), then the halo collapses and the cell fades just
-     before the row drops. */
-  0%   { box-shadow: 0 0 0 2px var(--ds-accent-success); opacity: 1; }
-  60%  { box-shadow: 0 0 0 2px var(--ds-accent-success); opacity: 1; }
-  100% { box-shadow: 0 0 0 0 transparent; opacity: 0; }
+  0%   { box-shadow: 0 0 0 2px var(--ds-accent-success); }
+  60%  { box-shadow: 0 0 0 2px var(--ds-accent-success); }
+  100% { box-shadow: 0 0 0 0 transparent; }
 }
 .cat-tetris__label {
   font-family: var(--ds-font-mono); font-size: 11px; font-weight: 500;
@@ -1104,14 +1109,12 @@ footer.page-foot {
 </header>
 
 <!-- ============================================================
-     HERO — RAGStatus pattern. Single state-word callout.
+     HERO — eyebrow → state pill → name title (84px) → body
      ============================================================ -->
 <section class="hero">
   <span class="ds-eyebrow">Release</span>
-  <div class="rag-row">
-    <span class="ds-live-block">SHIPPED</span>
-    <h1>Composition contract.</h1>
-  </div>
+  <span class="ds-live-block hero__pill">SHIPPED</span>
+  <h1 class="hero__title">sous-ds</h1>
   <p class="lg">v0.7 turned <code>sous-ds</code> from a refusal contract into a composition contract. Same tokens, same components, same motion rules — plus a positive theory of what to compose, in what voice, against three dials.</p>
 </section>
 
@@ -1358,22 +1361,23 @@ footer.page-foot {
         <div class="cat-pt">
           <div class="cat-pt__canvas" id="cat-pt-canvas">
             <svg class="cat-pt__svg" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
-              <!-- Static base line through all dots -->
+              <!-- Base gray polyline — always shows the full path -->
               <polyline class="cat-pt__line" points="12,18 26,28 40,16 54,30 68,24 90,18" />
-              <!-- Animated overlay that "lights up" left→right, syncing with the head -->
-              <polyline class="cat-pt__line cat-pt__line--lit" points="12,18 26,28 40,16 54,30 68,24 90,18" />
+              <!-- Lit overlay — points list rewritten by JS each frame so it
+                   ends exactly where the head sits. No dashoffset, no drift. -->
+              <polyline class="cat-pt__line cat-pt__line--lit" id="cat-pt-lit" points="" />
             </svg>
             <span class="cat-pt__d" data-state="done" style="left: 12%; bottom: 22px;"></span>
             <span class="cat-pt__d" data-state="done" style="left: 26%; bottom: 12px;"></span>
             <span class="cat-pt__d" data-state="done" style="left: 40%; bottom: 24px;"></span>
             <span class="cat-pt__d"                   style="left: 54%; bottom: 10px;"></span>
             <span class="cat-pt__d"                   style="left: 68%; bottom: 16px;"></span>
-            <span class="cat-pt__head" id="cat-pt-head" aria-hidden="true" style="left: 0%; bottom: 22px;"></span>
+            <span class="cat-pt__head" id="cat-pt-head" aria-hidden="true" style="left: 12%; bottom: 22px;"></span>
           </div>
           <div class="cat-pt__axis"><span>Past</span><span>Now</span></div>
         </div>
       </div>
-      <p class="tile__role">Head sweeps a polyline through past events. Line lights as the head reaches each node.</p>
+      <p class="tile__role">Head sweeps the path; the lit line is rewritten each frame to end exactly where the head sits.</p>
     </article>
 
     <!-- 10. SegmentedBar -->
@@ -1395,7 +1399,7 @@ footer.page-foot {
             <span class="cat-segbar__seg"></span>
             <span class="cat-segbar__seg"></span>
           </div>
-          <span class="cat-segbar__hint" id="cat-segbar-hint">Click to fill</span>
+          <span class="cat-segbar__hint" id="cat-segbar-hint">Filling…</span>
         </div>
       </div>
       <p class="tile__role">Discrete vertical pills (4×16). Click fills 0 → half → full; full state turns accent-success.</p>
@@ -1807,24 +1811,24 @@ const REDUCED = window.matchMedia &&
   }, 100);
 })();
 
-// PulseTrail — single timeline drives BOTH the head dot and the lit
-// SVG line. At end-of-cycle, both fade out, reset, fade back in (no
-// awkward jump-back to the start).
+// PulseTrail — head + lit polyline ALWAYS in sync because the lit
+// polyline is recomputed every frame as the truncated path through
+// node positions, ending at the head's current point. No dashoffset,
+// no drift — both head and line use the literal same point as the
+// stop endpoint.
 (function () {
   const canvas = document.getElementById("cat-pt-canvas");
   const head = document.getElementById("cat-pt-head");
-  if (!canvas || !head) return;
-  const litLine = canvas.querySelector(".cat-pt__line--lit");
+  const lit = document.getElementById("cat-pt-lit");
+  if (!canvas || !head || !lit) return;
   // Nodes in (x = % of canvas width, y = px from canvas bottom).
-  // SVG path uses the same x but svgY = 40 - y. Head positions use
-  // bottom: y px directly.
+  // SVG y in the 40-unit viewBox = 40 - bottomPx.
   const NODES = [
     { x: 12, y: 22 }, { x: 26, y: 12 }, { x: 40, y: 24 },
     { x: 54, y: 10 }, { x: 68, y: 16 }, { x: 90, y: 22 },
   ];
-  // Compute total length of the polyline in SVG (100×40) units so
-  // dasharray / dashoffset map correctly.
   function svgY(n) { return 40 - n.y; }
+  // Per-segment lengths in SVG units, for length-proportional progress.
   const segs = [];
   let totalLen = 0;
   for (let i = 0; i < NODES.length - 1; i++) {
@@ -1833,12 +1837,8 @@ const REDUCED = window.matchMedia &&
     segs.push({ a, b, len });
     totalLen += len;
   }
-  if (litLine) {
-    litLine.style.strokeDasharray = String(totalLen);
-    litLine.style.strokeDashoffset = String(totalLen);
-  }
   function pointAt(progress) {
-    const target = totalLen * progress;
+    const target = Math.max(0, Math.min(totalLen, totalLen * progress));
     let walked = 0;
     for (let i = 0; i < segs.length; i++) {
       const s = segs[i];
@@ -1847,123 +1847,177 @@ const REDUCED = window.matchMedia &&
         return {
           x: s.a.x + (s.b.x - s.a.x) * t,
           y: s.a.y + (s.b.y - s.a.y) * t,
+          segIdx: i,
         };
       }
       walked += s.len;
     }
-    return NODES[NODES.length - 1];
+    const last = NODES[NODES.length - 1];
+    return { x: last.x, y: last.y, segIdx: segs.length - 1 };
   }
-  function place(p) {
+  // Build the polyline points string for the lit overlay so it ends
+  // EXACTLY at the head's current position.
+  function litPoints(progress) {
+    const head = pointAt(progress);
+    const pts = [];
+    pts.push(NODES[0].x + "," + svgY(NODES[0]));
+    // Include each fully-traversed intermediate node.
+    for (let i = 1; i <= head.segIdx; i++) {
+      pts.push(NODES[i].x + "," + svgY(NODES[i]));
+    }
+    // Always end at the head point.
+    pts.push(head.x + "," + svgY({ x: head.x, y: head.y }));
+    return { str: pts.join(" "), pos: head };
+  }
+  function placeHead(p) {
     head.style.left = p.x + "%";
     head.style.bottom = p.y + "px";
   }
-  function setLine(progress) {
-    if (!litLine) return;
-    litLine.style.strokeDashoffset = String(totalLen * (1 - progress));
+  function applyProgress(progress) {
+    const r = litPoints(progress);
+    lit.setAttribute("points", r.str);
+    placeHead(r.pos);
   }
 
   if (REDUCED) {
-    place(NODES[NODES.length - 1]);
-    setLine(1);
+    applyProgress(1);
     head.style.opacity = "1";
-    if (litLine) litLine.style.opacity = "1";
+    lit.style.opacity = "1";
     return;
   }
 
-  const DRAW_MS    = 3600;  // head + line draw together
-  const HOLD_MS    = 250;   // beat at the end at full visibility
-  const FADE_OUT_MS= 280;   // dissolve
-  const RESET_MS   = 220;   // fade in at start
+  const DRAW_MS    = 3600;
+  const HOLD_MS    = 250;
+  const FADE_OUT_MS= 280;
+  const RESET_MS   = 220;
   let phase = "draw";
   let phaseStart = performance.now();
   function frame(now) {
     const elapsed = now - phaseStart;
     if (phase === "draw") {
       const t = Math.min(1, elapsed / DRAW_MS);
-      // ease-out so the head decelerates near the end (Emil-aligned)
-      const eased = 1 - Math.pow(1 - t, 3);
-      place(pointAt(eased));
-      setLine(eased);
+      const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+      applyProgress(eased);
       head.style.opacity = "1";
-      if (litLine) litLine.style.opacity = "1";
+      lit.style.opacity = "1";
       if (t >= 1) { phase = "hold"; phaseStart = now; }
     } else if (phase === "hold") {
-      place(pointAt(1));
-      setLine(1);
+      applyProgress(1);
       if (elapsed >= HOLD_MS) { phase = "fade"; phaseStart = now; }
     } else if (phase === "fade") {
       const t = Math.min(1, elapsed / FADE_OUT_MS);
       const opacity = 1 - t;
       head.style.opacity = String(opacity);
-      if (litLine) litLine.style.opacity = String(opacity);
-      place(pointAt(1));
+      lit.style.opacity = String(opacity);
+      applyProgress(1);
       if (t >= 1) {
-        // Snap back invisibly while opacity is 0
-        place(pointAt(0));
-        setLine(0);
+        applyProgress(0); // hidden by opacity 0 anyway, but reset position
         phase = "in";
         phaseStart = now;
       }
     } else if (phase === "in") {
       const t = Math.min(1, elapsed / RESET_MS);
       head.style.opacity = String(t);
-      if (litLine) litLine.style.opacity = String(t);
-      place(pointAt(0));
-      setLine(0);
+      lit.style.opacity = String(t);
+      applyProgress(0);
       if (t >= 1) { phase = "draw"; phaseStart = now; }
     }
     requestAnimationFrame(frame);
   }
+  // Seed with progress=0 so the head starts at the leftmost node, not
+  // hovering at left=0%.
+  applyProgress(0);
   requestAnimationFrame(frame);
 })();
 
-// SegmentedBar — click to animate fill 0 → 6 (text-primary) → 12 (accent-success), then reset.
+// SegmentedBar — auto-loops on mount; click toggles pause / resume.
+// One loop = fill 0 → half (white) → full (green) → hold → reset.
 (function () {
   const bar = document.getElementById("cat-segbar");
   const hint = document.getElementById("cat-segbar-hint");
   if (!bar) return;
-  const segs = bar.querySelectorAll(".cat-segbar__seg");
-  let busy = false;
-  function fill() {
-    if (busy) return;
-    busy = true;
-    if (hint) hint.textContent = "Filling…";
-    let i = 0;
-    // Phase 1: fill to half with text-primary
-    const STEP = 70;
-    function tickPrimary() {
-      if (i >= segs.length / 2) { setTimeout(toSuccess, 220); return; }
-      segs[i].classList.add("is-active");
-      i++;
-      setTimeout(tickPrimary, STEP);
-    }
-    function toSuccess() {
-      // Phase 2: continue filling but switch the rest to success
-      function tickSuccess() {
-        if (i >= segs.length) {
-          // Phase 3: hold full state, then promote all segments to success
-          segs.forEach((s) => { s.classList.remove("is-active"); s.classList.add("is-success"); });
-          if (hint) hint.textContent = "Complete";
-          setTimeout(reset, 1400);
-          return;
-        }
+  const segs = Array.from(bar.querySelectorAll(".cat-segbar__seg"));
+  const STEP = 90;          // ms per segment
+  const HALF = segs.length / 2;
+  const HOLD_MS = 1000;     // beat at full before reset
+  const REST_MS = 600;      // pause at empty before next loop
+  let timer = null;
+  let paused = false;
+  let i = 0;
+  let stage = "filling-primary"; // → filling-success → hold → rest
+
+  function clearAll() {
+    segs.forEach((s) => s.classList.remove("is-active", "is-success"));
+  }
+  function setHint(t) { if (hint) hint.textContent = t; }
+  function schedule(fn, ms) {
+    if (paused) return;
+    timer = setTimeout(fn, ms);
+  }
+
+  function tick() {
+    if (paused) return;
+    if (stage === "filling-primary") {
+      if (i < HALF) {
         segs[i].classList.add("is-active");
         i++;
-        setTimeout(tickSuccess, STEP);
+        schedule(tick, STEP);
+      } else {
+        stage = "filling-success";
+        schedule(tick, STEP);
       }
-      tickSuccess();
+    } else if (stage === "filling-success") {
+      if (i < segs.length) {
+        segs[i].classList.add("is-active");
+        i++;
+        schedule(tick, STEP);
+      } else {
+        // Promote whole bar to success.
+        segs.forEach((s) => { s.classList.remove("is-active"); s.classList.add("is-success"); });
+        setHint("Complete");
+        stage = "hold";
+        schedule(tick, HOLD_MS);
+      }
+    } else if (stage === "hold") {
+      clearAll();
+      setHint("Resetting…");
+      stage = "rest";
+      schedule(tick, REST_MS);
+    } else if (stage === "rest") {
+      i = 0;
+      stage = "filling-primary";
+      setHint("Filling…");
+      schedule(tick, STEP);
     }
-    function reset() {
-      segs.forEach((s) => { s.classList.remove("is-active", "is-success"); });
-      if (hint) hint.textContent = "Click to fill";
-      busy = false;
-    }
-    tickPrimary();
   }
-  bar.addEventListener("click", fill);
+
+  function pause() {
+    paused = true;
+    if (timer) { clearTimeout(timer); timer = null; }
+    setHint("Paused — click to resume");
+  }
+  function resume() {
+    paused = false;
+    setHint("Filling…");
+    schedule(tick, STEP);
+  }
+
+  bar.addEventListener("click", () => (paused ? resume() : pause()));
   bar.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fill(); }
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      paused ? resume() : pause();
+    }
   });
+
+  if (REDUCED) {
+    segs.forEach((s) => s.classList.add("is-success"));
+    setHint("Complete");
+    return;
+  }
+  // Auto-start on mount.
+  setHint("Filling…");
+  schedule(tick, STEP);
 })();
 
 // SegmentedControl — wire the click to swap [data-selected].
@@ -1978,16 +2032,27 @@ const REDUCED = window.matchMedia &&
   });
 })();
 
-// MetricStat — slow tween counter, 0 → 74 over 1.5s, hold, 74 → 0 over 1.5s, hold, repeat.
-// Uses cubic ease-out on the way up (responsive feel) and ease-in-out on
-// the way down (deliberate, settling).
+// MetricStat — three-digit range. Counts 0 → 150 over ~3s, then 150 → 0
+// over ~3s, then loops. Color flips at 100: under 100 = text-primary,
+// at-or-above 100 = accent-success. Tabular-nums keeps digits stable.
 (function () {
   const el = document.getElementById("cat-metric-num");
   if (!el) return;
-  if (REDUCED) { el.textContent = "74"; return; }
-  const TARGET = 74;
-  const UP_MS = 1500;
-  const DOWN_MS = 1500;
+  // Update the suffix color & glyph along with the value, so the
+  // "%" matches the value's tone at each frame.
+  const value = el.parentElement;
+  function setColor(v) {
+    const c = v >= 100 ? "var(--ds-accent-success)" : "var(--ds-text-primary)";
+    el.style.color = c;
+  }
+  if (REDUCED) {
+    el.textContent = "150";
+    setColor(150);
+    return;
+  }
+  const TARGET = 150;
+  const UP_MS = 3000;
+  const DOWN_MS = 3000;
   const HOLD_MS = 800;
   function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
   function easeInOutCubic(t) {
@@ -1997,7 +2062,9 @@ const REDUCED = window.matchMedia &&
     const start = performance.now();
     function frame(now) {
       const t = Math.min(1, (now - start) / ms);
-      el.textContent = String(Math.round(from + (to - from) * easer(t)));
+      const v = Math.round(from + (to - from) * easer(t));
+      el.textContent = String(v);
+      setColor(v);
       if (t < 1) requestAnimationFrame(frame);
       else done();
     }
