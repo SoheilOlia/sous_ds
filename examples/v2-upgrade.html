@@ -2182,28 +2182,48 @@ const REDUCED = window.matchMedia &&
     clearLines();
   }
 
+  // Tracks whether a line-clear is mid-animation. While clearing,
+  // step() does nothing — no new piece spawns, nothing falls — so
+  // the green flash isn't visually undermined by a fresh piece
+  // landing on a row that hasn't actually been removed yet.
+  let clearing = false;
+
   function clearLines() {
     const full = [];
     for (let r = 0; r < ROWS; r++) {
       if (board[r].every((v) => v !== null)) full.push(r);
     }
     if (full.length === 0) { spawn(); return; }
+    clearing = true;
     full.forEach((r) => {
       for (let c = 0; c < COLS; c++) at(r, c).setAttribute("data-clearing", "");
     });
     render();
-    // Hold the green long enough to read as "row eaten," then collapse.
-    // Animation duration matches cat-tetris-flash (280ms).
+    // Hold the green long enough to read as "row eaten," then collapse
+    // the rows above into the gap (real Tetris behavior).
     setTimeout(() => {
-      full.forEach((r) => board.splice(r, 1));
-      while (board.length < ROWS) board.unshift(Array(COLS).fill(null));
+      // Build a new board that excludes every cleared row, then pad
+      // the top with empty rows. filter() handles multi-row clears
+      // correctly without index drift.
+      const kept = board.filter((_, r) => !full.includes(r));
+      while (kept.length < ROWS) kept.unshift(Array(COLS).fill(null));
+      board = kept;
+      // Strip data-clearing on every cell — the DOM cells get reused
+      // for whatever just shifted down, and stale data-clearing keeps
+      // them stuck green. Walking every cell is cheap (48 cells) and
+      // safer than tracking which DOM rows had it.
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) at(r, c).removeAttribute("data-clearing");
+      }
       spawn();
+      clearing = false;
       render();
     }, 320);
   }
 
   function step() {
-    if (!active) { spawn(); render(); return; }
+    if (clearing) return;          // mid line-clear: pause the world
+    if (!active) return;           // spawn is owned by clearLines + init
     const cells = cellsOf(active.piece, active.rotIdx);
     if (collides(active.row + 1, active.col, cells)) lock();
     else active.row += 1;
@@ -2240,6 +2260,14 @@ const REDUCED = window.matchMedia &&
   // preventDefault on every arrow / Space so the page never scrolls
   // while focus is in the playfield.
   host.addEventListener("keydown", (e) => {
+    // Block input during line-clear, but still preventDefault so the
+    // page doesn't scroll if the player happens to press an arrow.
+    if (clearing) {
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(e.key)) {
+        e.preventDefault();
+      }
+      return;
+    }
     if (!active) return;
     if (e.key === "ArrowLeft") {
       e.preventDefault();
