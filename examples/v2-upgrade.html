@@ -312,9 +312,29 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   margin: 0;
 }
 
-/* ---- LiveDot (real .ds-livedot structure) ------------------ */
+/* ---- LiveDot — opacity pulse + sonar ring at peak for prominence ---- */
 .cat-livedot { display: inline-flex; align-items: center; gap: var(--ds-space-3); font-family: var(--ds-font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ds-text-secondary); }
-.cat-livedot__mark { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-accent-live); animation: ds-pulse 2s linear infinite; }
+.cat-livedot__mark {
+  position: relative;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--ds-accent-live);
+  animation: cat-livedot-pulse 2000ms linear infinite;
+}
+.cat-livedot__mark::after {
+  content: ""; position: absolute; inset: 0;
+  border-radius: 50%;
+  background: var(--ds-accent-live);
+  animation: cat-livedot-sonar 2000ms ease-out infinite;
+}
+@keyframes cat-livedot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.65; transform: scale(0.92); }
+}
+@keyframes cat-livedot-sonar {
+  0%   { transform: scale(1);   opacity: 0.55; }
+  80%, 100% { transform: scale(3.2); opacity: 0; }
+}
 
 /* ---- LiveBlock (a tiny BlockLoader: 12px footprint, 7 chasing 3px blocks) ---- */
 .cat-liveblock { display: inline-flex; align-items: center; gap: var(--ds-space-3); font-family: var(--ds-font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ds-text-secondary); --cat-lb-cell: 3px; --cat-lb-gap: 1px; --cat-lb-step: 4px; }
@@ -362,60 +382,138 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
 .cat-toast__title { font-weight: 500; }
 .cat-toast__desc { color: var(--ds-text-secondary); margin-top: 2px; font-size: 12px; }
 
-/* ---- DottedChart (real .ds-chart bars; 6px dots, 4px gap) -- */
+/* ---- DottedChart — stagger entrance + breathing loop -------
+   Each dot fades in with a small scale, staggered by index.
+   After mount, the active bars subtly breathe (opacity pulse) so
+   the chart reads as alive without pulling focus. ---- */
 .cat-chart { display: inline-flex; flex-direction: column; gap: var(--ds-space-3); }
 .cat-chart__bars { display: grid; grid-auto-flow: column; grid-auto-columns: 6px; gap: 8px; align-items: end; min-height: 64px; }
 .cat-chart__bar { display: flex; flex-direction: column-reverse; gap: 4px; align-items: center; }
-.cat-chart__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-text-muted); }
+.cat-chart__dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ds-text-muted);
+  opacity: 0;
+  transform: scale(0.9);
+  animation: cat-chart-in 220ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
 .cat-chart__bar[data-active] .cat-chart__dot { background: var(--ds-text-primary); }
 .cat-chart__bar[data-success] .cat-chart__dot { background: var(--ds-accent-success); }
+@keyframes cat-chart-in {
+  to { opacity: 1; transform: scale(1); }
+}
+/* Breathing loop on the topmost dot of each active bar — reads as
+   "this stage is alive" without being noisy. Stagger by bar index. */
+.cat-chart__bar[data-active] .cat-chart__dot:last-child {
+  animation:
+    cat-chart-in 220ms cubic-bezier(0.23, 1, 0.32, 1) forwards,
+    cat-chart-breathe 2400ms ease-in-out var(--cat-chart-delay, 0ms) infinite 220ms;
+}
+@keyframes cat-chart-breathe {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.6; transform: scale(0.92); }
+}
 
-/* ---- DotTimeline (real .ds-dot-timeline; 6px dots, 8px gap, axis line) ---- */
+/* ---- DotTimeline — stagger reveal of done columns + scanline -- */
 .cat-timeline {
+  position: relative;
   display: grid; grid-auto-flow: column; grid-auto-columns: 6px;
   align-items: end; gap: 8px;
   height: 64px; padding: 4px 0;
   border-bottom: 1px solid var(--ds-line);
+  overflow: hidden;
 }
 .cat-timeline__col { position: relative; width: 6px; height: 100%; display: flex; flex-direction: column-reverse; align-items: center; gap: 4px; }
-.cat-timeline__d { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-text-muted); opacity: 0.55; }
+.cat-timeline__d {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ds-text-muted); opacity: 0.55;
+  transform: translateY(4px);
+  animation: cat-timeline-rise 280ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  animation-delay: var(--cat-timeline-delay, 0ms);
+}
 .cat-timeline__col[data-state="done"] .cat-timeline__d { background: var(--ds-accent-success); opacity: 1; }
-.cat-timeline__col[data-state="live"] .cat-timeline__d { background: var(--ds-accent-live); opacity: 1; animation: ds-livepulse 2s linear infinite; }
+.cat-timeline__col[data-state="live"] .cat-timeline__d {
+  background: var(--ds-accent-live); opacity: 1;
+  animation:
+    cat-timeline-rise 280ms cubic-bezier(0.23, 1, 0.32, 1) forwards,
+    cat-livedot-pulse 2000ms linear infinite 280ms;
+}
 .cat-timeline__col[data-state="active"] .cat-timeline__d { background: var(--ds-text-primary); opacity: 1; }
-@keyframes ds-livepulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+@keyframes cat-timeline-rise {
+  to { transform: translateY(0); }
+}
+/* Scanline — vertical 1px line sweeps left→right every 5s,
+   indicating "time is moving" through the timeline. */
+.cat-timeline::after {
+  content: "";
+  position: absolute; top: 4px; bottom: 4px; left: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--ds-text-secondary) 50%, transparent);
+  opacity: 0.55;
+  animation: cat-timeline-scan 5000ms cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes cat-timeline-scan {
+  0%   { left: 0%; opacity: 0; }
+  10%  { opacity: 0.55; }
+  85%  { opacity: 0.55; }
+  100% { left: 100%; opacity: 0; }
+}
 
-/* ---- PulseTrail (real .ds-pulse-trail; head 8px + halo, trail 6px, axis line) ---- */
+/* ---- PulseTrail — connecting polyline through trail dots; head sweeps along it ---- */
 .cat-pt {
   width: 100%; max-width: 200px;
   display: flex; flex-direction: column; gap: var(--ds-space-3);
   font-family: var(--ds-font-mono);
 }
 .cat-pt__canvas {
-  position: relative; height: 32px;
+  position: relative; height: 40px;
   border-bottom: 1px solid var(--ds-line);
 }
+.cat-pt__svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.cat-pt__line {
+  fill: none;
+  stroke: var(--ds-line-strong);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.cat-pt__line--lit {
+  stroke: var(--ds-accent-live);
+  stroke-width: 1.5;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: cat-pt-line-fill 4000ms linear infinite;
+  filter: drop-shadow(0 0 2px rgba(229, 83, 60, 0.4));
+}
+@keyframes cat-pt-line-fill {
+  0%   { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: -100; }
+}
 .cat-pt__d {
-  position: absolute; bottom: 4px;
+  position: absolute;
   width: 6px; height: 6px;
-  transform: translateX(-50%);
+  transform: translate(-50%, 50%);
   border-radius: 50%;
   background: var(--ds-text-muted);
+  z-index: 2;
 }
 .cat-pt__d[data-state="done"] { background: var(--ds-accent-success); }
 .cat-pt__head {
-  position: absolute; bottom: 3px; left: 0;
+  position: absolute;
   width: 8px; height: 8px;
   border-radius: 50%;
   background: var(--ds-accent-live);
   box-shadow: 0 0 0 3px rgba(229, 83, 60, 0.18);
-  transform: translateX(-50%);
-  z-index: 2;
+  transform: translate(-50%, 50%);
+  z-index: 3;
   animation:
-    ds-pt-sweep 4000ms linear infinite,
-    ds-pt-pulse 2000ms linear infinite;
+    cat-pt-pulse 2000ms linear infinite;
 }
-@keyframes ds-pt-sweep { 0%{left:0%} 100%{left:100%} }
-@keyframes ds-pt-pulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+@keyframes cat-pt-pulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
 .cat-pt__axis {
   display: flex; justify-content: space-between;
   font-family: var(--ds-font-mono); font-size: 11px;
@@ -423,10 +521,30 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   color: var(--ds-text-muted);
 }
 
-/* ---- SegmentedBar (real .ds-segmented-bar; 4px×16px vertical pills) ---- */
-.cat-segbar { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 4px; gap: 4px; align-items: end; min-height: 16px; }
-.cat-segbar__seg { width: 4px; height: 16px; border-radius: 9999px; background: var(--ds-line-strong); }
+/* ---- SegmentedBar — vertical pills, click fills 0→half→full success -- */
+.cat-segbar-wrap { display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-3); }
+.cat-segbar {
+  display: inline-grid; grid-auto-flow: column; grid-auto-columns: 4px;
+  gap: 4px; align-items: end; min-height: 16px;
+  cursor: pointer;
+  padding: var(--ds-space-3);
+  border-radius: var(--ds-radius-sm);
+  transition: background-color var(--ds-dur-micro) var(--ds-ease-out);
+}
+.cat-segbar:hover { background: var(--ds-surface-raised); }
+.cat-segbar__seg {
+  width: 4px; height: 16px;
+  border-radius: 9999px;
+  background: var(--ds-line-strong);
+  transition: background-color var(--ds-dur-standard) cubic-bezier(0.23, 1, 0.32, 1);
+}
 .cat-segbar__seg.is-active { background: var(--ds-text-primary); }
+.cat-segbar__seg.is-success { background: var(--ds-accent-success); }
+.cat-segbar__hint {
+  font-family: var(--ds-font-mono); font-size: 10px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-muted);
+}
 
 /* ---- SegmentedControl (real .ds-segmented-control; thumb under selected) ---- */
 .cat-segctrl {
@@ -487,7 +605,7 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
 .cat-toolcall__dur { font-family: var(--ds-font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ds-text-muted); }
 .cat-toolcall__detail { font-family: var(--ds-font-sans); font-size: 13px; line-height: 20px; color: var(--ds-text-secondary); margin: 0; }
 
-/* ---- TetrisLoader (real .ds-tetris-loader playfield, 6×8 cells, 3 grayscale tones) ---- */
+/* ---- TetrisLoader — playfield with falling piece + landed stack ---- */
 .cat-tetris {
   display: inline-flex; flex-direction: column; align-items: center;
   gap: var(--ds-space-4);
@@ -504,12 +622,19 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   width: 8px; height: 8px; box-sizing: border-box;
   border: 1px solid var(--ds-line);
   background: transparent;
-  transition: background var(--ds-dur-micro) var(--ds-ease-out);
+  /* No transition — frame snaps. Drop motion comes from row-by-row
+     replacement, matching the real component's stepped feel. */
 }
 .cat-tetris__cell[data-filled="primary"]   { background: var(--ds-text-primary);   border-color: var(--ds-text-primary); }
 .cat-tetris__cell[data-filled="secondary"] { background: var(--ds-text-secondary); border-color: var(--ds-text-secondary); }
 .cat-tetris__cell[data-filled="muted"]     { background: var(--ds-text-muted);     border-color: var(--ds-text-muted); }
-.cat-tetris__cell[data-clearing]           { background: var(--ds-accent-success); border-color: var(--ds-accent-success); animation: cat-tetris-flash var(--ds-dur-standard) var(--ds-ease-out); }
+.cat-tetris__cell[data-active]             { /* current falling piece — same colors, just to differentiate logic */
+  background: var(--ds-text-primary); border-color: var(--ds-text-primary);
+}
+.cat-tetris__cell[data-clearing]           {
+  background: var(--ds-accent-success); border-color: var(--ds-accent-success);
+  animation: cat-tetris-flash var(--ds-dur-standard) var(--ds-ease-out);
+}
 @keyframes cat-tetris-flash {
   0%   { box-shadow: 0 0 0 2px var(--ds-accent-success); }
   100% { box-shadow: 0 0 0 0 transparent; }
@@ -519,6 +644,11 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--ds-text-secondary);
   font-variant-numeric: tabular-nums;
+}
+.cat-tetris__hint {
+  font-family: var(--ds-font-mono); font-size: 10px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-muted);
 }
 
 /* ---- BoxLoader (real .ds-box-loader: iso 30/45 rotation, 4 cubes in 3×2) ---- */
@@ -578,7 +708,7 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
 }
 .cat-dotloader span.active { background: var(--ds-text-primary); }
 
-/* ---- ThinkingCube (real .ds-thinking-cube; iso tilt + 4-step face flip + caret) ---- */
+/* ---- ThinkingCube — slower 3.5s rotation, no caret, vertically centered with label ---- */
 .cat-think {
   display: inline-flex; align-items: center; gap: var(--ds-space-3);
   font-family: var(--ds-font-mono); font-size: 12px; font-weight: 500;
@@ -596,7 +726,7 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   position: relative;
   width: var(--cat-tc-edge); height: var(--cat-tc-edge);
   transform-style: preserve-3d;
-  animation: cat-think-rotate 2000ms linear infinite;
+  animation: cat-think-rotate 3500ms linear infinite;
 }
 .cat-think__face {
   position: absolute; top: 0; left: 0;
@@ -617,14 +747,6 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   75%, 95% { transform: rotateX(-8deg) rotateY(-270deg); }
   100%     { transform: rotateX(-8deg) rotateY(-360deg); }
 }
-.cat-think__caret {
-  display: inline-block; width: 1px; height: 1em;
-  margin-left: 2px;
-  background: currentColor;
-  vertical-align: -0.12em;
-  animation: cat-think-blink 1000ms steps(2, start) infinite;
-}
-@keyframes cat-think-blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
 
 /* ---- BlockLoader (real .ds-block-loader; 8-position 3×3 path INCLUDING center) ---- */
 .cat-block {
@@ -668,8 +790,15 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
   100%        { transform: translate(0, 0); }
 }
 
-/* ---- AgentStream (real .ds-agent-stream pattern) ---------- */
-.cat-stream-stage { font-family: var(--ds-font-mono); font-size: 13px; line-height: 20px; color: var(--ds-text-primary); width: 100%; white-space: pre-wrap; text-align: left; }
+/* ---- AgentStream — center-aligned in tile ---------------- */
+.cat-stream-stage {
+  display: inline-block;
+  font-family: var(--ds-font-mono); font-size: 13px; line-height: 20px;
+  color: var(--ds-text-primary);
+  max-width: 200px;
+  white-space: pre-wrap;
+  text-align: center;
+}
 
 /* ---- Citation (uses the existing .ds-citation popover styles above) ---- */
 .cat-citation-stage { display: flex; align-items: center; gap: 8px; font-family: var(--ds-font-sans); font-size: 13px; color: var(--ds-text-secondary); }
@@ -783,58 +912,87 @@ header.page-head .pills { display: flex; gap: var(--ds-space-3); }
 .ds-citation__popover-body { color: var(--ds-text-secondary); }
 
 /* ============================================================
-   Voice diff
+   Content Design specimen — voice in use
    ============================================================ */
-.voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--ds-line); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-md); overflow: hidden; }
-.voice-cell { background: var(--ds-surface); padding: var(--ds-space-6); display: flex; flex-direction: column; gap: var(--ds-space-3); }
-.voice-cell__label {
-  display: flex; align-items: center; gap: var(--ds-space-3);
-  font-family: var(--ds-font-mono); font-size: 11px;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--ds-text-muted);
-}
-.voice-cell__label::before {
-  content: ""; width: 6px; height: 6px; border-radius: 50%;
-}
-.voice-cell--bad .voice-cell__label::before { background: var(--ds-accent-live); }
-.voice-cell--good .voice-cell__label::before { background: var(--ds-accent-success); }
-.voice-cell__copy { font-size: 14px; line-height: 22px; color: var(--ds-text-primary); }
-.voice-cell--bad .voice-cell__copy { color: var(--ds-text-secondary); }
-
-/* ============================================================
-   Pipeline mini
-   ============================================================ */
-.pipeline {
+.cd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ds-space-5); }
+.cd-spec {
   background: var(--ds-surface);
   border: 1px solid var(--ds-line);
   border-radius: var(--ds-radius-md);
   padding: var(--ds-space-7);
+  display: flex; flex-direction: column; gap: var(--ds-space-5);
 }
-.dot-timeline {
-  display: grid; grid-template-columns: repeat(10, 1fr);
-  gap: var(--ds-space-2);
-  margin-top: var(--ds-space-5);
+.cd-spec__role {
+  font-family: var(--ds-font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ds-text-muted);
 }
-.dot-col { display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-3); }
-.dot-cells { display: flex; flex-direction: column; gap: 2px; min-height: 56px; align-items: center; justify-content: flex-end; width: 100%; }
-.dot-cell { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-text-muted); }
-.dot-cell[data-state="active"] { background: var(--ds-text-primary); }
-.dot-cell[data-state="done"] { background: var(--ds-accent-success); }
-.dot-cell[data-state="live"] { background: var(--ds-accent-live); animation: ds-pulse 2s linear infinite; }
-.dot-label { font-family: var(--ds-font-mono); font-size: 10px; letter-spacing: 0.04em; color: var(--ds-text-muted); text-transform: uppercase; text-align: center; }
-.dot-col[data-current] .dot-label { color: var(--ds-text-primary); }
-
-.dotted-chart {
-  display: grid; grid-template-columns: repeat(10, 1fr);
-  gap: var(--ds-space-2);
-  margin-top: var(--ds-space-5);
-  padding-top: var(--ds-space-5);
+.cd-spec__sample--display {
+  font-family: var(--ds-font-display); font-weight: 600;
+  font-size: 28px; line-height: 32px;
+  letter-spacing: -0.025em;
+  color: var(--ds-text-primary);
+  margin: 0;
+}
+.cd-spec__sample--body {
+  font-family: var(--ds-font-sans); font-size: 17px; line-height: 26px;
+  color: var(--ds-text-primary); margin: 0;
+}
+.cd-spec__sample--row {
+  font-family: var(--ds-font-mono); font-size: 14px; line-height: 22px;
+  color: var(--ds-text-primary); margin: 0;
+}
+.cd-spec__inline-status {
+  font-family: var(--ds-font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-primary);
+}
+.cd-spec__time { color: var(--ds-text-muted); }
+.cd-spec__rule {
+  font-family: var(--ds-font-sans); font-size: 13px; line-height: 20px;
+  color: var(--ds-text-secondary);
   border-top: 1px solid var(--ds-line);
+  padding-top: var(--ds-space-4);
+  margin: 0;
 }
-.bar { display: flex; flex-direction: column-reverse; gap: 2px; align-items: center; height: 40px; }
-.bar span { width: 4px; height: 4px; border-radius: 50%; background: var(--ds-text-muted); }
-.bar[data-strong] span { background: var(--ds-text-primary); }
-.bar[data-success] span:last-child { background: var(--ds-accent-success); }
+.cd-spec__sample--micro { display: flex; flex-direction: column; gap: var(--ds-space-3); }
+.cd-spec__micro-row {
+  display: grid; grid-template-columns: 110px 1fr;
+  gap: var(--ds-space-5); align-items: baseline;
+  padding-bottom: var(--ds-space-3);
+  border-bottom: 1px dashed var(--ds-line);
+}
+.cd-spec__micro-row:last-child { border-bottom: none; padding-bottom: 0; }
+.cd-spec__micro-label {
+  font-family: var(--ds-font-mono); font-size: 11px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ds-text-muted);
+}
+.cd-spec__micro-text {
+  font-family: var(--ds-font-mono); font-size: 13px; line-height: 20px;
+  color: var(--ds-text-primary);
+}
+.cd-spec--rules { background: var(--ds-surface-raised); }
+.cd-rule-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: var(--ds-space-3);
+  counter-reset: rule;
+}
+.cd-rule-list li {
+  position: relative;
+  padding-left: var(--ds-space-7);
+  font-family: var(--ds-font-sans); font-size: 13px; line-height: 20px;
+  color: var(--ds-text-primary);
+  counter-increment: rule;
+}
+.cd-rule-list li::before {
+  content: counter(rule, decimal-leading-zero);
+  position: absolute; left: 0; top: 0;
+  font-family: var(--ds-font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--ds-text-muted);
+  font-variant-numeric: tabular-nums;
+}
 
 /* ============================================================
    Banned phrases catalogue
@@ -1175,53 +1333,62 @@ footer.page-foot {
       <div class="tile__name"><span>PulseTrail</span><span class="tile__index">09</span></div>
       <div class="tile__stage">
         <div class="cat-pt">
-          <div class="cat-pt__canvas">
-            <span class="cat-pt__d" data-state="done" style="left: 12%;  bottom: 16px;"></span>
-            <span class="cat-pt__d" data-state="done" style="left: 26%;  bottom: 9px;"></span>
-            <span class="cat-pt__d" data-state="done" style="left: 40%;  bottom: 19px;"></span>
-            <span class="cat-pt__d"                   style="left: 54%;  bottom: 7px;"></span>
-            <span class="cat-pt__d"                   style="left: 68%;  bottom: 12px;"></span>
-            <span class="cat-pt__head" aria-hidden="true"></span>
+          <div class="cat-pt__canvas" id="cat-pt-canvas">
+            <svg class="cat-pt__svg" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+              <!-- Static base line through all dots -->
+              <polyline class="cat-pt__line" points="12,18 26,28 40,16 54,30 68,24 90,18" />
+              <!-- Animated overlay that "lights up" left→right, syncing with the head -->
+              <polyline class="cat-pt__line cat-pt__line--lit" points="12,18 26,28 40,16 54,30 68,24 90,18" />
+            </svg>
+            <span class="cat-pt__d" data-state="done" style="left: 12%; bottom: 22px;"></span>
+            <span class="cat-pt__d" data-state="done" style="left: 26%; bottom: 12px;"></span>
+            <span class="cat-pt__d" data-state="done" style="left: 40%; bottom: 24px;"></span>
+            <span class="cat-pt__d"                   style="left: 54%; bottom: 10px;"></span>
+            <span class="cat-pt__d"                   style="left: 68%; bottom: 16px;"></span>
+            <span class="cat-pt__head" id="cat-pt-head" aria-hidden="true" style="left: 0%; bottom: 22px;"></span>
           </div>
-          <div class="cat-pt__axis"><span>Past</span><span>Live</span></div>
+          <div class="cat-pt__axis"><span>Past</span><span>Now</span></div>
         </div>
       </div>
-      <p class="tile__role">Head sweeps left→right over 4s with halo + 2s pulse. Trail dots are static markers.</p>
+      <p class="tile__role">Head sweeps a polyline through past events. Line lights as the head reaches each node.</p>
     </article>
 
     <!-- 10. SegmentedBar -->
     <article class="tile">
       <div class="tile__name"><span>SegmentedBar</span><span class="tile__index">10</span></div>
       <div class="tile__stage">
-        <div class="cat-segbar">
-          <span class="cat-segbar__seg is-active"></span>
-          <span class="cat-segbar__seg is-active"></span>
-          <span class="cat-segbar__seg is-active"></span>
-          <span class="cat-segbar__seg is-active"></span>
-          <span class="cat-segbar__seg is-active"></span>
-          <span class="cat-segbar__seg"></span>
-          <span class="cat-segbar__seg"></span>
-          <span class="cat-segbar__seg"></span>
-          <span class="cat-segbar__seg"></span>
-          <span class="cat-segbar__seg"></span>
-          <span class="cat-segbar__seg"></span>
-          <span class="cat-segbar__seg"></span>
+        <div class="cat-segbar-wrap">
+          <div class="cat-segbar" id="cat-segbar" role="button" tabindex="0" aria-label="Demo: click to fill the bar">
+            <span class="cat-segbar__seg"></span>
+            <span class="cat-segbar__seg"></span>
+            <span class="cat-segbar__seg"></span>
+            <span class="cat-segbar__seg"></span>
+            <span class="cat-segbar__seg"></span>
+            <span class="cat-segbar__seg"></span>
+            <span class="cat-segbar__seg"></span>
+            <span class="cat-segbar__seg"></span>
+            <span class="cat-segbar__seg"></span>
+            <span class="cat-segbar__seg"></span>
+            <span class="cat-segbar__seg"></span>
+            <span class="cat-segbar__seg"></span>
+          </div>
+          <span class="cat-segbar__hint" id="cat-segbar-hint">Click to fill</span>
         </div>
       </div>
-      <p class="tile__role">Discrete vertical pills (4×16). At <code>value === total</code>, switches to accent-success.</p>
+      <p class="tile__role">Discrete vertical pills (4×16). Click fills 0 → half → full; full state turns accent-success.</p>
     </article>
 
     <!-- 11. SegmentedControl -->
     <article class="tile">
       <div class="tile__name"><span>SegmentedControl</span><span class="tile__index">11</span></div>
       <div class="tile__stage">
-        <div class="cat-segctrl">
-          <button class="cat-segctrl__btn">All</button>
-          <button class="cat-segctrl__btn" data-selected>Live</button>
-          <button class="cat-segctrl__btn">Done</button>
+        <div class="cat-segctrl" id="cat-segctrl" role="tablist">
+          <button class="cat-segctrl__btn" role="tab">All</button>
+          <button class="cat-segctrl__btn" role="tab" data-selected>Live</button>
+          <button class="cat-segctrl__btn" role="tab">Done</button>
         </div>
       </div>
-      <p class="tile__role">Compact filter switcher. Pill track, filled-thumb selection.</p>
+      <p class="tile__role">Compact filter switcher. Click any option to switch — try it.</p>
     </article>
 
     <!-- 12. InlineStatus -->
@@ -1243,10 +1410,10 @@ footer.page-foot {
       <div class="tile__stage">
         <div class="cat-metric">
           <span class="cat-metric__label">Evidence</span>
-          <span class="cat-metric__value">74<span class="cat-metric__suffix">%</span></span>
+          <span class="cat-metric__value"><span id="cat-metric-num">0</span><span class="cat-metric__suffix">%</span></span>
         </div>
       </div>
-      <p class="tile__role">The number is the hero. Mono + tabular-nums + suffix at 0.32em.</p>
+      <p class="tile__role">Slow tween counter, 1.5s up and 1.5s down. Tabular-nums keeps the digits stable.</p>
     </article>
 
     <!-- 14. ToolCall -->
@@ -1300,11 +1467,12 @@ footer.page-foot {
       <div class="tile__name"><span>TetrisLoader</span><span class="tile__index">17</span></div>
       <div class="tile__stage">
         <div class="cat-tetris">
-          <div class="cat-tetris__frame" id="cat-tetris-frame" aria-hidden="true"></div>
+          <div class="cat-tetris__frame" id="cat-tetris-frame" tabindex="0" aria-label="Tetris demo — focus to play"></div>
           <span class="cat-tetris__label">[Loading…]</span>
+          <span class="cat-tetris__hint">Click to focus · ←→↓ to play</span>
         </div>
       </div>
-      <p class="tile__role">Percussive playfield. Three grayscale tones; line-clear flashes accent-success.</p>
+      <p class="tile__role">Pieces fall row-by-row from the top. Lock, scan, clear, drop. Focus to steer.</p>
     </article>
 
     <!-- 18. BoxLoader -->
@@ -1370,10 +1538,10 @@ footer.page-foot {
               <span class="cat-think__face cat-think__face--bottom"></span>
             </span>
           </span>
-          <span>Thinking<span class="cat-think__caret"></span></span>
+          <span>Thinking</span>
         </span>
       </div>
-      <p class="tile__role">16px iso cube with stepped 90° face turns + blinking caret + label.</p>
+      <p class="tile__role">16px iso cube with stepped 90° face turns over 3.5s. Cube and label baseline-aligned.</p>
     </article>
 
     <!-- 21. BlockLoader -->
@@ -1444,108 +1612,72 @@ footer.page-foot {
 </section>
 
 <!-- ============================================================
-     PIPELINE MAP — live mini-render
+     CONTENT DESIGN — voice in use (specimen, not before/after)
      ============================================================ -->
 <section>
   <header>
-    <span class="ds-eyebrow">RECIPE — PIPELINEMAP</span>
-    <h2>Ten stages, four wired.</h2>
-    <p>The 1.0 page rendered this exact pipeline as a flat 5-card grid. The 2.0 PipelineMap recipe uses a horizontal <code>&lt;DotTimeline&gt;</code> over a per-stage <code>&lt;DottedChart&gt;</code> — flow is in the structure, density per stage is in the bars below.</p>
-  </header>
-  <div class="pipeline">
-    <div class="dot-timeline">
-      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Input</span></div>
-      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Classify</span></div>
-      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Variants</span></div>
-      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Surfaces</span></div>
-      <div class="dot-col" data-current><div class="dot-cells"><span class="dot-cell" data-state="done"></span><span class="dot-cell" data-state="done"></span><span class="dot-cell" data-state="done"></span><span class="dot-cell" data-state="done"></span><span class="dot-cell" data-state="done"></span></div><span class="dot-label">Copy</span></div>
-      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Compliance</span></div>
-      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Render</span></div>
-      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Codegen</span></div>
-      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Verify</span></div>
-      <div class="dot-col"><div class="dot-cells"><span class="dot-cell" data-state="live"></span><span class="dot-cell" data-state="active"></span></div><span class="dot-label">Output</span></div>
-    </div>
-    <div class="dotted-chart">
-      <div class="bar" data-strong><span></span><span></span><span></span></div>
-      <div class="bar" data-strong><span></span><span></span><span></span><span></span></div>
-      <div class="bar" data-strong><span></span><span></span><span></span></div>
-      <div class="bar" data-strong><span></span><span></span><span></span></div>
-      <div class="bar" data-strong data-success><span></span><span></span><span></span><span></span><span></span></div>
-      <div class="bar" data-strong><span></span><span></span><span></span></div>
-      <div class="bar"><span></span><span></span></div>
-      <div class="bar" data-strong><span></span><span></span><span></span></div>
-      <div class="bar" data-strong><span></span><span></span><span></span><span></span></div>
-      <div class="bar"><span></span><span></span></div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================================
-     VOICE — before/after diffs
-     ============================================================ -->
-<section>
-  <header>
-    <span class="ds-eyebrow">VOICE — BEFORE / AFTER</span>
-    <h2>The system speaks like a precision instrument.</h2>
-    <p>Each pair below is real. Left: actual copy from the 1.0 test page that graded D− on content. Right: the 2.0 voice contract applied to the same data.</p>
+    <span class="ds-eyebrow">CONTENT DESIGN</span>
+    <h2>How the system writes.</h2>
+    <p>The voice is terse instrument-readout: present tense, active subject, numerals in mono, no narration of the work itself. Below — the voice in context, not as a corrections list.</p>
   </header>
 
-  <div style="display: flex; flex-direction: column; gap: var(--ds-space-5);">
+  <div class="cd-grid">
 
-    <div class="voice-grid">
-      <div class="voice-cell voice-cell--bad">
-        <span class="voice-cell__label">1.0 — verbose, status-meeting voice</span>
-        <span class="voice-cell__copy">"PRD to verified handoff, shown end to end."</span>
-      </div>
-      <div class="voice-cell voice-cell--good">
-        <span class="voice-cell__label">2.0 — verb-led, present tense</span>
-        <span class="voice-cell__copy">"Ten stages, four wired."</span>
-      </div>
-    </div>
+    <!-- Headline specimen -->
+    <article class="cd-spec">
+      <span class="cd-spec__role">HEADLINE</span>
+      <h3 class="cd-spec__sample cd-spec__sample--display">Ten stages, four wired.</h3>
+      <p class="cd-spec__rule">Verb-led. Present tense. ≤7 words. Numerals run in mono inside the headline (the alpha/numeric mix).</p>
+    </article>
 
-    <div class="voice-grid">
-      <div class="voice-cell voice-cell--bad">
-        <span class="voice-cell__label">1.0 — vague comparative, no subject</span>
-        <span class="voice-cell__copy">"Amber, stricter after diagnostics."</span>
-      </div>
-      <div class="voice-cell voice-cell--good">
-        <span class="voice-cell__label">2.0 — state word + verb-led clause</span>
-        <span class="voice-cell__copy">"Amber: diagnostics tightened the bar."</span>
-      </div>
-    </div>
+    <!-- State callout specimen -->
+    <article class="cd-spec">
+      <span class="cd-spec__role">STATE CALLOUT</span>
+      <h3 class="cd-spec__sample cd-spec__sample--display">Amber: diagnostics tightened the bar.</h3>
+      <p class="cd-spec__rule">State word, colon, verb-led clause. The state word names what's true; the clause names why.</p>
+    </article>
 
-    <div class="voice-grid">
-      <div class="voice-cell voice-cell--bad">
-        <span class="voice-cell__label">1.0 — passive, narrating existence</span>
-        <span class="voice-cell__copy">"Stale handoffs are audited and retired from current-readiness claims."</span>
-      </div>
-      <div class="voice-cell voice-cell--good">
-        <span class="voice-cell__label">2.0 — subject-verb-object</span>
-        <span class="voice-cell__copy">"PR #17 retired stale handoffs."</span>
-      </div>
-    </div>
+    <!-- Body specimen -->
+    <article class="cd-spec">
+      <span class="cd-spec__role">BODY</span>
+      <p class="cd-spec__sample cd-spec__sample--body">Bar confidence climbs to <code>78–80%</code> after <code>#16</code> and <code>#17</code> land. Green requires <code>PR #20</code> (CI gate).</p>
+      <p class="cd-spec__rule">First sentence ≤12 words names the state. Second ≤24 words names cause or next gate. Numerals in mono. No third sentence without structural reason.</p>
+    </article>
 
-    <div class="voice-grid">
-      <div class="voice-cell voice-cell--bad">
-        <span class="voice-cell__label">1.0 — file paths in body prose</span>
-        <span class="voice-cell__copy">"Receipts: consent_orders/docs/receipts/2026-04-28-smoke-matrix-expansion-receipt.md, …"</span>
-      </div>
-      <div class="voice-cell voice-cell--good">
-        <span class="voice-cell__label">2.0 — Citation chips, body reads clean</span>
-        <span class="voice-cell__copy">"Three receipts. See the ReceiptStack below."</span>
-      </div>
-    </div>
+    <!-- Receipt-row specimen -->
+    <article class="cd-spec">
+      <span class="cd-spec__role">RECEIPT ROW</span>
+      <p class="cd-spec__sample cd-spec__sample--row"><code>[#17]</code> PR retired stale handoffs. <span class="cd-spec__inline-status">[MERGED]</span> <span class="cd-spec__time">2026-04-29</span></p>
+      <p class="cd-spec__rule"><code>[ID]</code> · subject-verb-object · <code>[STATE]</code> · timestamp. Mono throughout. Body never carries file paths — those live in <code>&lt;Citation&gt;</code>.</p>
+    </article>
 
-    <div class="voice-grid">
-      <div class="voice-cell voice-cell--bad">
-        <span class="voice-cell__label">1.0 — editorial frame as h1</span>
-        <span class="voice-cell__copy">"Where we are going"</span>
+    <!-- Microcopy specimen -->
+    <article class="cd-spec">
+      <span class="cd-spec__role">MICROCOPY</span>
+      <div class="cd-spec__sample cd-spec__sample--micro">
+        <div class="cd-spec__micro-row"><span class="cd-spec__micro-label">Empty state</span><span class="cd-spec__micro-text">No receipts yet.</span></div>
+        <div class="cd-spec__micro-row"><span class="cd-spec__micro-label">Loading</span><span class="cd-spec__micro-text">[LOADING 00:03]</span></div>
+        <div class="cd-spec__micro-row"><span class="cd-spec__micro-label">Error</span><span class="cd-spec__micro-text">Connection lost. Retry.</span></div>
+        <div class="cd-spec__micro-row"><span class="cd-spec__micro-label">Toast</span><span class="cd-spec__micro-text">PR #17 merged.</span></div>
+        <div class="cd-spec__micro-row"><span class="cd-spec__micro-label">Button</span><span class="cd-spec__micro-text">Save.</span></div>
+        <div class="cd-spec__micro-row"><span class="cd-spec__micro-label">Form label</span><span class="cd-spec__micro-text">Email</span></div>
       </div>
-      <div class="voice-cell voice-cell--good">
-        <span class="voice-cell__label">2.0 — name the artifact</span>
-        <span class="voice-cell__copy">"Five phases. Three live, two queued."</span>
-      </div>
-    </div>
+      <p class="cd-spec__rule">Verbs for buttons, nouns for labels. Errors name the action that fixes them. No "please," no "sorry," no exclamation marks.</p>
+    </article>
+
+    <!-- Voice rules summary card -->
+    <article class="cd-spec cd-spec--rules">
+      <span class="cd-spec__role">SEVEN RULES</span>
+      <ol class="cd-rule-list">
+        <li>Terse-first sentences. ≤12 words to open.</li>
+        <li>Present tense, active voice. Subject acts.</li>
+        <li>Numerals, IDs, timestamps in mono.</li>
+        <li>File paths never in body prose.</li>
+        <li>Project jargon gets a one-clause unpack on first appearance.</li>
+        <li>Rhythm variance. No two adjacent sections share micro-template.</li>
+        <li>No status-meeting voice. The system narrates state, not its own existence.</li>
+      </ol>
+    </article>
 
   </div>
 </section>
@@ -1615,6 +1747,10 @@ footer.page-foot {
 </main>
 
 <script>
+// Shared: reduced-motion check
+const REDUCED = window.matchMedia &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 // Catalogue: build the 49-cell DotLoader grid + run a frame snake.
 // Frame snap (no CSS transition) — matches the real component.
 (function () {
@@ -1632,16 +1768,13 @@ footer.page-foot {
       order.push(r % 2 === 0 ? r * 7 + c : r * 7 + (6 - c));
     }
   }
-  const reduced = window.matchMedia &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduced) {
+  if (REDUCED) {
     cells.forEach((c) => c.classList.add("active"));
     return;
   }
   let i = 0;
   setInterval(() => {
     cells.forEach((c) => c.classList.remove("active"));
-    // 5-cell trail head — last is brightest, fades back via inline opacity
     for (let k = 0; k < 5; k++) {
       const idx = order[(i - k + order.length) % order.length];
       cells[idx].classList.add("active");
@@ -1651,8 +1784,135 @@ footer.page-foot {
   }, 100);
 })();
 
-// Catalogue: TetrisLoader — build a 6×8 frame, animate piece drops + line
-// clears against the real .ds-tetris-loader visual contract.
+// PulseTrail — head sweeps along a polyline through past-event nodes.
+// Reads the polyline points and interpolates the head position so the
+// line "lights up" exactly where the head currently sits.
+(function () {
+  const canvas = document.getElementById("cat-pt-canvas");
+  const head = document.getElementById("cat-pt-head");
+  if (!canvas || !head) return;
+  const points = [
+    { x: 12, y: 22 }, { x: 26, y: 12 }, { x: 40, y: 24 },
+    { x: 54, y: 10 }, { x: 68, y: 16 }, { x: 90, y: 22 },
+  ];
+  if (REDUCED) {
+    head.style.left = points[points.length - 1].x + "%";
+    head.style.bottom = points[points.length - 1].y + "px";
+    return;
+  }
+  // Walk segment-by-segment. Per segment, tween from one point to the next.
+  const SEG_MS = 4000 / (points.length - 1);
+  let segIdx = 0, segStart = performance.now();
+  function frame(now) {
+    const t = Math.min(1, (now - segStart) / SEG_MS);
+    const a = points[segIdx];
+    const b = points[(segIdx + 1) % points.length];
+    head.style.left = (a.x + (b.x - a.x) * t) + "%";
+    head.style.bottom = (a.y + (b.y - a.y) * t) + "px";
+    if (t >= 1) {
+      segIdx = (segIdx + 1) % points.length;
+      segStart = now;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+// SegmentedBar — click to animate fill 0 → 6 (text-primary) → 12 (accent-success), then reset.
+(function () {
+  const bar = document.getElementById("cat-segbar");
+  const hint = document.getElementById("cat-segbar-hint");
+  if (!bar) return;
+  const segs = bar.querySelectorAll(".cat-segbar__seg");
+  let busy = false;
+  function fill() {
+    if (busy) return;
+    busy = true;
+    if (hint) hint.textContent = "Filling…";
+    let i = 0;
+    // Phase 1: fill to half with text-primary
+    const STEP = 70;
+    function tickPrimary() {
+      if (i >= segs.length / 2) { setTimeout(toSuccess, 220); return; }
+      segs[i].classList.add("is-active");
+      i++;
+      setTimeout(tickPrimary, STEP);
+    }
+    function toSuccess() {
+      // Phase 2: continue filling but switch the rest to success
+      function tickSuccess() {
+        if (i >= segs.length) {
+          // Phase 3: hold full state, then promote all segments to success
+          segs.forEach((s) => { s.classList.remove("is-active"); s.classList.add("is-success"); });
+          if (hint) hint.textContent = "Complete";
+          setTimeout(reset, 1400);
+          return;
+        }
+        segs[i].classList.add("is-active");
+        i++;
+        setTimeout(tickSuccess, STEP);
+      }
+      tickSuccess();
+    }
+    function reset() {
+      segs.forEach((s) => { s.classList.remove("is-active", "is-success"); });
+      if (hint) hint.textContent = "Click to fill";
+      busy = false;
+    }
+    tickPrimary();
+  }
+  bar.addEventListener("click", fill);
+  bar.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fill(); }
+  });
+})();
+
+// SegmentedControl — wire the click to swap [data-selected].
+(function () {
+  const ctrl = document.getElementById("cat-segctrl");
+  if (!ctrl) return;
+  ctrl.querySelectorAll(".cat-segctrl__btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      ctrl.querySelectorAll(".cat-segctrl__btn").forEach((b) => b.removeAttribute("data-selected"));
+      btn.setAttribute("data-selected", "");
+    });
+  });
+})();
+
+// MetricStat — slow tween counter, 0 → 74 over 1.5s, hold, 74 → 0 over 1.5s, hold, repeat.
+// Uses cubic ease-out on the way up (responsive feel) and ease-in-out on
+// the way down (deliberate, settling).
+(function () {
+  const el = document.getElementById("cat-metric-num");
+  if (!el) return;
+  if (REDUCED) { el.textContent = "74"; return; }
+  const TARGET = 74;
+  const UP_MS = 1500;
+  const DOWN_MS = 1500;
+  const HOLD_MS = 800;
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+  function tween(from, to, ms, easer, done) {
+    const start = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - start) / ms);
+      el.textContent = String(Math.round(from + (to - from) * easer(t)));
+      if (t < 1) requestAnimationFrame(frame);
+      else done();
+    }
+    requestAnimationFrame(frame);
+  }
+  function up() { tween(0, TARGET, UP_MS, easeOutCubic, () => setTimeout(down, HOLD_MS)); }
+  function down() { tween(TARGET, 0, DOWN_MS, easeInOutCubic, () => setTimeout(up, HOLD_MS)); }
+  up();
+})();
+
+// TetrisLoader — real top-to-bottom falling pieces with keyboard steering.
+// Layout: 6 cols × 8 rows. Spawns at top, falls one row per tick, locks
+// when it hits the floor or a landed cell. Full rows flash accent-success
+// then collapse. Keyboard: ←→ = move, ↓ = soft drop, Space = hard drop.
 (function () {
   const host = document.getElementById("cat-tetris-frame");
   if (!host) return;
@@ -1669,12 +1929,10 @@ footer.page-foot {
     }
     host.appendChild(row);
   }
-  // Index helper: row r, column c → flat index.
   const at = (r, c) => cells[r * COLS + c];
 
-  // A small palette of tetromino shapes (relative offsets) + tone tier.
-  // Tone tier matches the real component: I/O = primary, T/L/J = secondary,
-  // S/Z = muted.
+  // Tetromino shapes, each as a list of [dr, dc] from the piece anchor (0,0).
+  // Tone tier matches the real component: I/O = primary, T/L/J = secondary, S/Z = muted.
   const PIECES = [
     { name: "I", tone: "primary",   cells: [[0,0],[0,1],[0,2],[0,3]] },
     { name: "O", tone: "primary",   cells: [[0,0],[0,1],[1,0],[1,1]] },
@@ -1685,8 +1943,74 @@ footer.page-foot {
     { name: "Z", tone: "muted",     cells: [[0,0],[0,1],[1,1],[1,2]] },
   ];
 
-  // Logical board: 8 rows × 6 cols of tone strings or null.
+  // Logical board: rows × cols of tone strings or null.
   let board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  // Active falling piece state.
+  let active = null; // { piece, row, col }
+
+  function spawn() {
+    const piece = PIECES[Math.floor(Math.random() * PIECES.length)];
+    const maxC = Math.max(...piece.cells.map(([, c]) => c));
+    const width = maxC + 1;
+    const col = Math.floor((COLS - width) / 2);
+    const row = -Math.max(0, ...piece.cells.map(([r]) => r));
+    active = { piece, row, col };
+    // If spawn collides immediately, the stack is too tall — reset.
+    if (collides(active.row, active.col, active.piece)) {
+      board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+      active.row = row;
+      active.col = col;
+    }
+  }
+
+  function collides(row, col, piece) {
+    return piece.cells.some(([dr, dc]) => {
+      const r = row + dr;
+      const c = col + dc;
+      if (c < 0 || c >= COLS || r >= ROWS) return true;
+      if (r < 0) return false; // above the board is fine while spawning
+      return board[r][c] !== null;
+    });
+  }
+
+  function lock() {
+    if (!active) return;
+    active.piece.cells.forEach(([dr, dc]) => {
+      const r = active.row + dr;
+      const c = active.col + dc;
+      if (r >= 0 && r < ROWS && c >= 0 && c < COLS) board[r][c] = active.piece.tone;
+    });
+    active = null;
+    clearLines();
+  }
+
+  function clearLines() {
+    const full = [];
+    for (let r = 0; r < ROWS; r++) {
+      if (board[r].every((v) => v !== null)) full.push(r);
+    }
+    if (full.length === 0) { spawn(); return; }
+    full.forEach((r) => {
+      for (let c = 0; c < COLS; c++) at(r, c).setAttribute("data-clearing", "");
+    });
+    render(); // show flash on the locked board
+    setTimeout(() => {
+      full.forEach((r) => board.splice(r, 1));
+      while (board.length < ROWS) board.unshift(Array(COLS).fill(null));
+      spawn();
+      render();
+    }, 240);
+  }
+
+  function step() {
+    if (!active) { spawn(); render(); return; }
+    if (collides(active.row + 1, active.col, active.piece)) {
+      lock();
+    } else {
+      active.row += 1;
+    }
+    render();
+  }
 
   function render() {
     for (let r = 0; r < ROWS; r++) {
@@ -1695,82 +2019,53 @@ footer.page-foot {
         const cell = at(r, c);
         if (v) cell.setAttribute("data-filled", v);
         else cell.removeAttribute("data-filled");
+        cell.removeAttribute("data-active");
         cell.removeAttribute("data-clearing");
       }
     }
-  }
-
-  function dropPiece() {
-    const piece = PIECES[Math.floor(Math.random() * PIECES.length)];
-    const minC = Math.min(...piece.cells.map(([, c]) => c));
-    const maxC = Math.max(...piece.cells.map(([, c]) => c));
-    const minR = Math.min(...piece.cells.map(([r]) => r));
-    const maxR = Math.max(...piece.cells.map(([r]) => r));
-    const width = maxC - minC + 1;
-    const startCol = Math.floor(Math.random() * (COLS - width + 1)) - minC;
-    // Find lowest row the piece can sit at without overlapping existing cells.
-    let row = -minR;
-    while (row + maxR < ROWS) {
-      const wouldHit = piece.cells.some(([dr, dc]) => {
-        const r = row + dr + 1;
-        const c = startCol + dc;
-        if (r >= ROWS) return true;
-        return board[r][c] !== null;
+    if (active) {
+      active.piece.cells.forEach(([dr, dc]) => {
+        const r = active.row + dr;
+        const c = active.col + dc;
+        if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
+          at(r, c).setAttribute("data-filled", active.piece.tone);
+          at(r, c).setAttribute("data-active", "");
+        }
       });
-      if (wouldHit) break;
-      row++;
     }
-    // Place
-    piece.cells.forEach(([dr, dc]) => {
-      const r = row + dr;
-      const c = startCol + dc;
-      if (r >= 0 && r < ROWS && c >= 0 && c < COLS) board[r][c] = piece.tone;
-    });
   }
 
-  function clearLines() {
-    const fullRows = [];
-    for (let r = 0; r < ROWS; r++) {
-      if (board[r].every((v) => v !== null)) fullRows.push(r);
-    }
-    if (fullRows.length === 0) return false;
-    // Flash, then drop above rows down.
-    fullRows.forEach((r) => {
-      for (let c = 0; c < COLS; c++) {
-        at(r, c).setAttribute("data-clearing", "");
-      }
-    });
-    setTimeout(() => {
-      fullRows.forEach((r) => board.splice(r, 1));
-      while (board.length < ROWS) board.unshift(Array(COLS).fill(null));
+  // Keyboard: ←→ move, ↓ soft drop, Space hard drop.
+  host.addEventListener("keydown", (e) => {
+    if (!active) return;
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      if (!collides(active.row, active.col - 1, active.piece)) { active.col -= 1; render(); }
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      if (!collides(active.row, active.col + 1, active.piece)) { active.col += 1; render(); }
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      step();
+    } else if (e.key === " ") {
+      e.preventDefault();
+      while (!collides(active.row + 1, active.col, active.piece)) active.row += 1;
+      lock();
       render();
-    }, 220);
-    return true;
+    }
+  });
+
+  // Pre-seed an interesting bottom stack so the tile is never empty.
+  for (let i = 0; i < 3; i++) {
+    spawn();
+    while (active && !collides(active.row + 1, active.col, active.piece)) active.row += 1;
+    lock();
   }
-
-  const reduced = window.matchMedia &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // Pre-fill an interesting initial state so the tile shows real content
-  // even before the first drop.
-  for (let i = 0; i < 4; i++) dropPiece();
+  spawn();
   render();
 
-  if (reduced) return;
-
-  setInterval(() => {
-    // If stack got too tall, clear half the board to reset.
-    const topFilled = board[1].some((v) => v !== null);
-    if (topFilled) {
-      board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
-      for (let i = 0; i < 3; i++) dropPiece();
-      render();
-      return;
-    }
-    dropPiece();
-    render();
-    clearLines();
-  }, 700);
+  if (REDUCED) return;
+  setInterval(step, 600);
 })();
 
 // Catalogue: mini AgentStream (separate instance from the big demo).
