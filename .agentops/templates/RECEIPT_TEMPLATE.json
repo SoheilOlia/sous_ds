@@ -1,0 +1,19 @@
+{
+  "receipt_id": "RCT-0000",
+  "task_id": "TASK-0000",
+  "owner_agent": "codex",
+  "status": "completed",
+  "repo_root": "",
+  "worktree_path": "",
+  "branch": "",
+  "base_branch": "main",
+  "base_sha": "",
+  "timestamp": "",
+  "summary": "",
+  "files_changed": [],
+  "commands_run": [],
+  "acceptance_evidence": [],
+  "risks": [],
+  "handoff_to": "goose",
+  "next_task": ""
+}

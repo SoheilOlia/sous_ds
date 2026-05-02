@@ -1,0 +1,5 @@
+{"ts": "2026-04-25T01:48:30Z", "event": "bootstrap_completed", "repo_root": "/Users/soheil/Sous_DS", "by": "cli"}
+{"ts": "2026-04-25T01:48:42Z", "event": "room_reset", "repo_root": "/Users/soheil/Sous_DS", "by": "cli"}
+{"ts": "2026-04-25T06:57:29Z", "event": "bootstrap_completed", "repo_root": "/Users/soheil/Sous_DS", "by": "cli"}
+{"ts": "2026-04-25T06:57:29Z", "event": "room_reset", "repo_root": "/Users/soheil/Sous_DS", "by": "cli"}
+{"ts": "2026-04-25T06:58:29Z", "event": "room_reset", "repo_root": "/Users/soheil/Sous_DS", "by": "cli"}

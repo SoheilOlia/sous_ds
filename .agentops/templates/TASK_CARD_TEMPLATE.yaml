@@ -1,0 +1,60 @@
+task_id: TASK-0000
+title: ""
+status: draft
+priority: P1
+owner_agent: codex
+review_agent: cursor
+created_by: goose
+created_at: ""
+
+repo_root: ""
+worktree_path: ""
+branch: ""
+base_branch: "main"
+base_sha: ""
+
+verify_commands:
+  - "git rev-parse --show-toplevel"
+  - "git rev-parse --abbrev-ref HEAD"
+  - "git rev-parse main"
+  - "git status --porcelain"
+
+goal: |
+  
+
+scope:
+  include_paths: []
+  exclude_paths: []
+
+inputs:
+  required_reads:
+    - AGENTS.md
+    - __LESSONS_FILE__
+    - .agentops/context/PROJECT_CONTEXT.md
+    - .agentops/context/REPO_MAP.md
+    - .agentops/context/STATUS.md
+  related_tasks: []
+
+deliverables: []
+artifacts_expected: []
+
+acceptance_criteria: []
+
+commands:
+  setup: []
+  verify: []
+
+risk_level: medium
+approval_gate:
+  required: false
+  reason: ""
+
+rollback_plan: |
+  
+
+handoff:
+  next_agent: goose
+  next_task: ""
+
+notes: |
+  
