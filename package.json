@@ -65,6 +65,7 @@
     "components/",
     "scripts/",
     "examples/",
+    "docs/specs/",
     "preview.html"
   ],
   "scripts": {

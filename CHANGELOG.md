@@ -4,6 +4,21 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- `npx sous-ds install-global` / `npx sous-ds global` to install the SOUS-DS skill and `/sous-ds` command shims into Claude, Codex, Goose, and Cursor user-level locations.
+- `docs/specs/sous-ds-reference-learning.md`, the source-truth protocol for "Learn from this project" requests.
+- Global skill language that teaches agents how to promote finished project lessons into SOUS-DS without importing project-specific content or foreign aesthetics wholesale.
+
+### Changed
+
+- `SKILL.md`, `README.md`, and `INSTALL.md` now document "Learn from this project" as a first-class workflow.
+- `bin/init.test.mjs` covers the global installer path through `SOUS_DS_HOME` so user-level writes stay testable without touching the real home directory.
+
+---
+
 ## [0.7.1] — 2026-05-01
 
 **Composition contract — components, lint enforcement, verification artifact.** The implementation half of v0.7.0. v0.7.0 landed the docs-only spec for the 2.0 composition contract; this release lands the code that backs it.

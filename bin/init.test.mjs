@@ -18,7 +18,7 @@ import { mkdtempSync, mkdirSync, rmSync, symlinkSync, readFileSync, writeFileSyn
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { applyManagedBlock, planLine, buildTargets } from "./init.mjs";
+import { applyManagedBlock, planLine, buildTargets, buildGlobalTargets } from "./init.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ENTRYPOINT = resolve(__dirname, "sous-ds.mjs");
@@ -122,6 +122,21 @@ test("buildTargets: returns the four expected paths in order", () => {
   assert.equal(targets[3].mode, "owned-file");
 });
 
+test("buildGlobalTargets: returns global skill and command paths", () => {
+  const targets = buildGlobalTargets("/tmp/sous-ds-fake");
+  const paths = targets.map((t) => t.path);
+  assert.deepEqual(paths, [
+    ".agents/skills/sous-ds/SKILL.md",
+    ".codex/skills/sous-ds/SKILL.md",
+    ".claude/skills/sous-ds/SKILL.md",
+    ".config/goose/skills/sous-ds/SKILL.md",
+    ".cursor/commands/sous-ds.md",
+    ".claude/commands/sous-ds.md",
+  ]);
+  assert.ok(targets.every((t) => t.mode === "owned-file"));
+  assert.match(targets[0].body, /Learn from this project/);
+});
+
 // ─── Subprocess + symlink regression tests ────────────────────────────
 //
 // The bug fixed in v0.6.1 was: bin/init.mjs's `isDirect` check
@@ -210,6 +225,24 @@ test("CLI: real run writes the four files in an empty cwd", () => {
     assert.equal(existsSync(join(cwd, "CLAUDE.md")), true);
     assert.equal(existsSync(join(cwd, ".cursor/rules/sous-ds.mdc")), true);
     assert.equal(existsSync(join(cwd, ".claude/skills/sous-ds/SKILL.md")), true);
+  });
+});
+
+test("CLI: install-global writes global skill and command shims under SOUS_DS_HOME", () => {
+  withTmpDir((cwd) => {
+    const result = spawnSync(process.execPath, [ENTRYPOINT, "install-global"], {
+      cwd,
+      encoding: "utf8",
+      env: { ...process.env, SOUS_DS_HOME: cwd },
+    });
+    assert.equal(result.status, 0, `stderr=${result.stderr}`);
+    assert.match(result.stdout, /install-global/);
+    assert.equal(existsSync(join(cwd, ".agents/skills/sous-ds/SKILL.md")), true);
+    assert.equal(existsSync(join(cwd, ".codex/skills/sous-ds/SKILL.md")), true);
+    assert.equal(existsSync(join(cwd, ".claude/skills/sous-ds/SKILL.md")), true);
+    assert.equal(existsSync(join(cwd, ".config/goose/skills/sous-ds/SKILL.md")), true);
+    assert.equal(existsSync(join(cwd, ".cursor/commands/sous-ds.md")), true);
+    assert.equal(existsSync(join(cwd, ".claude/commands/sous-ds.md")), true);
   });
 });
 
