@@ -25,7 +25,7 @@ jobs:
 
       - name: Lint DESIGN.md against Google Labs alpha spec
         continue-on-error: true
-        run: npx --yes @google/design.md lint DESIGN.md
+        run: timeout 60s npx --yes @google/design.md lint DESIGN.md
 
       - name: Check for regressions against main with Google Labs alpha diff
         if: github.event_name == 'pull_request'
@@ -33,7 +33,7 @@ jobs:
         run: |
           git fetch origin main
           git show origin/main:DESIGN.md > DESIGN.main.md
-          npx --yes @google/design.md diff DESIGN.main.md DESIGN.md
+          timeout 60s npx --yes @google/design.md diff DESIGN.main.md DESIGN.md
 
   implementation-lint:
     name: Implementation (components, preview)
