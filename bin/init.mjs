@@ -31,15 +31,18 @@
  *   .claude/skills/sous-ds/SKILL.md
  *
  * Usage:
- *   npx sous-ds init                  Apply the bootstrap
- *   npx sous-ds init --dry-run        Print the plan, write nothing
- *   npx sous-ds init --force          Overwrite owned files
+ *   npx sous-ds init                  Apply the project bootstrap
+ *   npx sous-ds install-global        Apply the global skill bootstrap
+ *   npx sous-ds init --dry-run        Print the project plan, write nothing
+ *   npx sous-ds install-global -n     Print the global plan, write nothing
+ *   npx sous-ds init --force          Overwrite owned project files
  *   npx sous-ds --version             Print package version
  *   npx sous-ds --help                Print usage
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 
 // ─── Constants ────────────────────────────────────────────────────────
@@ -188,6 +191,83 @@ import { Button, Card, LiveDot } from "sous-ds";
 For Tailwind users: \`presets: [require("sous-ds/tailwind")]\`.
 `;
 
+function globalSkillBody(packageRoot) {
+  return `---
+name: sous-ds
+description: Use when building, styling, auditing, refining, or learning from UI work with the SOUS-DS design system. Triggers on /sous-ds, /learn-from-this-project, "Learn from this project", "make this match SOUS-DS", "SOOS-DS", dark-first data-dense UI, citation chips, agent/chat interfaces, dot/dash data motif, design-system drift, or any request to update the system from a finished project.
+---
+
+# sous-ds global skill
+
+SOUS-DS is the active design system. Use it before creating, reviewing, or changing UI.
+
+This global skill was installed from:
+
+\`\`\`
+${packageRoot}
+\`\`\`
+
+Read, in order, when the files exist:
+
+1. \`${packageRoot}/SKILL.md\`
+2. \`${packageRoot}/DESIGN.md\`
+3. \`${packageRoot}/AGENTS.md\`
+4. \`${packageRoot}/ANIMATION_RULES.md\`
+5. \`${packageRoot}/TASTE_LOG.md\`
+6. \`${packageRoot}/refusals.json\`
+7. \`${packageRoot}/components/\`
+8. \`${packageRoot}/docs/specs/\`
+
+If that package root is missing, locate the nearest installed source in this order:
+
+1. \`node_modules/sous-ds\` in the current project
+2. \`/Users/soheil/Sous_DS\`
+3. \`/Users/soheil/Development/Sous_DS\`
+4. \`https://github.com/SoheilOlia/sous_ds\`
+
+## Apply SOUS-DS
+
+- Use tokens only: \`var(--ds-*)\` for color, spacing, radius, duration, and easing.
+- Use existing components before inventing local CSS.
+- Use \`Geist Mono\` for data, labels, IDs, timestamps, and numerals.
+- Keep motion under 300ms, enumerate transition properties, and respect reduced motion.
+- Keep accent colors semantic: live/attention and success/completion only.
+- Refuse gradients, glass morphism, heavy shadows, \`transition: all\`, and primary Inter/system-ui.
+
+## Learn from this project
+
+When the user says "Learn from this project" or asks to update SOUS-DS from a finished surface:
+
+1. Capture the source: repo path, URL, PR, screenshot, current branch, and exact files.
+2. Separate system learning from project-specific content.
+3. Classify each finding as one of: token, component, composition recipe, refusal, motion rule, voice rule, installer/tooling, or taste-log entry.
+4. Compare against SOUS-DS before writing. If the system already covers it, cite the existing rule instead of duplicating it.
+5. Promote only durable patterns. Do not import a foreign aesthetic wholesale.
+6. Update source truth first: \`DESIGN.md\`, \`SKILL.md\`, \`AGENTS.md\`, \`refusals.json\`, \`components/\`, \`docs/specs/\`, \`TASTE_LOG.md\`, or the installer.
+7. Verify with the narrowest real commands available. If npm is unavailable, say that and run node-level tests that do not require npm.
+8. Record a receipt: source, extracted lesson, files changed, commands run, what was rejected, and remaining risks.
+
+## Reference lessons already ingested
+
+- \`Donsoleil/ui-ux-pro-max-skill\`: keep design intelligence searchable and domain-aware, but avoid importing broad style taxonomies into SOUS-DS. SOUS-DS stays one system with dials, recipes, refusals, and checklists.
+- \`Donsoleil/cult-ui\`: prefer copy-owned source components and registry-style recipes over black-box UI dependencies. When a pattern repeats, promote it into SOUS-DS source so agents stop patching it locally.
+`;
+}
+
+const GLOBAL_COMMAND_BODY = `# sous-ds
+
+Use the global SOUS-DS skill.
+
+Read:
+
+\`\`\`
+~/.agents/skills/sous-ds/SKILL.md
+\`\`\`
+
+If the request says "Learn from this project", run the learning protocol from that skill and return the source-truth updates needed for SOUS-DS.
+Otherwise, apply or audit the current UI against SOUS-DS.
+`;
+
 /**
  * Build the targets list. Each target describes a file we may write,
  * which mode we use (managed-block append vs full overwrite), and the
@@ -220,6 +300,48 @@ export function buildTargets(packageRoot) {
       // Copy the package's SKILL.md verbatim — it's the canonical
       // agent entrypoint and Claude Code reads SKILL.md at this path.
       body: () => readFileSync(join(packageRoot, "SKILL.md"), "utf8"),
+    },
+  ];
+}
+
+export function buildGlobalTargets(packageRoot) {
+  const skillBody = globalSkillBody(packageRoot);
+  return [
+    {
+      label: "Agent skill",
+      path: ".agents/skills/sous-ds/SKILL.md",
+      mode: "owned-file",
+      body: skillBody,
+    },
+    {
+      label: "Codex skill",
+      path: ".codex/skills/sous-ds/SKILL.md",
+      mode: "owned-file",
+      body: skillBody,
+    },
+    {
+      label: "Claude skill",
+      path: ".claude/skills/sous-ds/SKILL.md",
+      mode: "owned-file",
+      body: skillBody,
+    },
+    {
+      label: "Goose skill",
+      path: ".config/goose/skills/sous-ds/SKILL.md",
+      mode: "owned-file",
+      body: skillBody,
+    },
+    {
+      label: "Cursor command",
+      path: ".cursor/commands/sous-ds.md",
+      mode: "owned-file",
+      body: GLOBAL_COMMAND_BODY,
+    },
+    {
+      label: "Claude command",
+      path: ".claude/commands/sous-ds.md",
+      mode: "owned-file",
+      body: GLOBAL_COMMAND_BODY,
     },
   ];
 }
@@ -291,6 +413,9 @@ any agent that reads AGENTS.md).
 
 Commands:
   init             Apply the bootstrap (default; runs when no command given)
+  install-global   Install/update the global sous-ds skill and slash command
+                   shims for Claude, Codex, Goose, and Cursor
+  global           Alias for install-global
 
 Options:
   -n, --dry-run    Print the plan; write nothing
@@ -302,6 +427,40 @@ Idempotent: safe to re-run after upgrading sous-ds. Existing
 AGENTS.md / CLAUDE.md content above and below the managed-block
 markers is preserved.`;
 
+function targetRootForGlobalInstall() {
+  return process.env.SOUS_DS_HOME || process.env.HOME || homedir();
+}
+
+function writePlans(label, root, plans, opts) {
+  console.log(label);
+  console.log("");
+  let wrote = 0;
+  let skipped = 0;
+  for (const p of plans) {
+    if (p.action === "skip") {
+      const note = p.reason ? ` (${p.reason})` : "";
+      console.log(planLine("skip", p.target.path) + note);
+      skipped++;
+      continue;
+    }
+    console.log(planLine(p.action, p.target.path));
+    if (!opts.dryRun) {
+      const fullPath = join(root, p.target.path);
+      ensureDir(fullPath);
+      writeFileSync(fullPath, p.next);
+      wrote++;
+    }
+  }
+
+  console.log("");
+  if (opts.dryRun) {
+    console.log(`Plan only. Re-run without --dry-run to apply.`);
+  } else {
+    console.log(`Wrote ${wrote} file${wrote === 1 ? "" : "s"}, skipped ${skipped}.`);
+    console.log(`Verify with: npx sous-lint`);
+  }
+}
+
 /**
  * Run the init bootstrap. Exits the process on terminal errors
  * (sanity-check failure, write errors). Returns 0 on success.
@@ -310,6 +469,7 @@ markers is preserved.`;
  * both invoke it directly without re-implementing arg parsing.
  */
 export function main(argv = []) {
+  const command = argv.find((arg) => !arg.startsWith("-")) || "init";
   const opts = {
     dryRun: argv.includes("--dry-run") || argv.includes("-n"),
     force: argv.includes("--force") || argv.includes("-f"),
@@ -327,6 +487,12 @@ export function main(argv = []) {
     return 0;
   }
 
+  if (!["init", "install-global", "global"].includes(command)) {
+    console.error(`sous-ds: unknown command '${command}'.`);
+    console.error("Run: npx sous-ds --help");
+    return 1;
+  }
+
   // Sanity check that PKG_ROOT looks like the installed sous-ds package.
   // Without SKILL.md, the .claude/skills/ target can't be populated and
   // the bootstrap content references files that won't exist — fail loud.
@@ -337,37 +503,19 @@ export function main(argv = []) {
     return 1;
   }
 
-  const cwd = process.cwd();
   const version = readPackageVersion();
+
+  if (command === "install-global" || command === "global") {
+    const root = targetRootForGlobalInstall();
+    const targets = buildGlobalTargets(PKG_ROOT);
+    const plans = targets.map((t) => ({ target: t, ...planTarget(t, root, opts) }));
+    writePlans(`sous-ds@${version} install-global · ${root}`, root, plans, opts);
+    return 0;
+  }
+
+  const cwd = process.cwd();
   const targets = buildTargets(PKG_ROOT);
   const plans = targets.map((t) => ({ target: t, ...planTarget(t, cwd, opts) }));
-
-  console.log(`sous-ds@${version} init · ${cwd}`);
-  console.log("");
-  let wrote = 0;
-  let skipped = 0;
-  for (const p of plans) {
-    if (p.action === "skip") {
-      const note = p.reason ? ` (${p.reason})` : "";
-      console.log(planLine("skip", p.target.path) + note);
-      skipped++;
-      continue;
-    }
-    console.log(planLine(p.action, p.target.path));
-    if (!opts.dryRun) {
-      const fullPath = join(cwd, p.target.path);
-      ensureDir(fullPath);
-      writeFileSync(fullPath, p.next);
-      wrote++;
-    }
-  }
-
-  console.log("");
-  if (opts.dryRun) {
-    console.log(`Plan only. Re-run without --dry-run to apply.`);
-  } else {
-    console.log(`Wrote ${wrote} file${wrote === 1 ? "" : "s"}, skipped ${skipped}.`);
-    console.log(`Verify with: npx sous-lint`);
-  }
+  writePlans(`sous-ds@${version} init · ${cwd}`, cwd, plans, opts);
   return 0;
 }

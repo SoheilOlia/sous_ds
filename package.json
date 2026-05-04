@@ -65,16 +65,19 @@
     "components/",
     "scripts/",
     "examples/",
+    "docs/specs/",
     "preview.html"
   ],
   "scripts": {
     "build:js": "tsup",
     "build:css": "node scripts/build-styles.mjs",
     "build": "npm run build:js && npm run build:css",
-    "lint:contract": "npx --yes @google/design.md lint DESIGN.md",
+    "lint:contract": "node scripts/check-design-contract.mjs",
+    "lint:contract:google": "npx --yes @google/design.md lint DESIGN.md",
+    "lint:tokens": "node scripts/check-token-parity.mjs",
     "lint:ui": "node scripts/lint.mjs components/ preview.html",
     "pack:check": "node scripts/check-package.mjs",
-    "lint": "npm run lint:contract && npm run lint:ui",
+    "lint": "npm run lint:contract && npm run lint:tokens && npm run lint:ui",
     "test": "node --test bin/*.test.mjs",
     "verify": "npm run lint && npm run test && npm run pack:check",
     "prepublishOnly": "npm run build"

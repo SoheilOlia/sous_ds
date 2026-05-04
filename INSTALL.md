@@ -70,6 +70,7 @@ React 18 or 19. `npm` will warn if missing; your app almost certainly already ha
 | Command | Purpose |
 |---|---|
 | `npx sous-ds init` | Wire the contract into Cursor / Claude Code / Codex / Goose for the current project. Idempotent. |
+| `npx sous-ds install-global` | Wire the global SOUS-DS skill and `/sous-ds` command shims into Claude, Codex, Goose, and Cursor user-level locations. |
 | `npx sous-lint` | Run the implementation linter against the current project's components/CSS |
 
 ---
@@ -143,6 +144,25 @@ git clone https://github.com/SoheilOlia/sous_ds.git
 ```
 
 Then point your agent's skill loader at the clone.
+
+### Option D: Global skill and command shims
+
+Use this when the design system should be available before any single project has installed the package:
+
+```bash
+npx sous-ds install-global
+```
+
+It writes owned files at user-level skill and command locations:
+
+- `~/.agents/skills/sous-ds/SKILL.md`
+- `~/.codex/skills/sous-ds/SKILL.md`
+- `~/.claude/skills/sous-ds/SKILL.md`
+- `~/.config/goose/skills/sous-ds/SKILL.md`
+- `~/.cursor/commands/sous-ds.md`
+- `~/.claude/commands/sous-ds.md`
+
+The global skill includes the "Learn from this project" protocol. Use that phrase when a finished project should be mined for durable SOUS-DS updates.
 
 ---
 

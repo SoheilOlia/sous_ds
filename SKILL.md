@@ -1,6 +1,6 @@
 ---
 name: sous-ds
-description: Use when building, styling, auditing, or refining UI in any project using the sous-ds design system. Triggers on any UI task mentioning components, pages, dashboards, data displays, agent or chat interfaces, streaming responses, tool-call rows, citation chips, or the dot/dash data motif. Also triggers on dark mode, restrained aesthetic, monospace-for-data, sub-300ms motion, WCAG AA review, the `--ds-accent-live` or `--ds-accent-success` semantics, and any task referencing DESIGN.md, AGENTS.md, tokens.css, or components/. Use to review or reject UI that uses gradients, shadow blur ≥ 25px, `transition: all`, scale(0) entries, Inter/system-ui as primary face, accent on CTAs, glass morphism, card-grid layouts for sequenced content, pill walls, or status-meeting voice.
+description: Use when building, styling, auditing, refining, or learning from UI in any project using the sous-ds design system. Triggers on /sous-ds, /learn-from-this-project, "Learn from this project", "make this match SOUS-DS", "SOOS-DS", any UI task mentioning components, pages, dashboards, data displays, agent or chat interfaces, streaming responses, tool-call rows, citation chips, or the dot/dash data motif. Also triggers on dark mode, restrained aesthetic, monospace-for-data, sub-300ms motion, WCAG AA review, the `--ds-accent-live` or `--ds-accent-success` semantics, and any task referencing DESIGN.md, AGENTS.md, tokens.css, or components/. Use to review or reject UI that uses gradients, shadow blur ≥ 25px, `transition: all`, scale(0) entries, Inter/system-ui as primary face, accent on CTAs, glass morphism, card-grid layouts for sequenced content, pill walls, or status-meeting voice.
 ---
 
 # sous-ds
@@ -19,6 +19,8 @@ Signal phrases that should trigger this skill:
 - "why does this look AI-slop"
 - "make this match our system"
 - "streaming response / tool call / citation chip"
+- "Learn from this project"
+- "/learn-from-this-project"
 
 ## Read in this order
 
@@ -32,6 +34,17 @@ Signal phrases that should trigger this skill:
 8. `docs/specs/sous-ds-v2.md` — composition contract. Read this before composing any page.
 9. `docs/specs/sous-ds-v2-composition-recipes.md` — named page archetypes.
 10. `docs/specs/sous-ds-v2-voice.md` — copy contract.
+11. `docs/specs/sous-ds-reference-learning.md` — learning protocol for promoting finished project patterns into SOUS-DS.
+
+## Learning from a project
+
+When the user says "Learn from this project", treat the finished surface as evidence, not authority. Search the source files, screenshots, PRs, and local CSS first; then classify each lesson as a token, component, composition recipe, refusal, motion rule, voice rule, installer/tooling change, or taste-log entry.
+
+Promote only reusable structure into SOUS-DS. Do not import project-specific copy, brand styling, PR IDs, one-off measurements, or a foreign aesthetic. If SOUS-DS already has the rule, cite the existing source instead of duplicating it. If the lesson is real, update source truth first (`DESIGN.md`, `SKILL.md`, `AGENTS.md`, `refusals.json`, `components/`, `docs/specs/`, `TASTE_LOG.md`, installer) and verify before claiming it is learned.
+
+Reference posture:
+- `Donsoleil/ui-ux-pro-max-skill` teaches searchable design intelligence, stack/domain checklists, and multi-agent packaging. SOUS-DS adopts the operating model, not the broad style taxonomy.
+- `Donsoleil/cult-ui` teaches source-owned registry components and inspectable recipes. SOUS-DS adopts copy-owned component promotion, not black-box dependency or decorative component imports.
 
 ## Non-negotiables
 
