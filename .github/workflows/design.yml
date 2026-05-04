@@ -15,7 +15,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Lint DESIGN.md against Google Labs spec
         run: npx --yes @google/design.md lint DESIGN.md
@@ -35,56 +35,23 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Quality Evaluator
         run: node scripts/lint.mjs --format text components/ preview.html
 
   token-parity:
-    name: Token parity (JSON ↔ CSS)
+    name: Token parity (JSON <-> CSS)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
-      # Every token in design-tokens.json must have a matching --ds-* variable
-      # in tokens.css. This guards against silent drift.
-      - name: Verify every token is exported to CSS
-        run: |
-          node -e "
-            const fs = require('fs');
-            const tokens = JSON.parse(fs.readFileSync('design-tokens.json','utf8'));
-            const css = fs.readFileSync('tokens.css','utf8');
-            const missing = [];
-            function walk(obj, path=[]) {
-              for (const k of Object.keys(obj)) {
-                if (k.startsWith('\$')) continue;
-                const v = obj[k];
-                if (v && typeof v === 'object' && '\$value' in v) {
-                  const name = '--ds-' + [...path, k].join('-').toLowerCase();
-                  if (!css.includes(name) && !css.includes(name.replace(/-default\$/, ''))) {
-                    missing.push(name);
-                  }
-                } else if (v && typeof v === 'object') {
-                  walk(v, [...path, k]);
-                }
-              }
-            }
-            // skip the top-level \$schema / \$name / \$version keys
-            for (const k of Object.keys(tokens)) {
-              if (k.startsWith('\$')) continue;
-              walk(tokens[k], [k]);
-            }
-            if (missing.length) {
-              console.error('Tokens missing from tokens.css:');
-              missing.forEach(m => console.error('  ' + m));
-              process.exit(1);
-            }
-            console.log('Token parity: OK');
-          "
+      - name: Verify runtime CSS exports are backed by design tokens
+        run: node scripts/check-token-parity.mjs
 
   package-integrity:
     name: Package integrity
@@ -94,7 +61,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build release artifacts
+        run: npm run build
 
       - name: Verify release tarball contents
         run: npm run pack:check
