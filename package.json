@@ -1,6 +1,6 @@
 {
   "name": "sous-ds",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Dark-first, data-dense, restraint-led design system for AI-native interfaces. Light mode is a first-class peer; prezzo mode collapses typography to Cash Sans Regular for slides. Monospace carries data, 1px borders over shadows, semantic accents for live and success only, motion under 300ms. Distributes as a global Claude/Codex/Goose/Nexus/Cursor skill plus installable React components.",
   "license": "Apache-2.0",
   "author": "SoheilOlia",
@@ -78,6 +78,7 @@
     "lint": "npm run lint:contract && npm run lint:ui",
     "test": "node --test bin/*.test.mjs",
     "verify": "npm run lint && npm run test && npm run pack:check",
+    "dev": "vite --config examples/vite.config.ts",
     "prepublishOnly": "npm run build"
   },
   "publishConfig": {
@@ -112,10 +113,16 @@
     "node": ">=18"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.27.0",
     "@types/node": "25.6.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "^4.3.0",
+    "ajv": "^8.17.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
     "tsup": "8.5.1",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vite": "^5.4.0"
   }
 }

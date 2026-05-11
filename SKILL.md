@@ -187,6 +187,17 @@ Full specs (JSX skeletons, microcopy templates, density quotas, forbidden substi
 - Two MetricWalls (only one anchor per page)
 - AgentLog + ReceiptStack of the same source (live + historical of the same stream — distinguish or pick one)
 
+### Runtime generative UI (v0.10.0)
+
+For agents that need to compose a sous-ds page at runtime from a natural-language intent, the system ships a planner-and-renderer contract:
+
+- **Schema:** [`docs/specs/generative-ui-schema.json`](./docs/specs/generative-ui-schema.json) — wire format the planner emits.
+- **Planner system prompt:** [`docs/specs/generative-ui-planner.md`](./docs/specs/generative-ui-planner.md) — self-contained, copy-paste into any Anthropic API call's `system` field.
+- **Renderer:** `<GenerativeRenderer composition={…} />` from `sous-ds` — typed React component, no LLM at render time, deterministic switch over the six recipes above.
+- **Playground:** `examples/generative-ui-playground.tsx` (Vite). Run `bun run dev` after `bun install` and setting `VITE_ANTHROPIC_API_KEY` in `examples/.env.local`.
+
+The state vocabulary is **`done | live | queued`** (matches `DotTimeline.BucketState`). All accents ride sanctioned carriers (`<LiveDot>`, `<PulseTrail>`, `<Pill live>`, `<InlineStatus tone="live">`, `<SegmentedBar completeTone="success">`). The renderer paints no accent directly — CL07 stays green without adding `GenerativeRenderer.css` to the allow list.
+
 ## Intent → component decision tree (2.0)
 
 The single largest 1.0 failure was **component starvation** — using 4 of 18 components because the contract listed components without naming when each is the right primitive. The decision tree is a forcing function.

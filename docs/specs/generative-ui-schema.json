@@ -1,0 +1,220 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sous-ds.dev/schema/generative-ui.v1.json",
+  "title": "sous-ds generative-UI composition",
+  "description": "Wire contract between an LLM planner and the GenerativeRenderer. The planner outputs JSON validating against this schema; the renderer turns it into a live sous-ds page. State vocabulary matches DotTimeline (`done | live | queued`). Voice and accent rules from sous-ds v2 are encoded as pattern and maxLength constraints where machine-checkable.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pageTitle", "sections"],
+  "properties": {
+    "pageTitle": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60,
+      "description": "Page title rendered in display type. Verb-led, present tense, period at end of declarative titles."
+    },
+    "dials": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Design dials. Default {density:6, rhythm:6, voice:4} per sous-ds v2.",
+      "properties": {
+        "density": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "rhythm":  { "type": "integer", "minimum": 1, "maximum": 10 },
+        "voice":   { "type": "integer", "minimum": 1, "maximum": 10 }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "description": "Page sections in render order. RHYTHM >= 4 should use >= 3 distinct recipes (R-COMPOSE-004); the planner enforces this, not the schema.",
+      "items": { "$ref": "#/definitions/Section" }
+    },
+    "_reasoning": {
+      "type": "string",
+      "maxLength": 600,
+      "description": "Planner notes. Stripped before render. Use to record silent-correction decisions (e.g., user asked for purple; correcting to neutral)."
+    }
+  },
+  "definitions": {
+    "Eyebrow": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 30,
+      "not": { "pattern": "[.!?]" },
+      "description": "Section eyebrow — a short label, not a sentence. Card CSS uppercases the display; source may include identifiers like `origin/main` or `case 4F2A`."
+    },
+    "Title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60,
+      "description": "Section title. Verb-led, present tense, period at end of declarative h2."
+    },
+    "Body": {
+      "type": "string",
+      "maxLength": 120,
+      "not": {
+        "pattern": "(?:[A-Za-z0-9_-]+/){2,}[A-Za-z0-9._-]+\\.(?:md|json|js|ts|tsx|jsx|css|html|yml|yaml|py|sh|mjs|cjs)"
+      },
+      "description": "Body sentence. No file paths inline (R-VOICE-001)."
+    },
+    "StageState": {
+      "type": "string",
+      "enum": ["done", "live", "queued"],
+      "description": "Canonical state vocabulary. Matches DotTimeline.BucketState."
+    },
+    "Section": {
+      "oneOf": [
+        { "$ref": "#/definitions/MetricWallSection" },
+        { "$ref": "#/definitions/RAGStatusSection" },
+        { "$ref": "#/definitions/PipelineMapSection" },
+        { "$ref": "#/definitions/MilestoneStripSection" },
+        { "$ref": "#/definitions/AgentLogSection" },
+        { "$ref": "#/definitions/ReceiptStackSection" }
+      ]
+    },
+    "MetricWallSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recipe", "eyebrow", "metrics"],
+      "properties": {
+        "recipe": { "const": "MetricWall" },
+        "eyebrow": { "$ref": "#/definitions/Eyebrow" },
+        "title": { "$ref": "#/definitions/Title" },
+        "metrics": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "value"],
+            "properties": {
+              "label": { "type": "string", "minLength": 1, "maxLength": 24 },
+              "value": { "type": "string", "minLength": 1, "maxLength": 12, "description": "String form so dashes, ranges, and units render uniformly in mono." },
+              "unit":  { "type": "string", "maxLength": 8 },
+              "delta": { "type": "string", "maxLength": 16 }
+            }
+          }
+        }
+      }
+    },
+    "RAGStatusSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recipe", "eyebrow", "status", "body"],
+      "properties": {
+        "recipe": { "const": "RAGStatus" },
+        "eyebrow": { "$ref": "#/definitions/Eyebrow" },
+        "title": { "$ref": "#/definitions/Title" },
+        "status": { "type": "string", "enum": ["RED", "AMBER", "GREEN"] },
+        "body": { "$ref": "#/definitions/Body" }
+      }
+    },
+    "PipelineMapSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recipe", "eyebrow", "title", "stages"],
+      "properties": {
+        "recipe": { "const": "PipelineMap" },
+        "eyebrow": { "$ref": "#/definitions/Eyebrow" },
+        "title": { "$ref": "#/definitions/Title" },
+        "stages": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 7,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "state"],
+            "properties": {
+              "label": { "type": "string", "minLength": 1, "maxLength": 24 },
+              "state": { "$ref": "#/definitions/StageState" }
+            }
+          }
+        }
+      }
+    },
+    "MilestoneStripSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recipe", "eyebrow", "title", "phases"],
+      "properties": {
+        "recipe": { "const": "MilestoneStrip" },
+        "eyebrow": { "$ref": "#/definitions/Eyebrow" },
+        "title": { "$ref": "#/definitions/Title" },
+        "phases": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "progress", "state"],
+            "properties": {
+              "label": { "type": "string", "minLength": 1, "maxLength": 8, "description": "Short phase code like M1, M2." },
+              "title": { "type": "string", "maxLength": 24 },
+              "date":  { "type": "string", "maxLength": 16 },
+              "progress": { "type": "integer", "minimum": 0, "maximum": 100 },
+              "state": { "$ref": "#/definitions/StageState" }
+            }
+          }
+        }
+      }
+    },
+    "AgentLogSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recipe", "eyebrow", "title", "items"],
+      "properties": {
+        "recipe": { "const": "AgentLog" },
+        "eyebrow": { "$ref": "#/definitions/Eyebrow" },
+        "title": { "$ref": "#/definitions/Title" },
+        "isLive": { "type": "boolean", "default": false },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["tool", "label", "status"],
+            "properties": {
+              "tool":     { "type": "string", "minLength": 1, "maxLength": 24 },
+              "label":    { "type": "string", "minLength": 1, "maxLength": 80 },
+              "duration": { "type": "string", "maxLength": 16 },
+              "status":   { "$ref": "#/definitions/StageState" }
+            }
+          }
+        }
+      }
+    },
+    "ReceiptStackSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recipe", "eyebrow", "title", "items"],
+      "properties": {
+        "recipe": { "const": "ReceiptStack" },
+        "eyebrow": { "$ref": "#/definitions/Eyebrow" },
+        "title": { "$ref": "#/definitions/Title" },
+        "body": { "$ref": "#/definitions/Body" },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "state"],
+            "properties": {
+              "id":        { "type": "string", "minLength": 1, "maxLength": 16, "description": "Mono identifier like #17, R-2026-04-28." },
+              "label":     { "type": "string", "minLength": 1, "maxLength": 80 },
+              "state":     { "type": "string", "minLength": 1, "maxLength": 16, "description": "Terminal state word: MERGED, CLOSED, SUPERSEDED, FAILED." },
+              "timestamp": { "type": "string", "maxLength": 24 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

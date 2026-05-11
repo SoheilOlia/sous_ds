@@ -12,3 +12,4 @@ coverage/
 .vercel/
 .claude/settings.local.json
 .gstack/
+bun.lock

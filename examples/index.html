@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>sous-ds — generative UI playground</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap"
+  rel="stylesheet"
+/>
+
+<script>
+  /* Pre-paint theme. Matches preview.html. */
+  (function () {
+    try {
+      var t = localStorage.getItem("sous-ds:theme");
+      if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+      var m = localStorage.getItem("sous-ds:mode");
+      if (m === "prezzo") document.documentElement.setAttribute("data-mode", m);
+    } catch (_) { /* private mode, skip */ }
+  })();
+</script>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="./generative-ui-playground.tsx"></script>
+</body>
+</html>

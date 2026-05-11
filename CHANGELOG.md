@@ -8,6 +8,36 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.10.0] — 2026-05-10
+
+**Generative UI layer.** Adds a runtime contract on top of the v2 composition system: a natural-language prompt produces composition JSON; a deterministic renderer turns that JSON into a live sous-ds page. Follow-up prompts update sections in place. No new visual primitives — six v2 recipes (MetricWall, RAGStatus, PipelineMap, MilestoneStrip, AgentLog, ReceiptStack) compose from the existing component catalog. All accent carriers route through sanctioned components (LiveDot, PulseTrail, Pill[live], InlineStatus[live], SegmentedBar[success]) per `R-SEMANTIC-001` and CL07.
+
+### Added
+
+- **`docs/specs/generative-ui-schema.json`** — JSON Schema draft-07 defining the wire contract between an LLM planner and the renderer. Every string is length-bounded; voice rules (V4 file-path ban) encoded as `pattern` constraints; state vocabulary is `done | live | queued` to match `DotTimeline.BucketState`.
+- **`docs/specs/generative-ui-planner.md`** — copy-paste system prompt for any Anthropic API call. Self-contained — encodes the six recipes, the design dials, the intent→component decision tree, the voice rules V1–V7, the refusal subset (R-COMPOSE-001..004, R-SEMANTIC-001, R-METRIC-001, R-VOICE-001..003), iteration rules, and three worked examples.
+- **`components/GenerativeRenderer.tsx` + `.css`** — typed React renderer. Switches on `recipe`; each branch composes existing sous-ds components. Dials map to CSS custom properties via on-grid lookup tables (no off-8pt interpolation). Section entry is `scale(0.97) → 1` + `opacity 0 → 1`, `var(--ds-dur-standard)`, staggered by `var(--ds-dur-stagger-column)`, with reduced-motion fallback to opacity-only. Identical sections (same content hash) skip re-animation on follow-up prompts.
+- **`components/generative-ui-types.ts`** — TS mirror of the schema. Exported from `components/index.ts` for callers building their own renderers.
+- **`examples/generative-ui-playground.tsx` + `.css` + `index.html`** — Vite-based React playground. Wires the planner system prompt → Anthropic API (browser, `dangerouslyAllowBrowser: true`, dev-only) → ajv validation → renderer. Sidebar carries prompt input, quick-pick chips for the four canonical prompts, fixture chips for offline use, and turn history. `bun run dev` (or `npm run dev`) boots the dev server.
+- **`examples/generative-ui-fixtures.json`** — four seed compositions: trust review dashboard, fraud investigation pipeline, agent live feed, and an adversarial-prompt response (proves silent-correction).
+- **`examples/vite.config.ts`**, **`examples/tsconfig.json`**, **`examples/.env.local.example`** — playground tooling.
+- **`GAPS.md`** — aspirational APIs surfaced by this work (`<LiveBlock state>`, `<ToolCall head>`, labeled stage-strip primitive, Pill success variant, Citation body interpolation). None block ship.
+- **`dev` script** in `package.json`: `vite --config examples/vite.config.ts`.
+
+### Changed
+
+- `package.json` version bumped to `0.10.0`.
+- `components/index.ts` exports `GenerativeRenderer`, `GenerativeRendererProps`, `DEFAULT_DIALS`, and the composition TS types.
+- New `devDependencies`: `@anthropic-ai/sdk`, `@vitejs/plugin-react`, `ajv`, `react`, `react-dom`, `vite`. None ship in the npm package (`files` array excludes `node_modules`; these are dev-only for the playground).
+
+### Notes
+
+- The playground exposes the API key to the browser. This is intentional for local dev — a production deployment must proxy through a server.
+- AMBER in `RAGStatus` renders neutrally — there is no AMBER accent in the system. RED rides `<LiveDot>`; GREEN rides `<SegmentedBar completeTone="success">`.
+- The schema's state vocabulary diverges from the original brief draft (which used `done | active | queued`). Aligned to the canonical primitive (`DotTimeline.BucketState`) so the schema and the renderer use one vocabulary.
+
+---
+
 ## [0.9.0] — 2026-05-08
 
 **Light mode + Prezzo mode + global propagation.** Two new orthogonal axes layered on top of the v0.7 composition contract: `[data-theme="light"]` makes light a first-class peer of dark across the entire token surface (every component flips automatically), and `[data-mode="prezzo"]` collapses typography to Cash Sans Regular at every role for presentation distance. They compose: prezzo-dark, prezzo-light, regular-dark, regular-light are four real states with two HTML attributes. Plus Nexus.app added as a 7th install target, SUSE / Sous design system trigger variants for natural-language invocation, and the v2 component catalogue promoted to the canonical preview.html.

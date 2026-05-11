@@ -82,6 +82,23 @@ export type { ThinkingCubeProps } from "./ThinkingCube";
 export { BlockLoader } from "./BlockLoader";
 export type { BlockLoaderProps } from "./BlockLoader";
 
+export { GenerativeRenderer } from "./GenerativeRenderer";
+export type { GenerativeRendererProps } from "./GenerativeRenderer";
+export { DEFAULT_DIALS } from "./generative-ui-types";
+export type {
+  CompositionJSON,
+  Section,
+  MetricWallSection,
+  RAGStatusSection,
+  PipelineMapSection,
+  MilestoneStripSection,
+  AgentLogSection,
+  ReceiptStackSection,
+  Dials,
+  StageState,
+  RecipeName,
+} from "./generative-ui-types";
+
 // Motion primitive — zero-dep animation vocabulary shared across
 // components and consumers. See components/motion.ts for the rationale.
 export {

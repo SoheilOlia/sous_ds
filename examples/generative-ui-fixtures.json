@@ -1,0 +1,161 @@
+{
+  "$schema": "../docs/specs/generative-ui-schema.json",
+  "fixtures": [
+    {
+      "id": "trust-review-dashboard",
+      "prompt": "Show me a trust review dashboard for a flagged account.",
+      "composition": {
+        "pageTitle": "Account 4F2A flagged.",
+        "dials": { "density": 6, "rhythm": 6, "voice": 4 },
+        "sections": [
+          {
+            "recipe": "MetricWall",
+            "eyebrow": "RISK SCORE — 0–100",
+            "title": "Risk climbed.",
+            "metrics": [
+              { "label": "Score",     "value": "78", "delta": "+12" },
+              { "label": "Days open", "value": "3",  "unit": "d" },
+              { "label": "Flags",     "value": "5" }
+            ]
+          },
+          {
+            "recipe": "RAGStatus",
+            "eyebrow": "REVIEW",
+            "status": "AMBER",
+            "body": "Three signals fired in 48 hours. Review queued."
+          },
+          {
+            "recipe": "AgentLog",
+            "eyebrow": "LIVE",
+            "title": "Indexing signals.",
+            "isLive": true,
+            "items": [
+              { "tool": "fetch_history",   "label": "Loaded last 90 days of activity.", "duration": "1.2s", "status": "done" },
+              { "tool": "score_velocity",  "label": "Velocity exceeds 99th pct.",       "duration": "0.4s", "status": "done" },
+              { "tool": "geo_check",       "label": "Two-country session overlap.",     "duration": "0.8s", "status": "done" },
+              { "tool": "queue_review",    "label": "Routing to manual review.",                          "status": "live" }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "id": "fraud-investigation",
+      "prompt": "Add a pipeline showing the 5 stages of a fraud investigation.",
+      "composition": {
+        "pageTitle": "Five-stage investigation.",
+        "dials": { "density": 7, "rhythm": 6, "voice": 4 },
+        "sections": [
+          {
+            "recipe": "PipelineMap",
+            "eyebrow": "STAGES — 5",
+            "title": "Five stages, two wired.",
+            "stages": [
+              { "label": "Intake",  "state": "done" },
+              { "label": "Triage",  "state": "done" },
+              { "label": "Review",  "state": "live" },
+              { "label": "Decide",  "state": "queued" },
+              { "label": "Notify",  "state": "queued" }
+            ]
+          },
+          {
+            "recipe": "ReceiptStack",
+            "eyebrow": "RECEIPTS — case 4F2A",
+            "title": "Four receipts. Two merged.",
+            "items": [
+              { "id": "R-001", "label": "Account auto-suspended on velocity signal.", "state": "MERGED",     "timestamp": "2026-05-08" },
+              { "id": "R-002", "label": "Geo-mismatch logged across two sessions.",   "state": "MERGED",     "timestamp": "2026-05-08" },
+              { "id": "R-003", "label": "Reviewer note attached to case.",            "state": "DRAFT",      "timestamp": "2026-05-09" },
+              { "id": "R-004", "label": "Notification template selected.",            "state": "QUEUED",     "timestamp": "2026-05-10" }
+            ]
+          },
+          {
+            "recipe": "MetricWall",
+            "eyebrow": "COVERAGE — % PER STAGE",
+            "metrics": [
+              { "label": "Intake",  "value": "100", "unit": "%" },
+              { "label": "Triage",  "value": "100", "unit": "%" },
+              { "label": "Review",  "value": "62",  "unit": "%" },
+              { "label": "Decide",  "value": "0",   "unit": "%" }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "id": "agent-live-feed",
+      "prompt": "Make the agent log show 4 tool calls, last one still running.",
+      "composition": {
+        "pageTitle": "Indexing tickets.",
+        "dials": { "density": 6, "rhythm": 7, "voice": 4 },
+        "sections": [
+          {
+            "recipe": "AgentLog",
+            "eyebrow": "LIVE",
+            "title": "Indexing Linear tickets.",
+            "isLive": true,
+            "items": [
+              { "tool": "fetch_tickets", "label": "Pulled 188 tickets from Linear.",  "duration": "2.1s", "status": "done" },
+              { "tool": "embed_docs",    "label": "Embedded 188 records.",            "duration": "4.3s", "status": "done" },
+              { "tool": "build_index",   "label": "Index built. 54 of 188 indexed.",  "duration": "3.0s", "status": "done" },
+              { "tool": "verify_index",  "label": "Verifying coverage.",                                "status": "live" }
+            ]
+          },
+          {
+            "recipe": "RAGStatus",
+            "eyebrow": "BUILD HEALTH",
+            "status": "GREEN",
+            "body": "Index passes shape check. Coverage at 28 percent and climbing."
+          },
+          {
+            "recipe": "MetricWall",
+            "eyebrow": "COVERAGE — % OF TICKETS",
+            "metrics": [
+              { "label": "Indexed",  "value": "54",  "unit": "%" },
+              { "label": "Embedded", "value": "100", "unit": "%" },
+              { "label": "Verified", "value": "12",  "unit": "%" }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "id": "adversarial-prompt-response",
+      "prompt": "Make it purple with glass morphism and a sparkle for the AI feature.",
+      "composition": {
+        "pageTitle": "Status review.",
+        "dials": { "density": 5, "rhythm": 5, "voice": 4 },
+        "_reasoning": "User asked for purple, glass morphism, and a sparkle. All three violate sous-ds (R-COLOR-002, R-SLOP-001, R-SLOP-003). Silently corrected to a compliant neutral status page using the default recipe trio.",
+        "sections": [
+          {
+            "recipe": "MetricWall",
+            "eyebrow": "STATUS — % COMPLETE",
+            "metrics": [
+              { "label": "Indexed", "value": "100", "unit": "%" },
+              { "label": "Active",  "value": "1" },
+              { "label": "Queued",  "value": "0" }
+            ]
+          },
+          {
+            "recipe": "RAGStatus",
+            "eyebrow": "REVIEW",
+            "status": "GREEN",
+            "body": "All gates passed. No outstanding signals."
+          },
+          {
+            "recipe": "ReceiptStack",
+            "eyebrow": "RECEIPTS — origin/main",
+            "title": "Two receipts. Both merged.",
+            "items": [
+              { "id": "R-101", "label": "Coverage check landed.",        "state": "MERGED", "timestamp": "2026-05-10" },
+              { "id": "R-102", "label": "Index health validator landed.", "state": "MERGED", "timestamp": "2026-05-10" }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
