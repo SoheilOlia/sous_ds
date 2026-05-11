@@ -8,12 +8,18 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ### Added
 
+- **Light mode as a first-class peer.** `[data-theme="light"]` flips the entire token contract — `bg`, `surface`, `surface-raised`, `line`, `line-strong`, every `text-*` ink, and `elev-1` / `elev-2` (with intentionally near-imperceptible alpha so dark-mode shadows don't punch holes in white). Semantic accents (`accent-live`, `accent-success`) stay constant across modes — meaning never shifts with theme. Both modes pass WCAG AA at minimum.
+- New light-only tokens in `design-tokens.json`: `surface.raised-light`, `line.strong-light`, `elevation.1-light`, `elevation.2-light`. `$version` bumped 0.3.9 → 0.8.0 to lead `package.json`.
+- `preview.html` now ships a DARK / LIGHT segmented toggle in the topbar (matches existing `.live` chip vocabulary), with localStorage persistence and a tiny pre-paint init script in `<head>` so refreshes don't flash the wrong theme. Body dot-grid texture inverts with the mode. Palette card hex/RGB labels and contrast-ratio specimens swap per-theme via `[data-show="dark|light"]`.
 - `npx sous-ds install-global` / `npx sous-ds global` to install the SOUS-DS skill and `/sous-ds` command shims into Claude, Codex, Goose, and Cursor user-level locations.
+- **Nexus install target.** `repos/agents/skills/sous-ds/SKILL.md` is now written by `install-global` so Nexus.app and other Block agents that scan `~/repos/agents/skills/` pick up SOUS-DS alongside the rest of the registry. Total install targets: 6 → 7.
 - `docs/specs/sous-ds-reference-learning.md`, the source-truth protocol for "Learn from this project" requests.
 - Global skill language that teaches agents how to promote finished project lessons into SOUS-DS without importing project-specific content or foreign aesthetics wholesale.
 
 ### Changed
 
+- `DESIGN.md` and `SKILL.md` reframe light mode from "alternate" to "first-class peer". Elevation table now lists dark and light values side-by-side. The "cards never cast shadows" rule is now mode-agnostic (was dark-only). Surface-hierarchy section explains the two mechanisms: dark uses luminance steps, light uses `elev-1-light` shadow.
+- `tokens.css` header bumped to v0.8.0; light-mode block completed (was a stub missing surface-raised, line-strong, elevations, on-accent inks, and accents).
 - `SKILL.md`, `README.md`, and `INSTALL.md` now document "Learn from this project" as a first-class workflow.
 - `bin/init.test.mjs` covers the global installer path through `SOUS_DS_HOME` so user-level writes stay testable without touching the real home directory.
 

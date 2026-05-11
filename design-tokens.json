@@ -1,8 +1,8 @@
 {
   "$schema": "https://tr.designtokens.org/format/",
   "$name": "sous-ds",
-  "$version": "0.3.9",
-  "$description": "Canonical tokens for the system. Dark is default. Every token passes WCAG AA at minimum. Semantic accents are reserved: live and success only. Format inspired by the W3C DTCG spec.",
+  "$version": "0.8.0",
+  "$description": "Canonical tokens for the system. Dark is default; light is a first-class peer. Every token passes WCAG AA at minimum. Semantic accents are reserved: live and success only — and constant across modes. Format inspired by the W3C DTCG spec.",
 
   "color": {
     "bg": {
@@ -10,15 +10,17 @@
       "light":    { "$value": "#F4F4F4", "$type": "color", "$description": "Page background, light mode" }
     },
     "surface": {
-      "default":       { "$value": "#141414", "$type": "color", "$description": "Card, panel, sheet. Dark mode" },
-      "raised":        { "$value": "#1C1C1C", "$type": "color", "$description": "Popover, menu, elevated dark surface" },
-      "light":         { "$value": "#FFFFFF", "$type": "color", "$description": "Card, panel, sheet. Light mode" },
-      "light-sunken":  { "$value": "#EBEBEB", "$type": "color", "$description": "Recessed surface on light" }
+      "default":        { "$value": "#141414", "$type": "color", "$description": "Card, panel, sheet. Dark mode" },
+      "raised":         { "$value": "#1C1C1C", "$type": "color", "$description": "Popover, menu, elevated dark surface" },
+      "light":          { "$value": "#FFFFFF", "$type": "color", "$description": "Card, panel, sheet. Light mode" },
+      "raised-light":   { "$value": "#FFFFFF", "$type": "color", "$description": "Popover, menu, elevated light surface. Stays white; elevation is carried by elev-1-light shadow, not a luminance step" },
+      "light-sunken":   { "$value": "#EBEBEB", "$type": "color", "$description": "Recessed surface on light" }
     },
     "line": {
-      "default": { "$value": "rgba(255,255,255,0.08)", "$type": "color", "$description": "Card border on dark. 1px only, never shadow" },
-      "strong":  { "$value": "rgba(255,255,255,0.14)", "$type": "color", "$description": "Higher contrast border for inputs" },
-      "light":   { "$value": "rgba(0,0,0,0.08)",       "$type": "color", "$description": "Light mode line" }
+      "default":      { "$value": "rgba(255,255,255,0.08)", "$type": "color", "$description": "Card border on dark. 1px only, never shadow" },
+      "strong":       { "$value": "rgba(255,255,255,0.14)", "$type": "color", "$description": "Higher contrast border for inputs" },
+      "light":        { "$value": "rgba(0,0,0,0.08)",       "$type": "color", "$description": "Light mode line" },
+      "strong-light": { "$value": "rgba(0,0,0,0.14)",       "$type": "color", "$description": "Higher contrast border for inputs. Light mode" }
     },
     "text": {
       "primary":       { "$value": "#F0F0F0", "$type": "color", "$description": "Dark mode primary text. 18.9:1 on bg.default. AAA" },
@@ -32,8 +34,8 @@
       "on-primary":    { "$value": "#0A0A0A", "$type": "color", "$description": "Text on filled primary button" }
     },
     "accent": {
-      "live": { "$value": "#E5533C", "$type": "color", "$description": "Secondary semantic accent. Attention, alerting, anomaly, error, or urgent live-now state. Never decorative, never a CTA color" },
-      "success": { "$value": "#00E013", "$type": "color", "$description": "Primary semantic accent. Success, completion, committed state, positive highlight, goal-met, resolved. Never decorative, never a CTA color" }
+      "live": { "$value": "#E5533C", "$type": "color", "$description": "Secondary semantic accent. Attention, alerting, anomaly, error, or urgent live-now state. Never decorative, never a CTA color. Constant across modes — semantic identity must not shift with theme" },
+      "success": { "$value": "#00E013", "$type": "color", "$description": "Primary semantic accent. Success, completion, committed state, positive highlight, goal-met, resolved. Never decorative, never a CTA color. Constant across modes — semantic identity must not shift with theme" }
     }
   },
 
@@ -98,9 +100,11 @@
   },
 
   "elevation": {
-    "0": { "$value": "none", "$type": "shadow", "$description": "Default. Cards use 1px border, never shadow, in dark mode" },
-    "1": { "$value": "0 1px 2px rgba(0,0,0,0.3)", "$type": "shadow", "$description": "Floating menu, toast. Use sparingly. Never on cards" },
-    "2": { "$value": "0 8px 24px rgba(0,0,0,0.5)", "$type": "shadow", "$description": "Modal, drawer only" }
+    "0":       { "$value": "none", "$type": "shadow", "$description": "Default. Cards use 1px border, never shadow" },
+    "1":       { "$value": "0 1px 2px rgba(0,0,0,0.3)", "$type": "shadow", "$description": "Floating menu, toast. Dark mode. Use sparingly. Never on cards" },
+    "2":       { "$value": "0 8px 24px rgba(0,0,0,0.5)", "$type": "shadow", "$description": "Modal, drawer. Dark mode only" },
+    "1-light": { "$value": "0 1px 2px rgba(0,0,0,0.06)", "$type": "shadow", "$description": "Floating menu, toast. Light mode. Soft — borders still do most of the work" },
+    "2-light": { "$value": "0 8px 24px rgba(0,0,0,0.10)", "$type": "shadow", "$description": "Modal, drawer. Light mode. Heavy enough to detach from page, light enough to read as restraint" }
   },
 
   "motion": {

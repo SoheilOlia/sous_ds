@@ -332,6 +332,15 @@ export function buildGlobalTargets(packageRoot) {
       body: skillBody,
     },
     {
+      label: "Nexus skill",
+      // Nexus.app reads guidance via the Block agent skill registry at
+      // ~/repos/agents/skills/<name>/. Drop our SKILL.md as a peer to the
+      // existing nexus, linear, figma, etc. skills there.
+      path: "repos/agents/skills/sous-ds/SKILL.md",
+      mode: "owned-file",
+      body: skillBody,
+    },
+    {
       label: "Cursor command",
       path: ".cursor/commands/sous-ds.md",
       mode: "owned-file",

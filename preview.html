@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" data-theme-default="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,6 +7,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  /* Pre-paint theme application. Must stay tiny and inline so it
+     runs before first paint and avoids a flash of the wrong theme. */
+  (function () {
+    try {
+      var stored = localStorage.getItem('sous-ds:theme');
+      if (stored === 'light' || stored === 'dark') {
+        document.documentElement.setAttribute('data-theme', stored);
+      }
+    } catch (_) { /* private mode, skip */ }
+  })();
+</script>
 <style>
 /* ============================================================
    Tokens (mirror of tokens.css, inlined for portability)
@@ -90,6 +102,29 @@
 }
 
 /* ============================================================
+   Light mode — first-class peer of dark.
+   Flip with [data-theme="light"] on <html>.
+   Accents are semantic; their hex stays constant across modes.
+   ============================================================ */
+[data-theme="light"] {
+  --ds-bg: #F4F4F4;
+  --ds-surface: #FFFFFF;
+  --ds-surface-raised: #FFFFFF;
+  --ds-line: rgba(0,0,0,0.08);
+  --ds-line-strong: rgba(0,0,0,0.14);
+  --ds-text-primary: #1A1A1A;
+  --ds-text-secondary: #6B6B6B;
+  --ds-text-muted: #767676;
+  --ds-text-on-primary: #F0F0F0;
+  --ds-text-on-accent: #FFFFFF;
+  --ds-text-on-success: #0A0A0A;
+  --ds-accent-live: #E5533C;
+  --ds-accent-success: #00E013;
+  --ds-elev-1: 0 1px 2px rgba(0,0,0,0.06);
+  --ds-elev-2: 0 8px 24px rgba(0,0,0,0.10);
+}
+
+/* ============================================================
    Base
    ============================================================ */
 *, *::before, *::after { box-sizing: border-box; }
@@ -111,6 +146,10 @@ body {
   background-image: radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
   background-size: 24px 24px;
   background-position: 0 0;
+}
+/* Light mode inverts the dot ink; same density, same restraint. */
+[data-theme="light"] body {
+  background-image: radial-gradient(circle, rgba(0,0,0,0.045) 1px, transparent 1px);
 }
 
 .mono { font-family: var(--ds-font-mono); font-variant-numeric: tabular-nums; }
@@ -201,6 +240,52 @@ body {
   text-transform: uppercase;
   color: var(--ds-text-secondary);
 }
+
+/* Theme toggle. Two-cell segmented pill. Same vocabulary as .live —
+   border, mono uppercase, pill radius — so it sits as a sibling, not
+   a foreign element. Active cell fills with text-primary, ink flips. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-pill);
+  padding: 2px;
+  gap: 2px;
+  background: transparent;
+}
+.theme-toggle button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ds-text-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--ds-radius-pill);
+  cursor: pointer;
+  transition: background-color var(--ds-dur-micro) var(--ds-ease-out);
+}
+.theme-toggle button:hover { color: var(--ds-text-secondary); }
+.theme-toggle button[aria-pressed="true"] {
+  background: var(--ds-text-primary);
+  color: var(--ds-text-on-primary);
+}
+.theme-toggle button:focus-visible {
+  outline: 2px solid var(--ds-accent-success);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle button { transition: none; }
+}
+
+/* Theme-conditional content. Used in palette/contrast labels where the
+   literal value changes per mode. Source order keeps both visible to
+   screen readers when CSS doesn't load; CSS hides the inactive copy. */
+[data-theme="dark"] [data-show="light"] { display: none; }
+[data-theme="light"] [data-show="dark"] { display: none; }
 
 .live .dot {
   width: 6px; height: 6px; border-radius: 999px;
@@ -2211,6 +2296,10 @@ body {
       <h1>sous-ds<span class="sep">/</span><span class="ver">v0.3.9</span></h1>
     </div>
     <div class="status">
+      <div class="theme-toggle" role="radiogroup" aria-label="Theme">
+        <button type="button" data-theme-set="dark" aria-pressed="true">Dark</button>
+        <button type="button" data-theme-set="light" aria-pressed="false">Light</button>
+      </div>
       <span class="clock" id="clock">00:00:00</span>
       <span class="live"><span class="dot"></span>Live</span>
     </div>
@@ -2262,11 +2351,11 @@ body {
           <div class="palette-card__meta">
             <div>
               <div class="palette-card__meta-label">HEX</div>
-              <div class="palette-card__meta-value">#0A0A0A</div>
+              <div class="palette-card__meta-value"><span data-show="dark">#0A0A0A</span><span data-show="light">#F4F4F4</span></div>
             </div>
             <div>
               <div class="palette-card__meta-label">RGB</div>
-              <div class="palette-card__meta-value">10, 10, 10</div>
+              <div class="palette-card__meta-value"><span data-show="dark">10, 10, 10</span><span data-show="light">244, 244, 244</span></div>
             </div>
           </div>
         </div>
@@ -2279,11 +2368,11 @@ body {
           <div class="palette-card__meta">
             <div>
               <div class="palette-card__meta-label">HEX</div>
-              <div class="palette-card__meta-value">#141414</div>
+              <div class="palette-card__meta-value"><span data-show="dark">#141414</span><span data-show="light">#FFFFFF</span></div>
             </div>
             <div>
               <div class="palette-card__meta-label">RGB</div>
-              <div class="palette-card__meta-value">20, 20, 20</div>
+              <div class="palette-card__meta-value"><span data-show="dark">20, 20, 20</span><span data-show="light">255, 255, 255</span></div>
             </div>
           </div>
         </div>
@@ -2296,11 +2385,11 @@ body {
           <div class="palette-card__meta">
             <div>
               <div class="palette-card__meta-label">HEX</div>
-              <div class="palette-card__meta-value">#1C1C1C</div>
+              <div class="palette-card__meta-value"><span data-show="dark">#1C1C1C</span><span data-show="light">#FFFFFF</span></div>
             </div>
             <div>
               <div class="palette-card__meta-label">RGB</div>
-              <div class="palette-card__meta-value">28, 28, 28</div>
+              <div class="palette-card__meta-value"><span data-show="dark">28, 28, 28</span><span data-show="light">255, 255, 255</span></div>
             </div>
           </div>
         </div>
@@ -2313,11 +2402,11 @@ body {
           <div class="palette-card__meta">
             <div>
               <div class="palette-card__meta-label">HEX</div>
-              <div class="palette-card__meta-value">#F0F0F0</div>
+              <div class="palette-card__meta-value"><span data-show="dark">#F0F0F0</span><span data-show="light">#1A1A1A</span></div>
             </div>
             <div>
               <div class="palette-card__meta-label">RGB</div>
-              <div class="palette-card__meta-value">240, 240, 240</div>
+              <div class="palette-card__meta-value"><span data-show="dark">240, 240, 240</span><span data-show="light">26, 26, 26</span></div>
             </div>
           </div>
         </div>
@@ -2330,11 +2419,11 @@ body {
           <div class="palette-card__meta">
             <div>
               <div class="palette-card__meta-label">HEX</div>
-              <div class="palette-card__meta-value">#A0A0A0</div>
+              <div class="palette-card__meta-value"><span data-show="dark">#A0A0A0</span><span data-show="light">#6B6B6B</span></div>
             </div>
             <div>
               <div class="palette-card__meta-label">RGB</div>
-              <div class="palette-card__meta-value">160, 160, 160</div>
+              <div class="palette-card__meta-value"><span data-show="dark">160, 160, 160</span><span data-show="light">107, 107, 107</span></div>
             </div>
           </div>
         </div>
@@ -2379,7 +2468,7 @@ body {
           <div class="text-specimen__sample">Anchor ink. The heading you read first.</div>
           <div class="text-specimen__meta">
             <span>text-primary</span>
-            <span><b>#F0F0F0</b> · 18.9:1 · AAA</span>
+            <span data-show="dark"><b>#F0F0F0</b> · 18.9:1 · AAA</span><span data-show="light"><b>#1A1A1A</b> · 15.8:1 · AAA</span>
           </div>
         </div>
 
@@ -2387,7 +2476,7 @@ body {
           <div class="text-specimen__sample">Supporting body. Descriptive copy under a heading.</div>
           <div class="text-specimen__meta">
             <span>text-secondary</span>
-            <span><b>#A0A0A0</b> · 7.58:1 · AAA</span>
+            <span data-show="dark"><b>#A0A0A0</b> · 7.58:1 · AAA</span><span data-show="light"><b>#6B6B6B</b> · 5.33:1 · AA</span>
           </div>
         </div>
 
@@ -2846,6 +2935,32 @@ body {
 </main>
 
 <script>
+/* ============================================================
+   Theme toggle. Persists to localStorage so a refresh keeps state.
+   Reads localStorage on load (the inline init script in <head>
+   already applied it pre-paint so this just wires interaction).
+   ============================================================ */
+(function themeToggle () {
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll('.theme-toggle [data-theme-set]');
+  const STORAGE_KEY = 'sous-ds:theme';
+
+  function setTheme(next) {
+    root.setAttribute('data-theme', next);
+    buttons.forEach(b => {
+      b.setAttribute('aria-pressed', b.dataset.themeSet === next ? 'true' : 'false');
+    });
+    try { localStorage.setItem(STORAGE_KEY, next); } catch (_) { /* private mode */ }
+  }
+
+  // Sync aria-pressed to whatever the inline pre-paint script set on <html>.
+  setTheme(root.getAttribute('data-theme') || 'dark');
+
+  buttons.forEach(b => {
+    b.addEventListener('click', () => setTheme(b.dataset.themeSet));
+  });
+})();
+
 /* ============================================================
    Live clock  — updates every second, tabular-nums aligned
    ============================================================ */

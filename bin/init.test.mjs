@@ -130,6 +130,7 @@ test("buildGlobalTargets: returns global skill and command paths", () => {
     ".codex/skills/sous-ds/SKILL.md",
     ".claude/skills/sous-ds/SKILL.md",
     ".config/goose/skills/sous-ds/SKILL.md",
+    "repos/agents/skills/sous-ds/SKILL.md",
     ".cursor/commands/sous-ds.md",
     ".claude/commands/sous-ds.md",
   ]);
@@ -241,6 +242,7 @@ test("CLI: install-global writes global skill and command shims under SOUS_DS_HO
     assert.equal(existsSync(join(cwd, ".codex/skills/sous-ds/SKILL.md")), true);
     assert.equal(existsSync(join(cwd, ".claude/skills/sous-ds/SKILL.md")), true);
     assert.equal(existsSync(join(cwd, ".config/goose/skills/sous-ds/SKILL.md")), true);
+    assert.equal(existsSync(join(cwd, "repos/agents/skills/sous-ds/SKILL.md")), true);
     assert.equal(existsSync(join(cwd, ".cursor/commands/sous-ds.md")), true);
     assert.equal(existsSync(join(cwd, ".claude/commands/sous-ds.md")), true);
   });

@@ -19,13 +19,18 @@ colors:
   accent-live:       "#E5533C"
   accent-success:    "#00E013"
 
-  # Light mode (alternate)
+  # Light mode (first-class peer — flip with [data-theme="light"])
   bg-light:               "#F4F4F4"
   surface-light:          "#FFFFFF"
+  surface-raised-light:   "#FFFFFF"   # raise with elev-1-light shadow, not a luminance step
   line-light:             "rgba(0,0,0,0.08)"
+  line-strong-light:      "rgba(0,0,0,0.14)"
   text-primary-light:     "#1A1A1A"
   text-secondary-light:   "#6B6B6B"
   text-muted-light:       "#767676"
+  elev-1-light:           "0 1px 2px rgba(0,0,0,0.06)"
+  elev-2-light:           "0 8px 24px rgba(0,0,0,0.10)"
+  # Accents are semantic — constant across modes. accent-live and accent-success do not change.
 
 typography:
   display:
@@ -168,7 +173,7 @@ components:
 
 ### Visual theme
 
-Terminal gravity meets editorial restraint. The interface feels like a precision instrument, not a brochure. Dark by default, near-black rather than charcoal. Monospace carries all data. The system is monochrome first: blacks, grays, and whites carry the structure; green is the primary semantic accent for positive emphasis, while red is a secondary rail for attention, anomaly, error, or urgent live-now state. Cards float on contrast, not shadow. Every element justifies its presence or it gets removed.
+Terminal gravity meets editorial restraint. The interface feels like a precision instrument, not a brochure. Dark by default, near-black rather than charcoal. Light mode is a first-class peer — flip with `data-theme="light"` on `<html>` (or any subtree); semantic accents stay constant across modes, so meaning never shifts with theme. Both modes pass WCAG AA at minimum. Monospace carries all data. The system is monochrome first: blacks, grays, and whites carry the structure; green is the primary semantic accent for positive emphasis, while red is a secondary rail for attention, anomaly, error, or urgent live-now state. Cards float on contrast, not shadow. Every element justifies its presence or it gets removed.
 
 ### Principles (in priority order)
 
@@ -309,13 +314,15 @@ Semantic aliases sit on top of the numeric scale and speed up composition decisi
 
 ## Elevation & Depth
 
-Elevation is the most abused part of most systems. This one resolves the contradiction explicitly: **in dark mode, cards never cast shadows.**
+Elevation is the most abused part of most systems. This one resolves the contradiction explicitly: **cards never cast shadows in either mode.** Borders carry separation; shadow is reserved for floating surfaces (menus, toasts, modals).
 
-| Level | Token | Value | Where |
-|---|---|---|---|
-| 0 | `elev-0` | `none` | Cards, panels, default state. 1px border does the separation |
-| 1 | `elev-1` | `0 1px 2px rgba(0,0,0,0.3)` | Floating menus, toasts only |
-| 2 | `elev-2` | `0 8px 24px rgba(0,0,0,0.5)` | Modals, drawers only |
+| Level | Token | Dark value | Light value | Where |
+|---|---|---|---|---|
+| 0 | `elev-0` | `none` | `none` | Cards, panels, default state. 1px border does the separation |
+| 1 | `elev-1` | `0 1px 2px rgba(0,0,0,0.3)` | `0 1px 2px rgba(0,0,0,0.06)` | Floating menus, toasts only |
+| 2 | `elev-2` | `0 8px 24px rgba(0,0,0,0.5)` | `0 8px 24px rgba(0,0,0,0.10)` | Modals, drawers only |
+
+Light-mode shadows are intentionally near-imperceptible. The dark-mode shadow alphas would punch holes in white. The token contract handles the swap automatically — components only reference `var(--ds-elev-1)`, `var(--ds-elev-2)`.
 
 ### Forbidden shadow values
 
@@ -324,6 +331,8 @@ Any shadow with blur ≥ 25px. This is the AI-slop shadow. The Quality Evaluator
 ### Surface hierarchy via luminance
 
 Cards float on dark-on-dark contrast. `bg (#0A0A0A)` → `surface (#141414)` → `surface-raised (#1C1C1C)`. Each step is 6 luminance points. The 1px border on each card crisps the edge. No blur, no glow, no gradient.
+
+In light mode the trick inverts: `surface` and `surface-raised` are both `#FFFFFF`, and the elevation step is carried by `elev-1-light` shadow rather than a luminance change. Same restraint, different mechanism — borders still do most of the visual work.
 
 ---
 
