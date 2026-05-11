@@ -3,15 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>sous-ds 2.0 — what changed</title>
+<title>sous-ds — design system</title>
 
 <!--
-  Single-page visual showcase of the v2.0 upgrade.
+  Canonical sous-ds preview. Self-contained: no build step, no React,
+  no external CSS. Renders all 21 components, the six v2 composition
+  recipes, the voice contract, the refusals catalogue, and the install
+  flow. Live demos for <AgentStream> (typewriter) and <Citation>
+  (hover popover).
 
-  Self-contained: no build step, no React, no external CSS. Open in any
-  browser. Live demos for <AgentStream> (typewriter) and <Citation>
-  (hover popover). All six recipes rendered. Voice contract shown via
-  side-by-side before/after diffs taken from the 1.0 case-study page.
+  Theme + mode toggles in the topbar:
+    [data-theme="dark|light"]    — color palette (light is a peer of dark)
+    [data-mode="prezzo"]         — Cash Sans Regular at every role; for slides
+  Both persist to localStorage; an inline pre-paint init script applies
+  them before first paint to avoid flashes.
 
   This page itself is built against the 2.0 contract — every section
   uses a distinct rhythm, every numeral runs in mono, no banned
@@ -21,6 +26,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+  /* Pre-paint theme + mode application. Tiny and inline so it runs
+     before first paint and avoids a flash of the wrong theme/mode. */
+  (function () {
+    try {
+      var t = localStorage.getItem('sous-ds:theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      var m = localStorage.getItem('sous-ds:mode');
+      if (m === 'prezzo') document.documentElement.setAttribute('data-mode', m);
+    } catch (_) { /* private mode, skip */ }
+  })();
+</script>
 
 <style>
 :root {
@@ -48,6 +65,47 @@
   --ds-radius-pill: 9999px;
   --ds-dur-micro: 140ms; --ds-dur-standard: 220ms;
   --ds-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --ds-text-on-accent: #FFFFFF;
+  --ds-text-on-success: #0A0A0A;
+  --ds-elev-1: 0 1px 2px rgba(0,0,0,0.3);
+  --ds-elev-2: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+/* ============================================================
+   Light mode — first-class peer of dark.
+   Flip with [data-theme="light"] on <html>. Accents stay constant.
+   ============================================================ */
+[data-theme="light"] {
+  --ds-bg: #F4F4F4;
+  --ds-surface: #FFFFFF;
+  --ds-surface-raised: #FFFFFF;
+  --ds-line: rgba(0,0,0,0.08);
+  --ds-line-strong: rgba(0,0,0,0.14);
+  --ds-text-primary: #1A1A1A;
+  --ds-text-secondary: #6B6B6B;
+  --ds-text-muted: #767676;
+  --ds-text-on-primary: #F0F0F0;
+  --ds-text-on-accent: #FFFFFF;
+  --ds-text-on-success: #0A0A0A;
+  --ds-accent-live: #E5533C;
+  --ds-accent-success: #00E013;
+  --ds-elev-1: 0 1px 2px rgba(0,0,0,0.06);
+  --ds-elev-2: 0 8px 24px rgba(0,0,0,0.10);
+}
+
+/* ============================================================
+   Prezzo mode — Cash Sans regular at every role and size.
+   Orthogonal to [data-theme]; composes as prezzo-dark, prezzo-light.
+   ============================================================ */
+[data-mode="prezzo"] {
+  --ds-font-display: "Cash Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --ds-font-sans:    "Cash Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --ds-font-mono:    "Cash Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+[data-mode="prezzo"],
+[data-mode="prezzo"] * {
+  font-weight: 400 !important;
 }
 
 * { box-sizing: border-box; }
@@ -183,6 +241,46 @@ header.page-head .brand {
 
 header.page-head .head-meta { display: flex; flex-direction: column; gap: var(--ds-space-3); align-items: flex-end; }
 header.page-head .pills { display: flex; gap: var(--ds-space-3); }
+header.page-head .toggles { display: flex; gap: var(--ds-space-3); }
+
+/* Two-cell segmented pill — same vocabulary as .ds-pill so it sits
+   as a sibling. Used for the theme (Dark/Light) and mode (Regular/Prezzo)
+   toggles in the topbar. Active cell fills with text-primary; ink flips. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-pill);
+  padding: 2px;
+  gap: 2px;
+  background: transparent;
+}
+.theme-toggle button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ds-text-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--ds-radius-pill);
+  cursor: pointer;
+  transition: background-color var(--ds-dur-micro) var(--ds-ease-out);
+}
+.theme-toggle button[aria-pressed="true"] {
+  background: var(--ds-text-primary);
+  color: var(--ds-text-on-primary);
+}
+.theme-toggle button:focus-visible {
+  outline: 2px solid var(--ds-accent-success);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle button { transition: none; }
+}
 
 /* ============================================================
    Hero — eyebrow / SHIPPED pill / 84px title / body
@@ -1098,12 +1196,22 @@ footer.page-foot {
       <span></span><span></span><span></span>
       <span></span><span></span><span></span>
     </span>
-    <span>sous-ds / upgrade</span>
+    <span>sous-ds</span>
   </div>
   <div class="head-meta">
     <div class="pills">
       <span class="ds-pill" data-variant="filled"><span class="ds-pill__dot"></span>Live on npm</span>
-      <span class="ds-pill" data-variant="outline">v0.7.1</span>
+      <span class="ds-pill" data-variant="outline">v0.9.0</span>
+    </div>
+    <div class="toggles">
+      <div class="theme-toggle" role="radiogroup" aria-label="Theme">
+        <button type="button" data-theme-set="dark" aria-pressed="true">Dark</button>
+        <button type="button" data-theme-set="light" aria-pressed="false">Light</button>
+      </div>
+      <div class="theme-toggle" role="radiogroup" aria-label="Mode">
+        <button type="button" data-mode-set="default" aria-pressed="true">Regular</button>
+        <button type="button" data-mode-set="prezzo" aria-pressed="false">Prezzo</button>
+      </div>
     </div>
   </div>
 </header>
@@ -1774,6 +1882,39 @@ footer.page-foot {
 </main>
 
 <script>
+// ============================================================
+// Theme + Mode toggles. Persists to localStorage so a refresh keeps state.
+// Pre-paint init script in <head> already applied the saved values; this
+// just wires interaction and aria-pressed sync.
+// ============================================================
+(function themeToggle () {
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll('.theme-toggle [data-theme-set]');
+  function setTheme(next) {
+    root.setAttribute('data-theme', next);
+    buttons.forEach(b => b.setAttribute('aria-pressed', b.dataset.themeSet === next ? 'true' : 'false'));
+    try { localStorage.setItem('sous-ds:theme', next); } catch (_) {}
+  }
+  setTheme(root.getAttribute('data-theme') || 'dark');
+  buttons.forEach(b => b.addEventListener('click', () => setTheme(b.dataset.themeSet)));
+})();
+
+(function modeToggle () {
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll('.theme-toggle [data-mode-set]');
+  function setMode(next) {
+    if (next === 'default') root.removeAttribute('data-mode');
+    else root.setAttribute('data-mode', next);
+    buttons.forEach(b => b.setAttribute('aria-pressed', b.dataset.modeSet === next ? 'true' : 'false'));
+    try {
+      if (next === 'default') localStorage.removeItem('sous-ds:mode');
+      else localStorage.setItem('sous-ds:mode', next);
+    } catch (_) {}
+  }
+  setMode(root.getAttribute('data-mode') || 'default');
+  buttons.forEach(b => b.addEventListener('click', () => setMode(b.dataset.modeSet)));
+})();
+
 // Shared: reduced-motion check
 const REDUCED = window.matchMedia &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
