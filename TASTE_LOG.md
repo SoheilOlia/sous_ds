@@ -365,3 +365,27 @@ The 1.0 case-study page becomes the v0.7.0 verification target. After 2.0 ships,
 - `docs/specs/sous-ds-v2.md` — canonical 2.0 spec with full architecture, gap analysis, and rule additions
 - `docs/specs/sous-ds-v2-composition-recipes.md` — initial six recipes with JSX skeletons and microcopy templates
 - `docs/specs/sous-ds-v2-voice.md` — voice contract with seven rules, per-recipe templates, banned phrases catalogue
+
+---
+
+## ENTRY 011 — Learning Protocol: Source-Owned, Not Style-Owned
+**Date:** 2026-05-04
+**Source:** Direct mining of `Donsoleil/ui-ux-pro-max-skill`, `Donsoleil/cult-ui`, and the Trust Automation milestone map polish pass
+**Type:** Distribution / governance extension
+
+### Signals extracted
+
+**1. Design intelligence needs a portable operating model**
+- `ui-ux-pro-max-skill` is strongest as a packaging and reasoning pattern: searchable knowledge, domain/stack checklists, pre-delivery gates, and platform templates.
+- Decision: add a global SOUS-DS skill and installer path so Claude, Codex, Goose, and Cursor start from the same contract.
+- Rejected: importing a broad catalogue of named visual styles. SOUS-DS remains one system; dials and recipes handle variation.
+
+**2. Repeated local CSS should become source-owned system code**
+- `cult-ui` is strongest as a source-owned registry model: copyable components, inspectable recipes, and no black-box package layer between design and implementation.
+- Decision: "Learn from this project" now means extract durable component/recipe/refusal lessons and promote them into SOUS-DS source truth.
+- Rejected: copying decorative components or project-specific surface styling into the system.
+
+**3. The Trust Automation milestone map exposed real promotion candidates**
+- Linked pills, source links, compact metric rails, progress stacks, dense evidence tables, and milestone stage cards should not remain app-local forever.
+- Decision: capture those as SOUS-DS learning candidates in `docs/specs/sous-ds-reference-learning.md`.
+- Boundary: Trust Automation copy, PR IDs, milestone labels, and proof semantics stay in Trust Automation.

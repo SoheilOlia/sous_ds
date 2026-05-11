@@ -7,7 +7,6 @@ const forbiddenPrefixes = [
   ".github/",
   "Inspiration/",
   "Sous_DS_v1.0/",
-  "docs/",
   "design.yml",
 ];
 
@@ -30,6 +29,10 @@ const requiredPaths = [
   "dist/components/motion.js",
   "dist/styles.css",
   "dist/tokens.css",
+  "docs/specs/sous-ds-reference-learning.md",
+  "docs/specs/sous-ds-v2.md",
+  "docs/specs/sous-ds-v2-composition-recipes.md",
+  "docs/specs/sous-ds-v2-voice.md",
   "examples/slop-vs-system.html",
   "quality-evaluator.md",
   "refusals.json",
@@ -38,9 +41,19 @@ const requiredPaths = [
   "tokens.css",
 ];
 
-const raw = execFileSync("npm", ["pack", "--dry-run", "--json"], {
-  encoding: "utf8",
-});
+let raw;
+try {
+  raw = execFileSync("npm", ["pack", "--dry-run", "--json"], {
+    encoding: "utf8",
+  });
+} catch (err) {
+  if (err?.code === "ENOENT") {
+    console.error("Package integrity: BLOCKED (npm not found on PATH)");
+    console.error("Install npm or run this check in a Node/npm environment.");
+    process.exit(1);
+  }
+  throw err;
+}
 
 const payload = JSON.parse(raw);
 const files = payload[0]?.files?.map((file) => file.path).sort() ?? [];

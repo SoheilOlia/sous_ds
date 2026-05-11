@@ -58,6 +58,7 @@ Idempotent (safe to re-run after upgrading) and never clobbers user content — 
 
 - **Plain HTML / no bundler:** `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sous-ds@latest/dist/styles.css">`
 - **Standalone agent skill (no React):** `curl -fsSL https://raw.githubusercontent.com/SoheilOlia/sous_ds/main/install.sh | bash`
+- **Global skill install:** `npx sous-ds install-global` wires `/sous-ds` and "Learn from this project" across Claude, Codex, Goose, and Cursor user-level skill/command locations.
 - **Full subpath reference and per-consumer details:** [INSTALL.md](./INSTALL.md)
 
 ---
@@ -101,6 +102,22 @@ A coding agent landing in a repo with this system should:
 6. Run `npm run pack:check` before cutting a release.
 
 Never hardcode a color, size, or duration. Never use Inter. Never use a shadow with blur ≥ 25px.
+
+### Learning from a finished project
+
+When a finished UI teaches the system something, use the global skill phrase:
+
+```text
+/sous-ds Learn from this project
+```
+
+or:
+
+```text
+Learn from this project for SOUS-DS.
+```
+
+The agent must compare the project against source truth, extract only durable system lessons, and route each update to the right file: tokens, components, recipes, refusals, motion rules, voice rules, installer, or `TASTE_LOG.md`. Project-specific copy, PR IDs, and brand styling stay in the project.
 
 ---
 

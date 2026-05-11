@@ -145,4 +145,7 @@ npx @google/design.md export --format dtcg DESIGN.md > tokens.dtcg.json
 
 # Install Emil Kowalski's design engineering skill for Claude Code
 npx skills add emilkowalski/skill
+
+# Install SOUS-DS globally for Claude / Codex / Goose / Cursor
+npx sous-ds install-global
 ```
