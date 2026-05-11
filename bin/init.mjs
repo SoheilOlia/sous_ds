@@ -194,7 +194,7 @@ For Tailwind users: \`presets: [require("sous-ds/tailwind")]\`.
 function globalSkillBody(packageRoot) {
   return `---
 name: sous-ds
-description: Use when building, styling, auditing, refining, or learning from UI work with the SOUS-DS design system. Triggers on /sous-ds, /learn-from-this-project, "Learn from this project", "make this match SOUS-DS", "SOOS-DS", dark-first data-dense UI, citation chips, agent/chat interfaces, dot/dash data motif, design-system drift, or any request to update the system from a finished project.
+description: Use when building, styling, auditing, refining, or learning from UI work with the SOUS-DS design system. Triggers on /sous-ds, /learn-from-this-project, "Learn from this project", "make this match SOUS-DS", "SOOS-DS", "SUSE", "SUSE-DS", "SUSE design system", "Sous design system", "Sous DS", "sous", "the SOUS-DS design system", "the design system" (when sous-ds is the active system), dark mode, light mode, prezzo mode, presentation mode, dark-first data-dense UI, citation chips, agent/chat interfaces, dot/dash data motif, design-system drift, or any request to update the system from a finished project.
 ---
 
 # sous-ds global skill
