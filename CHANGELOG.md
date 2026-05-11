@@ -6,6 +6,12 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+---
+
+## [0.9.0] — 2026-05-08
+
+**Light mode + Prezzo mode + global propagation.** Two new orthogonal axes layered on top of the v0.7 composition contract: `[data-theme="light"]` makes light a first-class peer of dark across the entire token surface (every component flips automatically), and `[data-mode="prezzo"]` collapses typography to Cash Sans Regular at every role for presentation distance. They compose: prezzo-dark, prezzo-light, regular-dark, regular-light are four real states with two HTML attributes. Plus Nexus.app added as a 7th install target, SUSE / Sous design system trigger variants for natural-language invocation, and the v2 component catalogue promoted to the canonical preview.html.
+
 ### Added
 
 - **Prezzo mode — presentation typography.** `[data-mode="prezzo"]` on `<html>` (orthogonal to `[data-theme]`, composes as prezzo-dark / prezzo-light) collapses the three-family contract (Cash Sans display, Geist sans, Geist Mono) to a single face: Cash Sans Regular at every role and size. h2/h3 family promotes from mono to display. Every type-scale weight pins to 400; a global descendant rule (`[data-mode="prezzo"] * { font-weight: 400 !important }`) catches components that hardcode font-weight: 500 (Pill filled, Button, label) without rewriting them. Tabular numerals and uppercase-tracked labels are intentionally preserved — they remain semantic, not stylistic. For slides, keynotes, and screenshots meant to be read at presentation distance. `preview.html` ships a Regular / Prezzo segmented toggle next to the theme toggle, with localStorage persistence (`sous-ds:mode`) and pre-paint application.

@@ -1,9 +1,9 @@
 {
   "name": "sous-ds",
-  "version": "0.7.1",
-  "description": "Dark-first, data-dense, restraint-led design system for AI-native interfaces. Monospace for data, 1px borders over shadows, semantic accents for live and success only, motion under 300ms. Distributes as a global Claude/Codex/Goose skill plus installable React components.",
+  "version": "0.9.0",
+  "description": "Dark-first, data-dense, restraint-led design system for AI-native interfaces. Light mode is a first-class peer; prezzo mode collapses typography to Cash Sans Regular for slides. Monospace carries data, 1px borders over shadows, semantic accents for live and success only, motion under 300ms. Distributes as a global Claude/Codex/Goose/Nexus/Cursor skill plus installable React components.",
   "license": "Apache-2.0",
-  "author": "Soheil Yasrebi",
+  "author": "SoheilOlia",
   "homepage": "https://github.com/SoheilOlia/sous_ds",
   "repository": {
     "type": "git",
