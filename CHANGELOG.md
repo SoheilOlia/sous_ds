@@ -8,6 +8,30 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.10.1] — 2026-05-10
+
+**Server-side planner proxy.** Closes the deploy-blocker that v0.10.0 flagged in `GAPS.md`. The playground no longer calls the Anthropic API from the browser — `examples/vite.config.ts` mounts a `/api/plan` middleware that forwards planner requests upstream from the Node process. The key stays server-side. CORS-blocked org keys (Block, Anthropic for Work) now work without falling back to a personal key.
+
+### Added
+
+- `examples/vite.config.ts` — `sous-ds-planner-proxy` plugin with `configureServer`. `GET /api/plan` returns `{ keyConfigured, model }` for sidebar health hint; `POST /api/plan` forwards the Anthropic `messages.create` payload upstream and pipes the response back.
+- Server-side env precedence: `ANTHROPIC_API_KEY` preferred; `VITE_ANTHROPIC_API_KEY` honored as a fallback so existing `.env.local` files keep working.
+
+### Changed
+
+- `examples/generative-ui-playground.tsx` — replaced the browser-side `Anthropic` SDK call with a plain `fetch("/api/plan", …)`. Mounted a health-check probe on app boot so the "no key" warning shows up without forcing a request first. Updated header comments + setup instructions to drop the `dangerouslyAllowBrowser` story.
+- `examples/.env.local.example` — primary key name is now `ANTHROPIC_API_KEY` (no `VITE_` prefix). Legacy name still honored. Comment block rewritten to describe the proxy path.
+- `components/GenerativeRenderer.tsx` — pass `prefix=""` to `<MetricStat>` explicitly. React destructuring uses the component's default (`"+"`) when prop is `undefined`, which was producing `+78` / `+3d` / `+5` instead of `78` / `3d` / `5` in `MetricWall` sections.
+- `package.json` — version `0.10.0 → 0.10.1`. Dropped `@anthropic-ai/sdk` from `devDependencies` (proxy uses native `fetch`; client never imported it again).
+- `GAPS.md` — proxy gap marked closed; remaining work noted (production-deploy edge function, not a dev-only Vite middleware).
+
+### Notes
+
+- The dev-server middleware is dev-only. Deploying the playground anywhere still requires a real edge function (Vercel/Cloudflare Worker/Next.js API route) mirroring the middleware. The client code already issues `fetch("/api/plan", …)` so only the server handler has to be ported.
+- Migration for users who already created `.env.local` with `VITE_ANTHROPIC_API_KEY`: nothing to do — the proxy still reads it. New installs should use `ANTHROPIC_API_KEY` (no prefix).
+
+---
+
 ## [0.10.0] — 2026-05-10
 
 **Generative UI layer.** Adds a runtime contract on top of the v2 composition system: a natural-language prompt produces composition JSON; a deterministic renderer turns that JSON into a live sous-ds page. Follow-up prompts update sections in place. No new visual primitives — six v2 recipes (MetricWall, RAGStatus, PipelineMap, MilestoneStrip, AgentLog, ReceiptStack) compose from the existing component catalog. All accent carriers route through sanctioned components (LiveDot, PulseTrail, Pill[live], InlineStatus[live], SegmentedBar[success]) per `R-SEMANTIC-001` and CL07.

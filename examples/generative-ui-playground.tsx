@@ -3,25 +3,25 @@
  *
  * A single-file React app that wires:
  *   - the planner system prompt (docs/specs/generative-ui-planner.md)
- *   - the Anthropic API (browser, dev-only)
+ *   - the planner-proxy middleware in vite.config.ts (server-side)
  *   - the JSON Schema validator (ajv)
  *   - the deterministic <GenerativeRenderer>
  *
+ * The Anthropic key is read server-side by the Vite middleware and
+ * never reaches the browser. CORS-blocked org keys work fine because
+ * the request originates from the Node process, not a browser tab.
+ *
  * Setup (one-time):
  *   1. cp examples/.env.local.example examples/.env.local
- *   2. Add your VITE_ANTHROPIC_API_KEY to .env.local
+ *   2. Add your ANTHROPIC_API_KEY to .env.local (no VITE_ prefix)
  *   3. bun install   (or npm install)
  *
  * Run:
  *   bun run dev      (opens http://localhost:5173 automatically)
- *
- * Security: the API key is exposed to the browser. This is dev-only;
- * production would proxy through a server. Do not deploy this as-is.
  */
 
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import Anthropic from "@anthropic-ai/sdk";
 import Ajv from "ajv";
 
 import "../tokens.css";
@@ -43,7 +43,7 @@ import fixturesData from "./generative-ui-fixtures.json";
 /* ------------------------------------------------------------------ */
 
 const VERSION = "v0.10.0";
-const DEFAULT_MODEL = "claude-sonnet-4-7";
+const DEFAULT_MODEL = "claude-sonnet-4-6";
 
 const QUICK_PROMPTS: string[] = [
   "Show me a trust review dashboard for a flagged account.",
@@ -86,29 +86,36 @@ function validateComposition(json: unknown): { ok: true; value: CompositionJSON 
 }
 
 /* ------------------------------------------------------------------ */
-/* Anthropic client                                                   */
+/* Planner — call /api/plan (server-side proxy)                       */
 /* ------------------------------------------------------------------ */
 
-function buildAnthropic(): Anthropic | null {
-  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY as string | undefined;
-  if (!apiKey || apiKey === "sk-ant-...") return null;
-  return new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+interface AnthropicMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+interface AnthropicContentBlock {
+  type: string;
+  text?: string;
+}
+
+interface AnthropicResponse {
+  content?: AnthropicContentBlock[];
+  error?: { type?: string; message?: string };
 }
 
 interface PlanArgs {
-  client: Anthropic;
   userPrompt: string;
   previousUserPrompt?: string;
   previousComposition?: CompositionJSON;
 }
 
 async function planComposition({
-  client,
   userPrompt,
   previousUserPrompt,
   previousComposition,
 }: PlanArgs): Promise<{ raw: string; composition: CompositionJSON }> {
-  const messages: Anthropic.MessageParam[] = [];
+  const messages: AnthropicMessage[] = [];
 
   if (previousUserPrompt && previousComposition) {
     messages.push({ role: "user", content: previousUserPrompt });
@@ -116,22 +123,37 @@ async function planComposition({
   }
   messages.push({ role: "user", content: userPrompt });
 
-  const model = (import.meta.env.VITE_ANTHROPIC_MODEL as string | undefined) ?? DEFAULT_MODEL;
+  const model =
+    (import.meta.env.PLANNER_MODEL as string | undefined) ?? DEFAULT_MODEL;
 
-  const response = await client.messages.create({
-    model,
-    max_tokens: 2000,
-    system: SYSTEM_PROMPT,
-    messages,
+  const response = await fetch("/api/plan", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model,
+      max_tokens: 2000,
+      system: SYSTEM_PROMPT,
+      messages,
+    }),
   });
 
-  const text = response.content
-    .filter((block): block is Anthropic.TextBlock => block.type === "text")
-    .map((block) => block.text)
+  if (!response.ok) {
+    const errText = await response.text();
+    const head = errText.slice(0, 200);
+    throw new Error(`Proxy returned ${response.status}: ${head}`);
+  }
+
+  const json = (await response.json()) as AnthropicResponse;
+  if (json.error) {
+    throw new Error(`Anthropic error: ${json.error.type ?? "unknown"} — ${json.error.message ?? ""}`);
+  }
+
+  const text = (json.content ?? [])
+    .filter((block) => block.type === "text" && typeof block.text === "string")
+    .map((block) => block.text as string)
     .join("");
 
-  /* The planner emits JSON only, but be tolerant of a leading/trailing
-   * fence the model may slip in. */
+  /* Tolerate a code fence the model may slip in despite instructions. */
   const cleaned = text.trim().replace(/^```(?:json)?\n/, "").replace(/\n```$/, "");
   const parsed = JSON.parse(cleaned);
   const result = validateComposition(parsed);
@@ -156,9 +178,23 @@ function App() {
   const [history, setHistory] = React.useState<HistoryEntry[]>([]);
   const [prompt, setPrompt] = React.useState("");
   const [planning, setPlanning] = React.useState(false);
-  const clientRef = React.useRef<Anthropic | null>(null);
-  if (!clientRef.current) clientRef.current = buildAnthropic();
-  const hasKey = clientRef.current !== null;
+  const [keyStatus, setKeyStatus] = React.useState<"unknown" | "ready" | "missing">("unknown");
+
+  /* Probe the proxy health endpoint so the sidebar can hint at config
+     issues without forcing the user to click first. */
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch("/api/plan", { method: "GET" })
+      .then((r) => r.json())
+      .then((data: { keyConfigured?: boolean }) => {
+        if (cancelled) return;
+        setKeyStatus(data.keyConfigured ? "ready" : "missing");
+      })
+      .catch(() => {
+        if (!cancelled) setKeyStatus("missing");
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   const dials: Dials = {
     ...DEFAULT_DIALS,
@@ -168,19 +204,10 @@ function App() {
   const submit = React.useCallback(
     async (text: string) => {
       if (!text.trim()) return;
-      if (!clientRef.current) {
-        toast.show({
-          tone: "live",
-          title: "API key missing",
-          description: "Set VITE_ANTHROPIC_API_KEY in examples/.env.local and reload.",
-        });
-        return;
-      }
       setPlanning(true);
       try {
         const previous = history[history.length - 1];
         const { composition: next } = await planComposition({
-          client: clientRef.current,
           userPrompt: text,
           previousUserPrompt: previous?.prompt,
           previousComposition: previous?.composition,
@@ -193,9 +220,9 @@ function App() {
         console.error("[playground] plan failed", err);
         toast.show({
           tone: "live",
-          title: "Planner output invalid",
-          description: message.length > 120 ? `${message.slice(0, 117)}…` : message,
-          duration: 8000,
+          title: "Planner failed",
+          description: message.length > 200 ? `${message.slice(0, 197)}…` : message,
+          duration: 10000,
         });
       } finally {
         setPlanning(false);
@@ -270,11 +297,12 @@ function App() {
           {planning && (
             <InlineStatus tone="active">Planning UI…</InlineStatus>
           )}
-          {!hasKey && (
+          {keyStatus === "missing" && (
             <p className="pg-warn">
-              No API key set. Use the fixtures below, or add{" "}
-              <code>VITE_ANTHROPIC_API_KEY</code> to{" "}
-              <code>examples/.env.local</code>.
+              No API key on the server. Use the fixtures below, or add{" "}
+              <code>ANTHROPIC_API_KEY</code> to{" "}
+              <code>examples/.env.local</code> and restart{" "}
+              <code>bun run dev</code>.
             </p>
           )}
         </section>

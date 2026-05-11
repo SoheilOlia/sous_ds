@@ -18,7 +18,7 @@ The planner outputs composition JSON matching
 [`<GenerativeRenderer>`](../../components/GenerativeRenderer.tsx) turns that
 JSON into a live page.
 
-Recommended model: **`claude-sonnet-4-7`** or **`claude-opus-4-7`**. `max_tokens`:
+Recommended model: **`claude-sonnet-4-6`** or **`claude-opus-4-7`**. `max_tokens`:
 **2000**. Pass the user's prompt as a `user` message. For follow-ups, append the
 previous user turn and the previous JSON response so the planner can update in
 place.
@@ -341,7 +341,7 @@ const client = new Anthropic({
 });
 
 const response = await client.messages.create({
-  model: "claude-sonnet-4-7",
+  model: "claude-sonnet-4-6",
   max_tokens: 2000,
   system: systemPrompt,
   messages: [{ role: "user", content: userPrompt }],

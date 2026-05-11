@@ -62,28 +62,28 @@ carrier entry in `R-SEMANTIC-001` and `CL07` (`components/Pill.css` is already
 in the `accent-success` allow list, so the file gate is fine — only the prop
 API needs deliberation).
 
-## Server-side proxy for the Anthropic API
+## Server-side proxy for the Anthropic API — **closed in v0.10.1**
 
-The playground uses `dangerouslyAllowBrowser: true` and reads
-`VITE_ANTHROPIC_API_KEY` straight from `import.meta.env`. That's fine on
-`localhost` for an individual dogfooding the demo. It is not fine for any
-deployed surface — including an internal Vercel preview, a Blockcell share
-link, or a teammate's machine.
+Previously: the playground called the Anthropic API directly from the
+browser with `dangerouslyAllowBrowser: true`. Org-issued keys (Block,
+Anthropic for Work tenants, etc.) reject browser-origin requests at the
+CORS layer, so the playground only worked with personal keys.
 
-**Before the playground becomes a shared URL** (deployed anywhere with
-network egress beyond the user who launched it), the Anthropic call must
-move behind a server. Smallest viable shape:
+**v0.10.1 fix:** `examples/vite.config.ts` mounts a `/api/plan`
+middleware that proxies planner requests to `api.anthropic.com`
+server-side. The key reads from `ANTHROPIC_API_KEY` (or legacy
+`VITE_ANTHROPIC_API_KEY` — both work, the former is preferred) and
+never reaches the browser bundle. The `@anthropic-ai/sdk` browser
+dependency was dropped; the proxy uses plain `fetch`.
 
-- A single edge function (Vercel/Cloudflare Worker/Next.js API route) that
-  reads `ANTHROPIC_API_KEY` from a server-side secret and forwards the
-  `messages.create` payload upstream.
-- Playground swaps the SDK call for a `fetch("/api/plan", { method: "POST",
-  body: JSON.stringify({ system, messages, model }) })`.
-- The browser bundle no longer references the SDK or the key.
+A `GET /api/plan` health check returns `{ keyConfigured, model }` so
+the sidebar can warn before the first request.
 
-The header comment in `examples/generative-ui-playground.tsx` already says
-"do not deploy this as-is" — but a comment isn't infrastructure. Track this
-as a real gating gap before any shared URL.
+**Remaining work for production:** the Vite middleware is a dev-server
+construct. Deploying the playground (Vercel, Blockcell, etc.) still
+needs a real edge function / API route mirroring the middleware. The
+client code (`fetch("/api/plan", …)`) is already deploy-ready; only
+the server-side handler has to be ported.
 
 ## `<Citation>` integration in body strings
 

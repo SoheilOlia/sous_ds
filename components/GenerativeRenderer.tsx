@@ -152,7 +152,7 @@ function renderMetricWall(section: MetricWallSection): React.ReactNode {
                 key={i}
                 label={metric.label}
                 value={numericValue}
-                prefix={undefined}
+                prefix=""
                 suffix={metric.unit}
                 delta={metric.delta}
                 animated={false}
