@@ -8,13 +8,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>
-  /* Pre-paint theme application. Must stay tiny and inline so it
-     runs before first paint and avoids a flash of the wrong theme. */
+  /* Pre-paint theme + mode application. Must stay tiny and inline so it
+     runs before first paint and avoids a flash of the wrong theme/mode. */
   (function () {
     try {
-      var stored = localStorage.getItem('sous-ds:theme');
-      if (stored === 'light' || stored === 'dark') {
-        document.documentElement.setAttribute('data-theme', stored);
+      var theme = localStorage.getItem('sous-ds:theme');
+      if (theme === 'light' || theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+      var mode = localStorage.getItem('sous-ds:mode');
+      if (mode === 'prezzo') {
+        document.documentElement.setAttribute('data-mode', mode);
       }
     } catch (_) { /* private mode, skip */ }
   })();
@@ -122,6 +126,26 @@
   --ds-accent-success: #00E013;
   --ds-elev-1: 0 1px 2px rgba(0,0,0,0.06);
   --ds-elev-2: 0 8px 24px rgba(0,0,0,0.10);
+}
+
+/* ============================================================
+   Prezzo mode — Cash Sans regular at every role and size.
+   Orthogonal to [data-theme]; composes as prezzo-dark, prezzo-light.
+   ============================================================ */
+[data-mode="prezzo"] {
+  --ds-font-display: "Cash Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --ds-font-sans:    "Cash Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --ds-font-mono:    "Cash Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --ds-type-h2-family: var(--ds-font-display);
+  --ds-type-h3-family: var(--ds-font-display);
+  --ds-type-display-weight: 400;
+  --ds-type-h1-weight: 400;
+  --ds-type-h2-weight: 400;
+  --ds-type-h3-weight: 400;
+}
+[data-mode="prezzo"],
+[data-mode="prezzo"] * {
+  font-weight: 400 !important;
 }
 
 /* ============================================================
@@ -2300,6 +2324,10 @@ body {
         <button type="button" data-theme-set="dark" aria-pressed="true">Dark</button>
         <button type="button" data-theme-set="light" aria-pressed="false">Light</button>
       </div>
+      <div class="theme-toggle" role="radiogroup" aria-label="Mode">
+        <button type="button" data-mode-set="default" aria-pressed="true">Regular</button>
+        <button type="button" data-mode-set="prezzo" aria-pressed="false">Prezzo</button>
+      </div>
       <span class="clock" id="clock">00:00:00</span>
       <span class="live"><span class="dot"></span>Live</span>
     </div>
@@ -2958,6 +2986,38 @@ body {
 
   buttons.forEach(b => {
     b.addEventListener('click', () => setTheme(b.dataset.themeSet));
+  });
+})();
+
+/* ============================================================
+   Mode toggle (Regular / Prezzo). Orthogonal to theme; same pattern.
+   "default" mode is represented as the absence of the data-mode
+   attribute so the cascade falls through to dark/light tokens cleanly.
+   ============================================================ */
+(function modeToggle () {
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll('.theme-toggle [data-mode-set]');
+  const STORAGE_KEY = 'sous-ds:mode';
+
+  function setMode(next) {
+    if (next === 'default') {
+      root.removeAttribute('data-mode');
+    } else {
+      root.setAttribute('data-mode', next);
+    }
+    buttons.forEach(b => {
+      b.setAttribute('aria-pressed', b.dataset.modeSet === next ? 'true' : 'false');
+    });
+    try {
+      if (next === 'default') localStorage.removeItem(STORAGE_KEY);
+      else localStorage.setItem(STORAGE_KEY, next);
+    } catch (_) { /* private mode */ }
+  }
+
+  setMode(root.getAttribute('data-mode') || 'default');
+
+  buttons.forEach(b => {
+    b.addEventListener('click', () => setMode(b.dataset.modeSet));
   });
 })();
 

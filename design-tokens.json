@@ -1,8 +1,8 @@
 {
   "$schema": "https://tr.designtokens.org/format/",
   "$name": "sous-ds",
-  "$version": "0.8.0",
-  "$description": "Canonical tokens for the system. Dark is default; light is a first-class peer. Every token passes WCAG AA at minimum. Semantic accents are reserved: live and success only — and constant across modes. Format inspired by the W3C DTCG spec.",
+  "$version": "0.9.0",
+  "$description": "Canonical tokens for the system. Dark is default; light is a first-class peer. Prezzo is an orthogonal mode that collapses typography to Cash Sans Regular at every role for presentation contexts. Every token passes WCAG AA at minimum. Semantic accents are reserved: live and success only — and constant across modes. Format inspired by the W3C DTCG spec.",
 
   "color": {
     "bg": {
@@ -135,6 +135,16 @@
     "md": { "$value": "768px",  "$type": "dimension" },
     "lg": { "$value": "1024px", "$type": "dimension" },
     "xl": { "$value": "1280px", "$type": "dimension" }
+  },
+
+  "mode": {
+    "$description": "Modes are orthogonal axes that compose with [data-theme]. Apply with [data-mode=\"<name>\"] on <html> or any subtree. Only typography is affected today; future modes may extend other axes.",
+    "default": {
+      "$description": "Three families: Cash Sans display (display, h1), Geist Mono (h2, h3, label, all data), Geist sans (body). Weights up to 500."
+    },
+    "prezzo": {
+      "$description": "Presentation typography. All three font-family tokens collapse to Cash Sans; h2/h3 family promotes from mono to display; every type-scale weight pins to 400; a global descendant rule forces components that hardcode font-weight: 500 down to 400. Tabular numerals and uppercase-tracked labels are intentionally preserved — they remain semantic, not stylistic. Use for slides, keynotes, and screenshots intended for presentation distance."
+    }
   },
 
   "component": {

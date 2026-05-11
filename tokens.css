@@ -1,6 +1,6 @@
 /* ============================================================
    sous-ds / tokens.css
-   Generated from design-tokens.json v0.8.0
+   Generated from design-tokens.json v0.9.0
    Every value here is the single source of truth for the system.
    Do not override in component CSS. Change the token instead.
 
@@ -137,6 +137,47 @@
      do most of the work. The dark shadows would punch holes in white. */
   --ds-elev-1:  0 1px 2px rgba(0, 0, 0, 0.06);
   --ds-elev-2:  0 8px 24px rgba(0, 0, 0, 0.10);
+}
+
+/* ============================================================
+   Prezzo mode — presentation typography (one face, one weight).
+
+   Collapses the three-family contract (Cash Sans display, Geist sans,
+   Geist Mono) into a single face: Cash Sans Regular at every role.
+   h2/h3 promote from mono to display. Every type-scale weight pins
+   to 400; a global descendant rule catches components that hardcode
+   font-weight: 500. Tabular numerals and uppercase+tracked labels
+   are intentionally preserved — they remain semantic, not stylistic.
+
+   Use for slides, keynotes, and screenshots meant to be read at
+   presentation distance, where monospace reads as engineering noise.
+   This is a different *voice* from regular sous-ds, not a stylistic
+   toggle — name the tradeoff before reaching for it.
+
+   Composes orthogonally with [data-theme] — prezzo-dark and
+   prezzo-light are real states with one extra attribute on <html>.
+   ============================================================ */
+[data-mode="prezzo"] {
+  --ds-font-display: "Cash Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --ds-font-sans:    "Cash Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --ds-font-mono:    "Cash Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --ds-type-h2-family: var(--ds-font-display);
+  --ds-type-h3-family: var(--ds-font-display);
+
+  --ds-type-display-weight: 400;
+  --ds-type-h1-weight:      400;
+  --ds-type-h2-weight:      400;
+  --ds-type-h3-weight:      400;
+}
+
+/* Pin every descendant to regular weight. Catches components that
+   hardcode font-weight: 500 (Pill filled, Button, label) without
+   rewriting them — prezzo's defining trait is one weight at every
+   size and role. */
+[data-mode="prezzo"],
+[data-mode="prezzo"] * {
+  font-weight: 400 !important;
 }
 
 /* ============================================================

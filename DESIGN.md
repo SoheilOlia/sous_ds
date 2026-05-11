@@ -258,10 +258,26 @@ If green and red appear together, the semantic split must be explicit: green mar
 | `mono-xl` | Geist Mono | 48 / 56 | 500 | -0.02em | Display numbers, times, metrics |
 | `mono` | Geist Mono | 13 / 20 | 400 | 0 | Data cells, timestamps, code |
 
+### Prezzo mode (presentation typography)
+
+A second typographic axis, orthogonal to dark/light. Flip with `[data-mode="prezzo"]` on `<html>` (or any subtree). Composes with `[data-theme]` so prezzo-dark, prezzo-light, regular-dark, regular-light are four real states.
+
+| Role | Default family | Prezzo family | Default weight | Prezzo weight |
+|---|---|---|---|---|
+| `display` / `h1` | Cash Sans | Cash Sans | 400 | 400 |
+| `h2` / `h3` | Geist Mono | Cash Sans | 400 | 400 |
+| `body-*` | Geist | Cash Sans | 400 | 400 |
+| `label` | Geist Mono | Cash Sans | 500 | 400 |
+| `mono-xl` / `mono` | Geist Mono | Cash Sans | 500 / 400 | 400 |
+
+**What changes:** every role uses Cash Sans Regular; weight is pinned to 400 across the system (a global descendant rule catches components that hardcode 500). What stays: tabular numerals (Cash Sans supports the `tnum` feature), uppercase + tracked labels (still semantic), tracking values, sizes, line-heights, motion.
+
+**What this is for:** slides, keynotes, screenshots intended to be read at presentation distance, where mono reads as engineering noise. **What this is not:** a stylistic toggle. Prezzo collapses the system's "monospace carries all data" signature — every label, timestamp, and tabular value reads as Cash Sans proportional. It's a different *voice* from default sous-ds; reach for it deliberately.
+
 ### Typography rules (canonical, non-negotiable)
 
 1. **Body caps at `65ch`.** Never stretch full viewport width. Source: Emil Kowalski.
-2. **All numeric display uses mono + `tabular-nums`.** Columns align. No exceptions.
+2. **All numeric display uses mono + `tabular-nums`.** Columns align. No exceptions. *(In prezzo mode, "mono" collapses to Cash Sans; tabular-nums stays on as an OpenType feature.)*
 3. **Use `…` not `...`** for truncation.
 4. **Uppercase labels need loosened tracking.** 0.06em minimum, 0.08em default.
 5. **Superscript units** on display numbers. `+326%` sets the % in lighter weight, smaller size, baseline-aligned. `7HR 48MIN` sets `HR` and `MIN` at half size beside the numerals.
