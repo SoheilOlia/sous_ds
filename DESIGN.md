@@ -188,6 +188,16 @@ Terminal gravity meets editorial restraint. The interface feels like a precision
 
 Not a SaaS marketing aesthetic. No gold stars, no gradient hero blobs, no glass morphism, no elevation theater. Not warm, not playful, not soft. Not a generic dashboard.
 
+### Reflective surfaces vs status surfaces (v0.11.0)
+
+A **reflective surface** is a knowledge layer that collects information about the user's own activity (or a team's) and presents it back for the user to reflect on — weekly status, team roster, profile, directory, knowledge graph.
+
+A **status surface** is a PM tool that computes a verdict about the user's activity and tells them where they stand — project tracker, OKR dashboard, performance review.
+
+**SOUS-DS composes reflective surfaces. It does not compose status surfaces.** If the request would produce a status surface, choose reflective shape. The structural insight: Screen Time on iOS does not say *"Hey, get off Twitter — you're spending too much time on it."* It collects information and presents it back. The user makes the judgment.
+
+This decision encodes as three refusals in `refusals.json` (R-COMPOSE-005, R-COMPOSE-006, R-METRIC-002) and a corpus section in `docs/specs/planner-taste.md`. The test reviewers apply: *is the user reading their own activity to reflect, or is the surface telling them they're behind?* If the latter, the surface is wrong.
+
 ---
 
 ## Colors
@@ -272,7 +282,7 @@ A second typographic axis, orthogonal to dark/light. Flip with `[data-mode="prez
 
 **What changes:** every role uses Cash Sans Regular; weight is pinned to 400 across the system (a global descendant rule catches components that hardcode 500). What stays: tabular numerals (Cash Sans supports the `tnum` feature), uppercase + tracked labels (still semantic), tracking values, sizes, line-heights, motion.
 
-**What this is for:** slides, keynotes, screenshots intended to be read at presentation distance, where mono reads as engineering noise. **What this is not:** a stylistic toggle. Prezzo collapses the system's "monospace carries all data" signature — every label, timestamp, and tabular value reads as Cash Sans proportional. It's a different *voice* from default sous-ds; reach for it deliberately.
+**What this is for:** any surface where the audience is reading state as story, not as data — slides, keynotes, weekly updates, all-hands snapshots, leadership readouts, team-of-teams overviews, screenshots intended to be read at presentation distance. The mono-data signature reads as engineering noise at executive distance; prezzo collapses that to Cash Sans proportional and lets the *narrative* land. v0.11.0 reframes prezzo: it is the **default mode for executive-distance, status-as-narrative surfaces**, not just `.key` exports. **What this is not:** a stylistic toggle. Prezzo collapses the system's "monospace carries all data" signature — every label, timestamp, and tabular value reads as Cash Sans proportional. It's a different *voice* from default sous-ds; reach for it deliberately.
 
 ### Typography rules (canonical, non-negotiable)
 

@@ -34,7 +34,20 @@ Signal phrases that should trigger this skill:
 8. `docs/specs/sous-ds-v2.md` — composition contract. Read this before composing any page.
 9. `docs/specs/sous-ds-v2-composition-recipes.md` — named page archetypes.
 10. `docs/specs/sous-ds-v2-voice.md` — copy contract.
-11. `docs/specs/sous-ds-reference-learning.md` — learning protocol for promoting finished project patterns into SOUS-DS.
+11. `docs/specs/planner-taste.md` — runtime planner-audience taste corpus (v0.11.0+). The bridge between `TASTE_LOG.md` (human audit) and the runtime planner LLM. Generative-UI work must read this alongside `generative-ui-planner.md`.
+12. `docs/specs/sous-ds-reference-learning.md` — learning protocol for promoting finished project patterns into SOUS-DS.
+
+## Version handshake (mandatory on /sous-ds invocation)
+
+When `/sous-ds` is invoked, before applying any rule the agent MUST announce
+the version it has loaded:
+
+> Loaded SOUS-DS v0.11.0, v2.0 composition contract + planner-taste corpus.
+
+Without this announcement the agent may silently load a 1.0-era skill and
+skip the 2.0 composition layer (recipes, decision tree, voice dials,
+reflective-surface refusals). Skipping the announcement is a process
+violation; redo from the latest source at `~/Sous_DS/`.
 
 ## Learning from a project
 
@@ -115,6 +128,14 @@ If the answer is "visitor," stop and revise. Spec-reviewed correctness is not en
 ### 6. MUST: Update section labels after shipping
 If the section-aside said `DOTTED BAR` and you shipped solid rectangles, the label is a lie. Either rewrite the component back into the motif, or rewrite the aside to name the new language honestly. Do not leave drift.
 
+### 7. MUST: Register the new component in the planner's decision tree
+If the new component will be reached by the runtime planner (most composable primitives will), update **both** decision trees in lockstep:
+
+- This SKILL.md's `Intent → component decision tree (2.0)` table — agents reach for it when generating.
+- `docs/specs/generative-ui-planner.md` component vocabulary table — the planner LLM uses it at runtime.
+
+A new component invisible to the planner is dead surface area — the planner will keep reaching for the four primitives it already knows. Step 7 is the difference between "shipped" and "reachable."
+
 ### The test
 
 "Does it pass the spec review?" is **not** the test.
@@ -149,10 +170,13 @@ Load `refusals.json` for the full machine-readable corpus with patterns. Summary
 | R-COMPOSE-002 | Same recipe used > 2 times on one page | Forces variance; ≥3 distinct recipes per page when RHYTHM ≥ 4 |
 | R-COMPOSE-003 | More than 3 `<Pill>` per card or > 8 per section | Pill wall — content shape is wrong |
 | R-COMPOSE-004 | Page uses < 3 distinct recipes when RHYTHM ≥ 4 | Forces archetype variance |
+| R-COMPOSE-005 | Policing chrome on reflective surfaces | Knowledge layers reflect, they don't judge — no risk badges, ranks, scores, flags |
+| R-COMPOSE-006 | Matching/relevancy/scoring on roster surfaces | Roster ≠ dating app; crew manifest, not profile match |
 | R-METRIC-001 | `<MetricStat>` group of 2+ without a shared unit/axis | Mismatched-unit KPI grid |
+| R-METRIC-002 | Per-person comparative or ranking metric | Show what was made, not how much; no leaderboards |
 | R-VOICE-001 | File path inline in body prose | Belongs in code block, ToolCall detail, or footnote |
 | R-VOICE-002 | Two adjacent sections share micro-template | Database-dump rhythm |
-| R-VOICE-003 | Status-meeting phrasing ("we are building," "things are stricter," "draft-PR truth") | Generic editorial voice; replace with instrument readout |
+| R-VOICE-003 | Status-meeting phrasing + PM status words (`off track`, `no DRI`, `underperforming`; also banned in voice: `risk`, `stale`, `blocked`, `behind`) | Generic editorial / PM-tool voice; replace with instrument readout |
 
 When refusing: cite the `R-*` id, quote the rationale, propose the canonical alternative.
 

@@ -459,6 +459,7 @@ function ruleCO11_statusMeetingVoice(src, file) {
   if (/(pipeline-status-2\.0|v2-upgrade)\.html$/.test(file)) return [];
   const findings = [];
   const BANNED = [
+    // v1 — engineering status-meeting voice
     "we are building",
     "what we are building",
     "what we're working on",
@@ -469,6 +470,13 @@ function ruleCO11_statusMeetingVoice(src, file) {
     "still-blocked truth",
     "the project is not green because",
     "where we are going",
+    // v0.11.0 — PM/status-meeting status words (unambiguous multi-word
+    // phrases only; the single-word bans (risk, stale, blocked, behind)
+    // are documented in planner-taste.md and refusals.json but not auto-
+    // enforced — too many false positives at info severity).
+    "off track",
+    "no DRI",
+    "underperforming",
   ];
   // Strip <code>, <pre>, comments to scan only rendered text.
   const stripped = src
@@ -477,7 +485,11 @@ function ruleCO11_statusMeetingVoice(src, file) {
     .replace(/<!--[\s\S]*?-->/g, "")
     .replace(/\/\*[\s\S]*?\*\//g, "");
   for (const phrase of BANNED) {
-    const rx = new RegExp(phrase.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"), "gi");
+    /* Wrap with word boundaries so "no DRI" doesn't match "no drift"
+       (the original regex without boundaries produced false positives
+       on substring matches — caught in v0.11.0). */
+    const escaped = phrase.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+    const rx = new RegExp(`\\b${escaped}\\b`, "gi");
     let m;
     while ((m = rx.exec(stripped)) !== null) {
       findings.push({

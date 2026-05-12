@@ -1,6 +1,6 @@
 {
   "$schema": "https://sous-ds.dev/schema/refusals.v0.json",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Machine-readable refusal corpus. Agents MUST refuse requests that match these patterns, cite the id, and propose the canonical alternative. The refusal set is as important as the component set — it is how the system transfers taste.",
   "categories": {
     "color": "Hue, tone, and the reserved semantic accents",
@@ -12,9 +12,9 @@
     "semantic": "Meaningful accent carriers and semantic discipline",
     "process": "How new components get designed, proposed, and added to the system",
     "anti-slop": "The recognizable AI-slop signatures",
-    "compose": "Page-level composition rules — recipes, density quotas, anti-card-grid, anti-pill-wall (2.0)",
+    "compose": "Page-level composition rules — recipes, density quotas, anti-card-grid, anti-pill-wall, reflective-surface discipline (2.0)",
     "voice": "Copy contract — terse instrument-readout voice, banned phrases, rhythm variance (2.0)",
-    "metric": "Coherence rules for metric clusters (2.0)"
+    "metric": "Coherence rules for metric clusters; per-person comparative-count refusal (2.0)"
   },
   "refusals": [
     {
@@ -241,7 +241,7 @@
       "title": "Display or h1 falls back to a serif when Cash Sans is unavailable",
       "pattern": "font-family:[^;]*(Times|Georgia|Garamond|Playfair|Cambria|Charter|serif)[^;]*;[\\s\\S]{0,200}(--ds-font-display|--ds-font-h1|font-size:\\s*(?:48|56|64|72|80|90)px)",
       "severity": "error",
-      "rationale": "When Cash Sans isn't licensed/loaded, models reach for a serif fallback because hero headlines 'feel editorial.' That breaks the system's voice — sous-ds is a monospace-instrument aesthetic, never a serif page. The 1.0 case-study page rendered the hero in serif because no fallback was named.",
+      "rationale": "When Cash Sans isn't licensed/loaded, models reach for a serif fallback because hero headlines 'feel editorial.' That breaks the system's voice — sous-ds is a monospace-instrument aesthetic, never a serif page. The 1.0 case-study page rendered the hero in serif because no fallback was named. Clarification (v0.11.0): this refusal carries even when reference imagery shared with the agent uses an editorial serif. Reference visual taste does not override the system contract; Cash Sans Display at the same size carries the editorial weight, and prezzo mode collapses everything to Cash Sans anyway.",
       "correct": "Display and h1 fallback when Cash Sans is unavailable: `var(--ds-font-mono)` (Geist Mono) at the same display size with `font-weight: 600`. Never a serif. Set the `font-family` stack as `\"Cash Sans\", var(--ds-font-mono)` so the cascade reaches mono, not the system serif.",
       "source": "docs/specs/sous-ds-v2.md#new-refusals",
       "manualCheck": true
@@ -268,8 +268,8 @@
       "title": "Same composition recipe used more than twice on one page",
       "pattern": "",
       "severity": "warning",
-      "rationale": "Card monotony — every section the same `eyebrow + h1 + body + grid-of-cards` rhythm — is the dominant 1.0 failure mode. Repeating any single recipe more than twice flattens hierarchy and removes scannability.",
-      "correct": "A page must use ≥3 distinct recipes from the catalogue when `RHYTHM ≥ 4` (default). Pick the recipe whose intent matches each section's content shape; don't reach for the same recipe by default.",
+      "rationale": "Card monotony — every section the same `eyebrow + h1 + body + grid-of-cards` rhythm — is the dominant 1.0 failure mode. Repeating any single recipe more than twice flattens hierarchy and removes scannability. Single-archetype surfaces (resume index, directory, glossary) are exempt only when `RHYTHM ≤ 3` is declared inline in the renderer — the dial declaration is the honesty contract; reviewers check for it before citing this rule.",
+      "correct": "A page must use ≥3 distinct recipes from the catalogue when `RHYTHM ≥ 4` (default). Pick the recipe whose intent matches each section's content shape; don't reach for the same recipe by default. For single-archetype pages, declare `// Dials: DENSITY=N, RHYTHM=M` inline in a comment at the top of the renderer.",
       "source": "docs/specs/sous-ds-v2-composition-recipes.md",
       "manualCheck": true
     },
@@ -290,10 +290,41 @@
       "title": "Page uses fewer than 3 distinct composition recipes when RHYTHM ≥ 4",
       "pattern": "",
       "severity": "warning",
-      "rationale": "Without recipe variance, every page converges on the same shape. The 2.0 contract requires ≥3 distinct recipes per page at default `RHYTHM` to force layout variation.",
-      "correct": "Choose ≥3 recipes whose intents match the page's content shapes. Default fallback set: MetricWall + RAGStatus + AgentLog covers most AI-product status surfaces.",
+      "rationale": "Without recipe variance, every page converges on the same shape. The 2.0 contract requires ≥3 distinct recipes per page at default `RHYTHM` to force layout variation. Single-archetype surfaces are exempt only when `RHYTHM ≤ 3` is declared inline; the dial declaration is the honesty contract.",
+      "correct": "Choose ≥3 recipes whose intents match the page's content shapes. Default fallback set: MetricWall + RAGStatus + AgentLog covers most AI-product status surfaces. For single-archetype pages, declare `// Dials: DENSITY=N, RHYTHM=M (single-archetype <kind> layout — exempt from R-COMPOSE-002/004 per the dial contract)` inline in the renderer.",
       "source": "docs/specs/sous-ds-v2.md#new-refusals",
       "manualCheck": true
+    },
+    {
+      "id": "R-COMPOSE-005",
+      "category": "compose",
+      "title": "Policing chrome on reflective surfaces",
+      "pattern": "",
+      "severity": "warning",
+      "rationale": "On reflective surfaces (knowledge layers, weekly status, team-roster, profile, directory), status-judgment chrome — risk badges, ranks, scores, flags, computed verdicts about people or projects — turns the surface into a PM tool, not a knowledge layer. The 1.0 R-VOICE-003 catches phrasing; this rule is broader and structural: the *components and composition* of a reflective surface must not include judgment chrome at all, regardless of phrasing. Screen Time presents information back to the user; it does not police. Reflective surfaces follow the same model.",
+      "correct": "Choose reflective shape, not status shape. The test: *is the user reading their own activity to reflect, or is the surface telling them they're behind?* If the latter, this refusal fires. Replace the verdict with the raw artifact or state — let the user make the judgment. Status-judgment chrome belongs in PM tools, not in a knowledge layer.",
+      "source": "TASTE_LOG.md#entry-011 · docs/specs/planner-taste.md#reflective-surfaces-vs-status-surfaces",
+      "manualCheck": true,
+      "appliesTo": [
+        "weekly status, team-of-teams snapshot, team-roster, profile, directory, knowledge-graph surfaces",
+        "any page that ranks people or projects",
+        "any badge or flag that encodes a computed verdict about the user's behavior"
+      ]
+    },
+    {
+      "id": "R-COMPOSE-006",
+      "category": "compose",
+      "title": "Matching, relevancy, scoring, or interest-affinity chrome on roster surfaces",
+      "pattern": "",
+      "severity": "warning",
+      "rationale": "When a team-detail, profile, or roster page sits next to a 'Match Summary / Relevancy / Interests' rail, the whole surface reads as a profile-matching app (Bumble / Hinge / Tinder) even if the chrome is restrained. The matching-pattern aesthetic *is* the failure mode — refuse the adjacent chrome, not just the wrong word. Roster surfaces in an instrument system look like crew manifests, not dating-app profiles.",
+      "correct": "Strip the matching/relevancy/interest rail. Show the team member's artifacts and what they have made. If the surface needs to communicate fit or relevance, do it through the artifact list itself, not a separate scoring rail.",
+      "source": "TASTE_LOG.md#entry-011 · docs/specs/planner-taste.md#reflective-surfaces-vs-status-surfaces",
+      "manualCheck": true,
+      "appliesTo": [
+        "any roster, profile, or team-detail surface",
+        "any sidebar labeled 'Match', 'Relevancy', 'Affinity', 'Interests', 'Score', 'Compatibility'"
+      ]
     },
     {
       "id": "R-METRIC-001",
@@ -305,6 +336,22 @@
       "correct": "A `<MetricStat>` group of 2+ must share a unit OR a clear semantic axis named in the eyebrow (e.g., `EVIDENCE MATURITY — % PER STAGE`). If units don't compose, split into separate one-stat callouts or pick a single axis and exclude the outliers.",
       "source": "docs/specs/sous-ds-v2.md#new-refusals",
       "manualCheck": true
+    },
+    {
+      "id": "R-METRIC-002",
+      "category": "metric",
+      "title": "Per-person comparative or ranking metric",
+      "pattern": "",
+      "severity": "warning",
+      "rationale": "Per-person counts ('X PRs this week', 'Y messages') and time-spent metrics turn visibility into surveillance — even inside an instrument aesthetic. Counts are permitted only when self-evidently descriptive ('3 files this week') and never compared across people. Person components should show what was made (demos, Figma files, GitHub contributions), not how much. Today `<MetricStat>` and `<DottedChart>` do not refuse this shape; this rule names it explicitly.",
+      "correct": "Show the artifacts directly — a list of demos, files, PRs, decisions, docs. If a count is descriptive (e.g., 'shipped 3 demos this week' as a single self-contained MetricStat with no comparison rail), it is permitted. The test: *could this metric be used to compare two people on the same screen?* If yes, this refusal fires. No leaderboards. No 'top N'. No 'X% of team output'.",
+      "source": "TASTE_LOG.md#entry-011 · docs/specs/planner-taste.md#person-components",
+      "manualCheck": true,
+      "appliesTo": [
+        "any `<MetricStat>` row showing per-person counts of activity (PRs, messages, time-spent, hours)",
+        "any 'top contributors' or 'leaderboard' rendering",
+        "any `<DottedChart>` axis where one axis is people and the other is a count comparable across people"
+      ]
     },
     {
       "id": "R-VOICE-001",
@@ -332,11 +379,11 @@
       "id": "R-VOICE-003",
       "category": "voice",
       "title": "Status-meeting phrasing in body prose, headlines, or eyebrows",
-      "pattern": "(?:>|\\b)(we are building|what we are building|what we're working on|things are stricter|main-branch truth|draft-PR truth|working-tree truth|still-blocked truth|where we are going|the project is not green because)\\b",
+      "pattern": "(?:>|\\b)(we are building|what we are building|what we're working on|things are stricter|main-branch truth|draft-PR truth|working-tree truth|still-blocked truth|where we are going|the project is not green because|off track|no DRI|underperforming)\\b",
       "severity": "info",
-      "rationale": "These phrasings come from engineering status meetings. They narrate the existence of the work rather than naming the state. The 1.0 case-study page used `we are building`, `things are stricter`, `main-branch truth`, and `where we are going` — every one of them obscured the actual state.",
-      "correct": "Replace with the named substitute from the V7 banned-phrase catalogue. `We are building…` → name the artifact. `Where we are going` → `Five phases queued.` `Things are stricter` → name what got stricter and how. `Main-branch truth` (as adjective) → `Lands on main.`",
-      "source": "docs/specs/sous-ds-v2-voice.md#v7",
+      "rationale": "These phrasings come from engineering status meetings and PM-tool vernacular. They narrate state as judgment ('stale' = 'you didn't update fast enough'), not as instrument readout. The 1.0 case-study page used `we are building`, `things are stricter`, `main-branch truth`, and `where we are going`. v0.11.0 extends the catalogue with PM-status status words (`risk`, `stale`, `off track`, `no DRI`, `blocked`, `behind`, `underperforming`) per the Nexus session: same failure mode, different vocabulary.",
+      "correct": "Replace with the named substitute. `We are building…` → name the artifact. `Where we are going` → `Five phases queued.` `Things are stricter` → name what got stricter and how. `Main-branch truth` (as adjective) → `Lands on main.` `Behind` → name the gating condition. `Blocked` → name the owner and action (`Waiting on platform DRI.`). `Stale` → name the state directly (`Last update 2 weeks ago.`). `Risk` → describe the contingent state (`Ship date contingent on rollout window.`).",
+      "source": "docs/specs/sous-ds-v2-voice.md#v7 · docs/specs/planner-taste.md#voice · TASTE_LOG.md#entry-011",
       "manualCheck": false
     },
     {

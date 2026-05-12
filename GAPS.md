@@ -85,6 +85,30 @@ needs a real edge function / API route mirroring the middleware. The
 client code (`fetch("/api/plan", …)`) is already deploy-ready; only
 the server-side handler has to be ported.
 
+## `<Pill variant="wordmark">` for source-system provenance chiprows
+
+Reflective surfaces (knowledge layers, weekly status, team rosters) often
+need to communicate which systems back the data — Slack permalinks,
+Figma URLs, GitHub PRs, Linear issues, Notion docs. v0.11.0 names the
+pattern in `docs/specs/planner-taste.md` (Source-system provenance) but
+the component variant is not yet built.
+
+The intended shape: a `wordmark` variant of `<Pill>` that renders a mono
+uppercase tracked wordmark inside a 1px-bordered chip. Same primitive
+shape as `<Pill variant="outline">`, semantic content is the system name.
+
+**Workaround in v0.11.0:** renderers compose the pattern inline using
+existing primitives — a row of `<Pill variant="outline">` with mono
+uppercase children carrying `SLACK`, `FIGMA`, `GITHUB`, `LINEAR`, `NOTION`.
+Pattern documented; component variant follows.
+
+**If we graduate it:** runs R-FAMILY-001 against the Pill family.
+Vocabulary: same pill shape, same radius, same 1px dashed border, but
+the `wordmark` semantic flag carries "this is a system name, not a
+status" so future styling decisions stay coherent. Critically, **real
+brand-color logos are forbidden** (R-COLOR-002, R-SEMANTIC-001) — only
+the mono wordmark in the chip.
+
 ## `<Citation>` integration in body strings
 
 `<Citation>` exists as an inline source chip but the renderer does not yet

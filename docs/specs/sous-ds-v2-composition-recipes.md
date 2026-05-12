@@ -55,6 +55,10 @@ Recipes are the unit of consistency that 1.0 lacked. Without recipes, every sect
 
 > **Intent:** A scrolling stream of agent or tool activity, latest at top, with status and duration per row, and a "live now" head.
 
+> **Row differentiation rule (v0.11.0):** AgentLog rows differentiate event kinds (demo / decision / status / code / file) **through the bracketed mono `[KIND]` label** inside the row, never through per-row background hue or per-kind text color. The natural first move is to tint rows by kind — that violates `R-SEMANTIC-001` and `R-COLOR-002`. Every row shares the same `surface-raised + 1px border` treatment; kind lives in the label.
+
+> **Forbidden:** `--demo: <warm>; --decision: <green>; --status: <gray>` row tinting. This was tried (variant C, 2026-05-11) and removed. Bracketed label only.
+
 **Primary primitive:** `<ToolCall>` stack (one row per event) with the head row carrying `<PulseTrail>` for "live now" feel.
 **Supporting:** `<InlineStatus>` for state, `<LiveDot>` only on the head row, `<Pill>` for the tool/source name.
 **Layout:** Single-column stack. Width ≤ 720px even on wide screens — agent activity reads as a transcript, not a dashboard.
@@ -257,3 +261,14 @@ Some recipe pairs are forbidden in the same page:
 Sections that are not anchored to a recipe in this catalogue (or a registered project-local recipe) require justification in the page draft. The default falls back to the safe `eyebrow + h1 + body + card-grid` — which is exactly the failure mode 2.0 exists to prevent.
 
 When in doubt, use **MetricWall + RAGStatus + AgentLog** as the three-recipe minimum. They cover most AI-product status surfaces.
+
+## Single-archetype surfaces (v0.11.0)
+
+Some surfaces are *legitimately* one recipe repeated: a resume index, a glossary, a directory of teams, a list of receipts. R-COMPOSE-002 forbids same-recipe ≥3 and R-COMPOSE-004 requires ≥3 distinct recipes — but those rules are scoped to `RHYTHM ≥ 4`. A single-archetype page is valid when `RHYTHM ≤ 3` **and the dial is declared inline** in the renderer:
+
+```jsx
+// Dials: DENSITY=4, RHYTHM=2 (single-archetype directory layout —
+// exempt from R-COMPOSE-002/004 per the dial contract)
+```
+
+The declaration is the honesty contract. Reviewers check for it before citing R-COMPOSE-002. A renderer that repeats one recipe with no dial declaration is wrong; a renderer that declares `RHYTHM=2` and repeats one recipe is correct.

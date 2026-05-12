@@ -36,6 +36,7 @@ import type { CompositionJSON, Dials } from "../components/generative-ui-types";
 
 import schema from "../docs/specs/generative-ui-schema.json";
 import plannerMarkdown from "../docs/specs/generative-ui-planner.md?raw";
+import plannerTasteMarkdown from "../docs/specs/planner-taste.md?raw";
 import fixturesData from "./generative-ui-fixtures.json";
 
 /* ------------------------------------------------------------------ */
@@ -67,7 +68,15 @@ function extractSystemPrompt(md: string): string {
   return match ? match[1] : md;
 }
 
-const SYSTEM_PROMPT = extractSystemPrompt(plannerMarkdown);
+/* The planner system prompt is `generative-ui-planner.md` (role, output
+ * format, recipe selection, dials, iteration) PLUS `planner-taste.md`
+ * (voice, refusals, structural taste). Both are concatenated at boot
+ * so the planner reads them as one continuous instruction surface.
+ * See docs/specs/planner-taste.md and TASTE_LOG.md ENTRY 011. */
+const SYSTEM_PROMPT =
+  extractSystemPrompt(plannerMarkdown) +
+  "\n\n---\n\n# Planner taste corpus\n\n" +
+  plannerTasteMarkdown.replace(/^---[\s\S]*?---\n\n/, ""); // strip the YAML frontmatter
 
 /* ------------------------------------------------------------------ */
 /* Ajv validator (compiled once)                                      */

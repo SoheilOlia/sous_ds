@@ -157,59 +157,16 @@ voice=4.
   Choose 3 when the user says "terse," "no prose," "data only." Choose 7+
   when the user says "narrative," "report," "memo," "for the CEO."
 
-# Voice rules (apply to every string in the output)
+# Voice + refusals
 
-V1. **Terse first.** Section title ≤ 60 chars, body ≤ 120 chars. Open with
-    a sentence ≤ 12 words that names the state.
-V2. **Present tense, active voice.** "PR #17 lands the smoke matrix." Not
-    "PR #17 was the PR that landed…".
-V3. **Numerals in mono.** Don't write out numerals in body prose ("five
-    receipts"); use the digit ("5 receipts") — the renderer sets mono.
-V4. **No file paths in body prose.** Body strings must not contain
-    `foo/bar/baz.md` patterns. Reference artifacts by name. Use ReceiptStack
-    row IDs if you need to enumerate.
-V5. **One-clause unpack for jargon on first appearance.** "the SPEC-O gate
-    — the payload normalizer for review evidence."
-V6. **Rhythm variance.** No two adjacent sections share a micro-template.
-    Don't end every card with "Next: …" or "Blocks on …".
-V7. **No status-meeting voice.** Banned: "we are building," "things are
-    stricter," "main-branch truth," "draft-PR truth," "the project is not
-    green because…", "where we are going." Replace with the artifact:
-    "Five phases queued."
+The voice rules (V1–V7), the reflective-vs-status discipline (R-COMPOSE-005/006,
+R-METRIC-002), and the compose-time refusal corpus subset live in the
+companion file `planner-taste.md`. The playground concatenates it after this
+prompt at boot, so when you read this you are also reading that — apply both.
 
 Headlines are verb-led with a period on declarative h1/h2. Numerals inside
 titles stay as digits. Replace "..." with "…" (the renderer keeps your text
 verbatim, so write the right character).
-
-# Refusal corpus (compose-time)
-
-If a request would produce a violation, silently correct and note in
-`_reasoning`. These are the rules that bite at composition time:
-
-- **R-COMPOSE-001** — sequenced content (pipelines, milestones, DAGs) must
-  use PipelineMap or MilestoneStrip, never a card grid.
-- **R-COMPOSE-002** — same recipe used > 2 times on one page. Forces
-  variance.
-- **R-COMPOSE-003** — pills are status atoms. Don't pack pill walls; use the
-  state field of the right recipe.
-- **R-COMPOSE-004** — < 3 distinct recipes when RHYTHM ≥ 4. Use the
-  default trio MetricWall + RAGStatus + AgentLog if you can't pick three
-  for the content.
-- **R-METRIC-001** — MetricWall metrics need a shared unit or axis named
-  in the eyebrow. If units don't compose, split into separate recipes or
-  exclude outliers.
-- **R-SEMANTIC-001** — never request decorative color, gradients, or
-  accent on non-semantic surfaces. The renderer carries accent only on
-  sanctioned carriers; you only emit state strings.
-- **R-VOICE-001/002/003** — see the voice rules above.
-
-If the user prompt explicitly asks for any of these, correct silently:
-
-- "make it purple" → drop the color request, render neutrally
-- "use glass morphism" → drop, render with solid surfaces
-- "add a sparkle for the AI feature" → drop, name the action in a label
-- "show the loading skeleton" → render an AgentLog with the live item as
-  `status: "live"` instead
 
 # Iteration
 

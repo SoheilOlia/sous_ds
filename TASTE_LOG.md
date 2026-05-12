@@ -1,7 +1,7 @@
 # TASTE_LOG.md
 > Canonical taste memory for the design system.
 > Append-only. Never silently overwrite. Each entry is timestamped and sourced.
-> Last updated: 2026-05-01 (v2.0 — composition contract)
+> Last updated: 2026-05-12 (v0.11.0 — taste bridge + reflective-surface refusals)
 
 ---
 
@@ -10,6 +10,17 @@
 Each entry records what was learned, from what source, and what it means for the system.
 Conflicts between entries are flagged explicitly, never silently resolved.
 The Quality Evaluator uses this file as ground truth for taste signals.
+
+### Entry template (v0.11.0+)
+
+Every new entry MUST include a `### Planner update` subsection that names
+what rule (if any) was added to `docs/specs/planner-taste.md` and at what
+anchor. If the entry does not touch planner behavior, write `n/a`.
+
+This is the taste-bridge contract — `TASTE_LOG.md` is the human audit
+trail; `planner-taste.md` is the runtime planner-audience corpus. Without
+the cross-reference, new taste decisions silently fail to reach the
+planner. See `docs/specs/2026-05-11-taste-bridge-design.md` (Option D).
 
 **Editorial note (2026-04-22):** references below to `/Users/soheil/Desktop/Inspiration` and "8 images" describe the initial subset review, preserved for history. The current working corpus lives in `Inspiration/` at repo root and contains 18 files; see ENTRY 005.
 
@@ -389,3 +400,65 @@ The 1.0 case-study page becomes the v0.7.0 verification target. After 2.0 ships,
 - Linked pills, source links, compact metric rails, progress stacks, dense evidence tables, and milestone stage cards should not remain app-local forever.
 - Decision: capture those as SOUS-DS learning candidates in `docs/specs/sous-ds-reference-learning.md`.
 - Boundary: Trust Automation copy, PR IDs, milestone labels, and proof semantics stay in Trust Automation.
+
+---
+
+## ENTRY 011 — Nexus session: reflective surfaces and the policing-chrome refusal
+**Date:** 2026-05-11
+**Source:** Nexus app session with the user (`/Users/soheil/Library/Application Support/com.nexus.app/...`) — visual critique on generated UI variants A / B / C against Cash CDWM Block 2.0 / democratized-knowledge-layer surfaces. Captured in the structured handoff format defined in this conversation.
+**Type:** Composition contract extension + voice clarification + new refusals
+
+### Why this entry exists
+
+This session surfaced a structural distinction the system had implicit but never named: **reflective surfaces vs status surfaces.** Without it, the system kept generating "looks restrained, behaves like a status dashboard" outputs — passing every R-* check in the 2.0 contract yet still wrong. Naming it as a refusal (R-COMPOSE-005) and adjacent refusals (R-COMPOSE-006, R-METRIC-002) closes the gap.
+
+The session also produced the forcing function for the taste-bridge architecture: this many cross-cutting decisions, all planner-relevant, with no path into the runtime planner system prompt other than hand-copy. Option D (`docs/specs/planner-taste.md`) ships in the same release.
+
+### Signals extracted (10 blocks)
+
+**1. R-COMPOSE-005 — No policing chrome on reflective surfaces.** *Principle.* On reflective surfaces (knowledge layers, weekly status, team-roster, profile, directory), forbid risk badges, ranks, scores, flags, and computed verdicts. Status-judgment chrome belongs in PM tools, not in a knowledge layer. The Screen Time principle: present information, do not police. Source quote: *"Screen Time does not say hey Soheil get off Twitter… all it does is it builds an interface to collect information and present that information back."* Surface: `refusals.json` (new R-COMPOSE-005), `planner-taste.md` (Reflective surfaces vs status surfaces), `DESIGN.md`.
+
+**2. R-COMPOSE-006 — No matching/relevancy/scoring on roster surfaces.** *Principle.* Roster, profile, and team-detail surfaces must not include match-summary/relevancy/interest rails alongside the artifact list — the Bumble/Hinge/Tinder aesthetic is the failure mode even when chrome is restrained. Roster surfaces in an instrument system look like crew manifests. Source: Bumble Conversations reference (`/Users/soheil/Library/Application Support/com.nexus.app/media/images/20260511-213257-79ffa7fc368d4476af2cbf9db7b558d3.png`). Surface: `refusals.json` (new R-COMPOSE-006), `planner-taste.md`.
+
+**3. R-METRIC-002 — No per-person comparative counts.** *Principle.* `<MetricStat>` and `<DottedChart>` may not display per-person counts in a comparative or ranking shape. Person components show what was made (demos, Figma files, GitHub contributions), not how much. Counts are permitted only when self-evidently descriptive ("3 files this week") and never invite comparison. Test: *could this metric be used to compare two people on the same screen?* If yes, refusal fires. Source: *"designers… are less interested in milestones or data… more interested in the juice of the consumer experiences like demos figma files github contributions."* Surface: `refusals.json` (new R-METRIC-002), `planner-taste.md` (Person components), `MetricStat.tsx` JSDoc (future).
+
+**4. R-VOICE-003 extension — PM/status-meeting status words.** *Clarification.* The R-VOICE-003 banned-phrase catalogue extends with `risk`, `stale`, `off track`, `no DRI`, `blocked`, `behind`, `underperforming`. Same failure mode as the 1.0 banned phrases ("we are building", "main-branch truth"), different vocabulary — these are the PM-tool vernacular for narrating state as judgment. The lint regex catches the unambiguous multi-word phrases (`off track`, `no DRI`, `underperforming`); the single-word bans (`risk`, `stale`, `blocked`, `behind`) are documented but not auto-enforced (too many false positives at info severity). Source: CDWM AGENTS.md guidance captured during onboarding. Surface: `refusals.json` (R-VOICE-003 pattern + rationale + correct), `scripts/lint.mjs` BANNED list, `planner-taste.md`.
+
+**5. Prezzo mode is the default for executive-distance surfaces.** *Polish.* Today the contract names prezzo as "for slides, keynotes, screenshots intended to be read at presentation distance" — positioning it as an export mode. The actual best use is *any* surface where the audience is reading state as story, not as data: weekly updates, all-hands, executive readouts, team-of-teams snapshots. Same type contract, expanded practical surface area. Source: `/sous-ds` invocation this session — *"Let's get all of them a pass of our design system. Go with the presentation one."* Surface: `planner-taste.md` (Prezzo mode section), `DESIGN.md` (Prezzo guidance).
+
+**6. R-TYPE-004 — Reference imagery does not override serif refusal.** *Polish.* The system already refuses serif fallback for display/h1 (R-TYPE-004). The clarification: this refusal carries even when reference imagery shared with the agent uses an editorial serif (e.g. Instrument Serif numbered Index). Cash Sans Display at the same size carries the editorial weight; prezzo mode collapses everything to Cash Sans anyway. Source: Direction B reference image (`20260511-212858-5ce6c11a603d489e8b3b2c20f2d1a608.png`) — variant B's implementation correctly swapped Instrument Serif for Cash Sans display, no pushback. Surface: `refusals.json` (R-TYPE-004 rationale clarification), `planner-taste.md`.
+
+**7. Version handshake on /sous-ds invocation.** *Polish.* When `/sous-ds` is invoked, the agent must announce the version it has loaded before applying any rule (`Loaded SOUS-DS v0.11.0, v2.0 composition contract`). Forces verification that the agent has the right layer. Source: *"(make sure it's the latest version) confirm you are loading the v2 composition contract."* Surface: `SKILL.md` (new Version handshake section).
+
+**8. Source-system wordmark chiprow.** *Polish.* Reflective surfaces need to communicate which systems back the data (Slack permalinks, Figma URLs, GitHub PRs, Linear issues, Notion docs). The minimal carrier is a mono-uppercase tracked wordmark inside a 1px-bordered chip — same shape as `<Pill variant="outline">` with semantic content. Brand-color logos are forbidden (R-COLOR-002, R-SEMANTIC-001). Source: Direction A discussion — *"It is on a white background so it looks very clean. Potentially we could even add logos for Slack or Linear or Figma."* Variant A shipped this as a wordmark chiprow. Surface: `planner-taste.md` (Source-system provenance), `GAPS.md` (build a `<Pill variant="wordmark">` later per R-FAMILY-001).
+
+**9. AgentLog row differentiation via bracketed labels, not hue.** *Polish.* AgentLog rows differentiate event kinds (demo / decision / status / code) via the bracketed mono `[KIND]` label inside the row, never via per-row background hue or per-kind text color. The natural first move (tinting each row by kind) violates R-SEMANTIC-001 + R-COLOR-002. Variant C made this mistake first (`--demo: #B0421F; --decision: #355E3B; --status: #5A5A5A;`), then corrected during the SOUS-DS pass. Surface: `docs/specs/sous-ds-v2-composition-recipes.md` (AgentLog section), `planner-taste.md` (AgentLog row differentiation).
+
+**10. Single-archetype pages valid with RHYTHM ≤ 3 + inline dial declaration.** *Polish.* R-COMPOSE-002/004 require recipe variance, but legitimately-single-archetype surfaces (resume index, directory, glossary) are exempt when `RHYTHM ≤ 3` is declared **inline in the renderer** — typically a header comment naming dials and the exemption rationale. The declaration is the honesty contract; reviewers check for it before citing R-COMPOSE-002. Source: Direction A reference (`20260511-212536-54a3d860ca2f49dd93bf2c27fb9da6a0.png`) — single-archetype resume layout explicitly chosen ("super simple"); variant A's renderer declares `Dials: DENSITY=4, RHYTHM=2 (single-archetype resume layout — exempt from R-COMPOSE-002/004 per the dial contract)`. Surface: `refusals.json` (R-COMPOSE-002 + R-COMPOSE-004 rationale and correct fields), `planner-taste.md` (Dial declaration honesty), `docs/specs/sous-ds-v2-composition-recipes.md`.
+
+### Planner update
+
+All ten blocks land in `docs/specs/planner-taste.md` (new file, shipped this release). Anchors:
+
+- §1 → `planner-taste.md#reflective-surfaces-vs-status-surfaces` (R-COMPOSE-005)
+- §2 → `planner-taste.md#reflective-surfaces-vs-status-surfaces` (R-COMPOSE-006)
+- §3 → `planner-taste.md#reflective-surfaces-vs-status-surfaces` (R-METRIC-002, Person components subsection)
+- §4 → `planner-taste.md#voice` (V7 extension)
+- §5 → `planner-taste.md#prezzo-mode`
+- §6 → `planner-taste.md#type-and-accent-clarifications` (R-TYPE-004)
+- §7 → `SKILL.md` (Version handshake) — not a planner-taste rule; the planner reads its corpus on every call, the handshake is for the agent loading the skill
+- §8 → `planner-taste.md#source-system-provenance`
+- §9 → `planner-taste.md#agentlog-row-differentiation`
+- §10 → `planner-taste.md#dial-declaration-honesty`
+
+### System integration
+
+- New file: `docs/specs/planner-taste.md` (Option D taste-bridge; per `docs/specs/2026-05-11-taste-bridge-design.md`).
+- `refusals.json` v0.4.0: +3 rules (R-COMPOSE-005, R-COMPOSE-006, R-METRIC-002), R-VOICE-003 pattern extended, R-TYPE-004 / R-COMPOSE-002 / R-COMPOSE-004 rationale clarifications.
+- `scripts/lint.mjs` ruleCO11 BANNED list extended (3 phrases auto-enforced; remaining 4 single-word bans documented but not auto-enforced).
+- `SKILL.md`: planner-taste.md added to read-order; new "Version handshake" section; R-FAMILY-001 gains Step 7 (register in planner decision tree).
+- `examples/generative-ui-playground.tsx`: concatenates `planner-taste.md` after the planner system prompt at boot. Browser never sees `TASTE_LOG.md`.
+- `docs/specs/generative-ui-planner.md`: voice rules and refusal subset stripped; replaced with a pointer to `planner-taste.md` (concatenated at runtime).
+- `DESIGN.md`: prezzo guidance reframed as executive-distance default, not just slide export.
+- `docs/specs/sous-ds-v2-composition-recipes.md`: AgentLog recipe spec gains explicit "differentiate by bracketed mono label, not by hue" note.
+- `GAPS.md`: `<Pill variant="wordmark">` filed as a future R-FAMILY-001 candidate.

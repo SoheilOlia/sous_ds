@@ -8,6 +8,42 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.11.0] — 2026-05-12
+
+**Taste bridge + reflective-surface refusals.** Closes the architectural seam between `TASTE_LOG.md` (human audit trail) and the runtime planner LLM. Adds three new refusals naming a structural distinction the system had implicit but never encoded: **reflective surfaces ≠ status surfaces**. Source of the refusals: Nexus design-critique session 2026-05-11, captured in the structured handoff format.
+
+### Added — taste bridge architecture (Option D from the 2026-05-11 design doc)
+
+- **`docs/specs/planner-taste.md`** — new file. Planner-audience corpus, instruction-shaped, hand-authored. The runtime planner system prompt is now `generative-ui-planner.md` (role + output format + recipe selection + dials + iteration) concatenated with this file (voice + refusals + structural taste). Both reach the LLM as one continuous instruction surface.
+- **`docs/specs/2026-05-11-taste-bridge-design.md`** — design doc that surfaced the four options (A/B/C/D) and recommended D. Captures why the planner is a distinct audience.
+- **`TASTE_LOG.md` entry template** — every new entry MUST include a `### Planner update` subsection that names what rule was added to `planner-taste.md` and at what anchor. Without the cross-reference, taste decisions silently fail to reach the planner. This is the bridge contract.
+
+### Added — three new refusals (R-COMPOSE-005, R-COMPOSE-006, R-METRIC-002)
+
+- **R-COMPOSE-005 — No policing chrome on reflective surfaces.** On reflective surfaces (knowledge layers, weekly status, team-roster, profile, directory), forbid risk badges, ranks, scores, flags, computed verdicts. Status-judgment chrome belongs in PM tools, not in a knowledge layer. The Screen Time principle: present information, don't police. Test: *is the user reading their own activity to reflect, or is the surface telling them they're behind?*
+- **R-COMPOSE-006 — No matching/relevancy/scoring on roster surfaces.** Roster, profile, and team-detail surfaces must not include match-summary / relevancy / interest rails alongside the artifact list. The Bumble/Hinge aesthetic is the failure mode even when chrome is restrained.
+- **R-METRIC-002 — No per-person comparative counts.** `<MetricStat>` and `<DottedChart>` may not display per-person counts in a comparative or ranking shape. Person components show what was *made*, not how much was *done*. Counts permitted only when self-evidently descriptive, never structured to invite comparison. Test: *could this metric be used to compare two people on the same screen?*
+
+### Changed
+
+- **`refusals.json` v0.4.0:** +3 new rules above; R-VOICE-003 pattern extended with `off track`, `no DRI`, `underperforming` (auto-enforced); rationale clarifications on R-TYPE-004 (reference imagery does not override serif refusal), R-COMPOSE-002 and R-COMPOSE-004 (dial-declaration exemption for single-archetype surfaces).
+- **`scripts/lint.mjs`** ruleCO11 BANNED list: +3 unambiguous PM phrases. Single-word PM bans (`risk`, `stale`, `blocked`, `behind`) are documented in `planner-taste.md` but not auto-enforced (too many false positives at info severity).
+- **`docs/specs/generative-ui-planner.md`** — voice rules V1-V7 and refusal corpus subset stripped out. They now live in `planner-taste.md`, concatenated at runtime by the playground. The planner system prompt stays focused on role + output format + recipe selection.
+- **`examples/generative-ui-playground.tsx`** — concatenates `planner-taste.md` after the planner system prompt at boot. Browser never reads `TASTE_LOG.md` (which is human audit, not planner context).
+- **`SKILL.md`** — `planner-taste.md` added to "Read in this order" at position 11. New **Version handshake** section: agents loading `/sous-ds` MUST announce the version they have (`Loaded SOUS-DS v0.11.0, v2.0 composition contract + planner-taste corpus`). R-FAMILY-001 gains **Step 7** — register new components in both decision trees (this SKILL.md's intent→component table AND `generative-ui-planner.md`'s vocabulary table) so the planner can actually reach the new primitive.
+- **`DESIGN.md`** — prezzo guidance reframed as the default mode for executive-distance, status-as-narrative surfaces (weekly updates, all-hands, leadership readouts), not just `.key` exports. New **Reflective surfaces vs status surfaces** subsection.
+- **`docs/specs/sous-ds-v2-composition-recipes.md`** — AgentLog recipe spec gains "differentiate by bracketed mono `[KIND]` label, not by hue" rule (variant C made this mistake first, then corrected). New **Single-archetype surfaces** section documenting the `RHYTHM ≤ 3` + inline-declaration exemption from R-COMPOSE-002/004.
+- **`TASTE_LOG.md`** — **ENTRY 011** consolidating all 10 Nexus-session decisions in named subsections with explicit `### Planner update` cross-references into `planner-taste.md`.
+- **`GAPS.md`** — `<Pill variant="wordmark">` filed as a future R-FAMILY-001 candidate; pattern documented in `planner-taste.md` (Source-system provenance) for inline composition meanwhile.
+- **`package.json`** — version `0.10.1 → 0.11.0`.
+
+### Notes
+
+- The 4 single-word PM bans (`risk`, `stale`, `blocked`, `behind`) are intentionally not auto-enforced. They have too many legitimate uses in code, comments, and unrelated UI to make the regex worth its false-positive cost at info severity. The planner system prompt (`planner-taste.md`) lists all 7; manual reviewers know all 7; the linter catches the 3 unambiguous multi-word ones.
+- The `<Pill variant="wordmark">` work is deferred to a follow-up release because adding a Pill variant requires running R-FAMILY-001 against the Pill family — that's a separate, deliberate piece of work, not bundled into a release that's primarily about the taste-bridge architecture.
+
+---
+
 ## [0.10.1] — 2026-05-10
 
 **Server-side planner proxy.** Closes the deploy-blocker that v0.10.0 flagged in `GAPS.md`. The playground no longer calls the Anthropic API from the browser — `examples/vite.config.ts` mounts a `/api/plan` middleware that forwards planner requests upstream from the Node process. The key stays server-side. CORS-blocked org keys (Block, Anthropic for Work) now work without falling back to a personal key.
