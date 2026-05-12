@@ -203,6 +203,7 @@ A page in 2.0 must use **≥3 distinct recipes** unless `RHYTHM ≤ 3` (single-p
 | **ReceiptStack** | Completed events as machine-attested truth | `<ToolCall tone="done">` rows with `[ID]` + `[STATE]` |
 | **MetricWall** | 2–4 numbers sharing a unit or axis | `<MetricStat>` row + optional `<DottedChart>` strip |
 | **RAGStatus** | Single state-word callout (RED/AMBER/GREEN) | `<LiveBlock>` + `<Pill>` + one body sentence |
+| **Profile** *(v0.12.0)* | One person — identity + artifacts + optional confidence | Identity-head row (monogram + name + handle) + ReceiptStack-style body |
 
 Full specs (JSX skeletons, microcopy templates, density quotas, forbidden substitutes) in [`docs/specs/sous-ds-v2-composition-recipes.md`](./docs/specs/sous-ds-v2-composition-recipes.md).
 
@@ -243,6 +244,7 @@ The single largest 1.0 failure was **component starvation** — using 4 of 18 co
 | Success endpoint marker | `<DottedChart>` final dot in `accent-success` | Green check icon |
 | Inline attention/error | `<InlineStatus tone="live">` | Red text |
 | Transient confirmation | `<Toast>` | Modal; banner |
+| One person — identity + what they shipped *(v0.12.0)* | `Profile` recipe (identity head + ReceiptStack body) | Free-form card with name/avatar/handle/match-summary; Bumble-style profile chrome |
 
 **Selection priority when two primitives compete:**
 1. Time-ordered, multi-stage beats everything else

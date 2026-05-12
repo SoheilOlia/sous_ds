@@ -1,7 +1,7 @@
 # TASTE_LOG.md
 > Canonical taste memory for the design system.
 > Append-only. Never silently overwrite. Each entry is timestamped and sourced.
-> Last updated: 2026-05-12 (v0.11.0 — taste bridge + reflective-surface refusals)
+> Last updated: 2026-05-12 (v0.12.0 — Profile recipe; R-FAMILY-001 pass on the recipes family)
 
 ---
 
@@ -462,3 +462,50 @@ All ten blocks land in `docs/specs/planner-taste.md` (new file, shipped this rel
 - `DESIGN.md`: prezzo guidance reframed as executive-distance default, not just slide export.
 - `docs/specs/sous-ds-v2-composition-recipes.md`: AgentLog recipe spec gains explicit "differentiate by bracketed mono label, not by hue" note.
 - `GAPS.md`: `<Pill variant="wordmark">` filed as a future R-FAMILY-001 candidate.
+
+---
+
+## ENTRY 012 — Profile recipe (seventh recipe; R-FAMILY-001 pass on the recipes family)
+**Date:** 2026-05-12
+**Source:** User dogfood — prompt *"Create a card that shows me: designer name, avatar, slack handle, what they are working on, AI confidence score"* failed schema validation in v0.11.0 because no existing recipe maps to "one person." Surfaced the catalogue gap. Design doc: `docs/specs/2026-05-12-profile-recipe-design.md`.
+**Type:** Composition recipe addition (the family being extended is the recipes catalogue itself)
+
+### Why this entry exists
+
+The Nexus session (ENTRY 011) added R-COMPOSE-006 — "no matching/relevancy chrome on roster surfaces." That refusal told the planner what *not* to do for person-shaped surfaces, but didn't propose what to use. The first user prompt against the v0.11.0 build hit the gap immediately: ajv rejected the planner's output because it had invented properties (avatar, slackHandle, confidence) that didn't fit any of the six recipes. The error was the schema doing its job; the gap was real.
+
+### Signals extracted
+
+**1. The recipes family has a one-person primitive shape.** The motif (Card-wrapped page section, eyebrow + title + body composed from sanctioned primitives) accommodates a new recipe whose primary primitive is an identity-head row (monogram circle + name + handle + body). The variant decision was made via the R-FAMILY-001 protocol — survey, motif, vocabulary, three same-motif variants, recommendation, glance test against ReceiptStack.
+
+**2. Monogram circle is the in-system avatar primitive.** No raster avatars in v1 — the precision-instrument aesthetic doesn't accommodate brand/photo imagery, and the dot-family vocabulary already establishes "small bordered circle in mono" as the system's identity glyph. Monogram is two-letter initial in mono, 40px (control-md), 1px border via `--ds-line-strong`, neutral text-primary. No accent. The `imageUrl` slot is deferred to a future R-FAMILY-001 pass.
+
+**3. `[@handle]` carries the source-system handle.** Wrapped in mono brackets (same pattern as `<InlineStatus>` and `[ID]` in ReceiptStack rows). The slot is a single optional string; parameterizing it as `{ kind, value }` was rejected as overkill for v1.
+
+**4. Confidence is the one per-person scalar R-METRIC-002 permits.** Rendered in `Card.meta` (right of the eyebrow), `<label> <value>%` format. Self-evidently descriptive of *this* surface, never comparative across people. Multiple confidence scores or per-person count groups would violate R-METRIC-002.
+
+**5. Profile is single-archetype.** A Profile-only page declares `RHYTHM ≤ 3` inline per the v0.11.0 dial-declaration contract. Multi-Profile pages (rosters) need a future Roster recipe; up to 3 Profiles compose inline if `RHYTHM ≥ 4`.
+
+**6. R-FAMILY-001 Step 7 (added in v0.11.0) was exercised on this work.** Profile registers in BOTH decision trees — `SKILL.md`'s intent→component table AND `generative-ui-planner.md`'s recipe + component vocabulary tables — so the runtime planner can actually reach the primitive. This is the first R-FAMILY-001 pass to use Step 7 since it was added; the protocol held.
+
+### Planner update
+
+- `docs/specs/planner-taste.md` — new section `# Profile recipe (v0.12.0)` covering when to pick Profile vs. ReceiptStack vs. AgentLog, the schema shape, what it refuses, microcopy, and the single-archetype dial declaration.
+- `docs/specs/generative-ui-planner.md` — new `## Profile` block in the recipe catalog, monogram entry in the component vocabulary table.
+- `SKILL.md` — Profile row added to the composition-recipes table and the intent→component decision tree.
+
+### System integration
+
+- New schema definition: `ProfileSection` in `docs/specs/generative-ui-schema.json` — `name` (required), `eyebrow`, optional `handle` (regex `^@?[A-Za-z0-9._-]+$`), `body`, `artifacts[]` (ReceiptItem-shaped, 0–6), `confidence` (`{ label, value 0..100 }`).
+- New TS type: `ProfileSection` in `components/generative-ui-types.ts`.
+- New renderer branch: `renderProfile()` in `components/GenerativeRenderer.tsx` — identity head, optional artifacts subsection. Uses `Card` with `label`/`meta`; no `title` (name is part of custom identity row).
+- New CSS pattern: `.ds-gen-profile-monogram`, `.ds-gen-profile-head`, `.ds-gen-profile-identity`, `.ds-gen-profile-name`, `.ds-gen-profile-body`, `.ds-gen-profile-handle`, `.ds-gen-profile-artifacts*` in `GenerativeRenderer.css`. All values via `var(--ds-*)`. No accent painted directly.
+- New fixture: `profile-soheil` in `examples/generative-ui-fixtures.json` — exercises every Profile field.
+- `docs/specs/sous-ds-v2-composition-recipes.md` — new "7. Profile" full spec section with JSX skeleton, microcopy template, density quotas, failure modes replaced (Bumble/Hinge profile chrome), forbidden substitutes.
+- `GAPS.md` — Roster recipe filed as next R-FAMILY-001 candidate.
+- `CHANGELOG.md` v0.12.0 entry.
+- `package.json` version bump 0.11.0 → 0.12.0.
+
+### Glance test (R-FAMILY-001 step 5)
+
+Profile rendered next to ReceiptStack (the closest sibling — both end in mono `[ID] · label · [STATE] · timestamp` row stacks). Verdict: **sibling, not visitor.** Same Card chrome, same eyebrow style, same artifact-row template. Differences (identity head, monogram, handle bracket, confidence meta slot) are the distinguishing primitives of the new recipe, not drift from family discipline.

@@ -70,7 +70,8 @@
         { "$ref": "#/definitions/PipelineMapSection" },
         { "$ref": "#/definitions/MilestoneStripSection" },
         { "$ref": "#/definitions/AgentLogSection" },
-        { "$ref": "#/definitions/ReceiptStackSection" }
+        { "$ref": "#/definitions/ReceiptStackSection" },
+        { "$ref": "#/definitions/ProfileSection" }
       ]
     },
     "MetricWallSection": {
@@ -212,6 +213,58 @@
               "state":     { "type": "string", "minLength": 1, "maxLength": 16, "description": "Terminal state word: MERGED, CLOSED, SUPERSEDED, FAILED." },
               "timestamp": { "type": "string", "maxLength": 24 }
             }
+          }
+        }
+      }
+    },
+    "ProfileSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recipe", "eyebrow", "name"],
+      "description": "One-person identity card. Compliant with R-COMPOSE-006 (no matching/relevancy rail) and R-METRIC-002 (confidence is the one permitted scalar; never comparative). Show what the person made, not how much they did.",
+      "properties": {
+        "recipe": { "const": "Profile" },
+        "eyebrow": { "$ref": "#/definitions/Eyebrow" },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48,
+          "description": "Display name. Verb-led title voice does not apply — this is an identity, not an action."
+        },
+        "handle": {
+          "type": "string",
+          "maxLength": 24,
+          "pattern": "^@?[A-Za-z0-9._-]+$",
+          "description": "Slack/GitHub/etc. handle. Rendered in mono as `[@name]`. Optional leading @ is normalized in the renderer."
+        },
+        "body": {
+          "$ref": "#/definitions/Body",
+          "description": "One-sentence 'working on' or descriptor. Same file-path constraint as other body strings (R-VOICE-001)."
+        },
+        "artifacts": {
+          "type": "array",
+          "maxItems": 6,
+          "description": "Things the person has made (R-METRIC-002 — what was made, not how much). Same shape as ReceiptStack items. Empty array renders an identity-only card.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "state"],
+            "properties": {
+              "id":        { "type": "string", "minLength": 1, "maxLength": 16 },
+              "label":     { "type": "string", "minLength": 1, "maxLength": 80 },
+              "state":     { "type": "string", "minLength": 1, "maxLength": 16 },
+              "timestamp": { "type": "string", "maxLength": 24 }
+            }
+          }
+        },
+        "confidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "value"],
+          "description": "One self-contained scalar. Permitted under R-METRIC-002 because it is descriptive of this person's surface only, not comparative.",
+          "properties": {
+            "label": { "type": "string", "minLength": 1, "maxLength": 24 },
+            "value": { "type": "integer", "minimum": 0, "maximum": 100 }
           }
         }
       }

@@ -63,7 +63,7 @@ Each Section is exactly one of: MetricWall, RAGStatus, PipelineMap,
 MilestoneStrip, AgentLog, ReceiptStack. The full schema with every field is
 authoritative — see generative-ui-schema.json.
 
-# The six recipes
+# The seven recipes
 
 Pick the recipe whose intent matches the content shape. At RHYTHM ≥ 4 a page
 uses **≥ 3 distinct recipes** (do not repeat the same recipe more than twice).
@@ -114,6 +114,25 @@ uses **≥ 3 distinct recipes** (do not repeat the same recipe more than twice).
 - Use ≤ 10 items. ≤ 1 ReceiptStack per page.
 - Forbidden substitutes: body prose enumerating file paths.
 
+## Profile *(v0.12.0)*
+- **When:** the user's intent is "show me one person — who they are, what
+  they're shipping." Identity is the anchor.
+- Required: `eyebrow` (role + scope, mono uppercase), `name` (display name).
+- Optional: `handle` (renderer wraps as `[@handle]`), `body` (≤ 120 chars,
+  one sentence naming current work), `artifacts` (0–6 ReceiptStack-shaped
+  rows), `confidence` (`{ label, value 0..100 }` — the *one* permitted
+  per-person scalar; rendered in `Card.meta`).
+- ≤ 1 Profile per page. The page is *about* this person.
+- Declare `dials.rhythm: 2` when Profile is the only recipe (single
+  archetype, per the dial-declaration exemption).
+- Forbidden substitutes: matching/relevancy/affinity rails (R-COMPOSE-006);
+  per-person comparative counts like "X PRs this week" (R-METRIC-002);
+  `[BEHIND]` / `[AT RISK]` / `[STALE]` policing badges on artifacts
+  (R-COMPOSE-005).
+- Disambiguation: pick **ReceiptStack** if the artifacts are the anchor and
+  the person is incidental; pick **AgentLog** if the user wants the "now"
+  feel; pick **Profile** when identity comes first.
+
 # Component vocabulary (what the renderer can carry)
 
 The renderer composes these components. You select them by recipe; you do not
@@ -128,6 +147,7 @@ name them directly.
 | PulseTrail       | live-now agent activity head             | AgentLog isLive=true          |
 | InlineStatus     | bracketed mono state                     | ReceiptStack state, errors    |
 | SegmentedBar     | discrete progress, success on full       | MilestoneStrip, RAGStatus GREEN |
+| Monogram circle  | identity head (mono initial, 40px, 1px border) | Profile (CSS pattern, not a component) |
 | ToolCall         | tool/event row with duration             | AgentLog                      |
 
 # Design dials

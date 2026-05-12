@@ -221,6 +221,52 @@ Recipes are the unit of consistency that 1.0 lacked. Without recipes, every sect
 </section>
 ```
 
+### 7. Profile
+
+> **Intent:** Show one person — who they are, what they are shipping. The seventh recipe, added in v0.12.0 via the R-FAMILY-001 protocol against the recipe family. Compliant with R-COMPOSE-006 (no matching/relevancy rail) and R-METRIC-002 (show what was made, not how much).
+
+**Primary primitive:** new identity-head row (monogram + name + body + handle) followed by a ReceiptStack-style artifact list. The identity head is a CSS pattern inside the renderer, not a new component.
+**Supporting:** `<Card>` chrome for the wrapper; `Card.label` for the eyebrow (role + scope); `Card.meta` for an optional single confidence metric; `<InlineStatus tone="default">` for artifact state words.
+**Layout:** Card head row carries eyebrow + meta (right-aligned confidence if present). Identity head row carries monogram circle (40px, 1px border, mono initial) + name (h3 mono) + body (Geist sans, secondary) + handle (mono label, right-aligned). A 1px line separator below the identity head, then a `RECENT` subsection label, then the ReceiptStack rows.
+**Microcopy:**
+- Eyebrow: role + optional scope (`DESIGNER — TRUST`, `ENGINEER`, `PM — PAYMENTS`)
+- Name: identity, period if the surrounding voice treats it as a sentence. ≤ 48 chars.
+- Body: one ≤ 120-char sentence naming what the person is working on. Same file-path constraint as other body strings (R-VOICE-001).
+- Handle: mono `[@handle]`. Optional leading `@` is normalized.
+- Confidence (optional): `Card.meta`, `<label> <value>%` format. Permitted under R-METRIC-002 because the metric is descriptive of this person's surface only, never comparative.
+- Artifact rows: `[ID] · subject-verb-object · [STATE] · timestamp` (same as ReceiptStack).
+**Density quotas:** ≤ 1 Profile per page (the page is *about* this person). 0–6 artifact rows. The dial declaration `RHYTHM ≤ 3` should be recorded inline since a Profile-only page is single-archetype.
+**Failure modes replaced:** A card with an avatar, a name, a "match summary" rail, a "relevancy" score, and an "interests" rail. The Bumble/Hinge profile aesthetic — refused at composition time by R-COMPOSE-006, replaced here with the crew-manifest read.
+**Forbidden substitutes:** A `<MetricStat>` row of "X PRs this week / Y messages this week" (R-METRIC-002). A list of project-tracker-style flags (R-COMPOSE-005). A "match summary" rail to the right of the identity head (R-COMPOSE-006).
+
+```jsx
+<section data-recipe="Profile">
+  <Card label="DESIGNER — TRUST" meta="AI CONFIDENCE 87%">
+    <div className="ds-gen-profile-head">
+      <span className="ds-gen-profile-monogram">SO</span>
+      <div className="ds-gen-profile-identity">
+        <h2 className="ds-gen-profile-name">Soheil Olia</h2>
+        <p className="ds-gen-profile-body">Working on cdwm trust-review and the SOUS-DS taste bridge.</p>
+      </div>
+      <code className="ds-gen-profile-handle">[@soheil]</code>
+    </div>
+    <div className="ds-gen-profile-artifacts">
+      <div className="ds-gen-profile-artifacts-head">RECENT</div>
+      <ul className="ds-gen-receipt-list">
+        {artifacts.map(item => (
+          <li className="ds-gen-receipt-row">
+            <code>{item.id}</code>
+            <span>{item.label}</span>
+            <InlineStatus>{item.state}</InlineStatus>
+            <time>{item.timestamp}</time>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Card>
+</section>
+```
+
 ## Recipe registration
 
 Project-local recipes live in `docs/specs/recipes/<name>.md` and follow the same schema as the catalogue above:

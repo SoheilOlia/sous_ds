@@ -33,6 +33,7 @@ import type {
   MilestoneStripSection,
   AgentLogSection,
   ReceiptStackSection,
+  ProfileSection,
   Dials,
   StageState,
 } from "./generative-ui-types";
@@ -130,8 +131,24 @@ function renderSection(section: Section): React.ReactNode {
     case "MilestoneStrip": return renderMilestoneStrip(section);
     case "AgentLog":       return renderAgentLog(section);
     case "ReceiptStack":   return renderReceiptStack(section);
+    case "Profile":        return renderProfile(section);
     default:               return renderUnknown(section);
   }
+}
+
+/* Two-letter initial (mono) extracted from "First Last" / "First" / "@handle". */
+function monogramFromName(name: string): string {
+  const parts = name.trim().replace(/[.,]/g, "").split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function normalizeHandle(handle: string | undefined): string | null {
+  if (!handle) return null;
+  const trimmed = handle.trim();
+  if (!trimmed) return null;
+  return trimmed.startsWith("@") ? trimmed : `@${trimmed}`;
 }
 
 /* --------------------------------------------------------------------- */
@@ -333,6 +350,51 @@ function renderReceiptStack(section: ReceiptStackSection): React.ReactNode {
           </li>
         ))}
       </ul>
+    </Card>
+  );
+}
+
+function renderProfile(section: ProfileSection): React.ReactNode {
+  const monogram = monogramFromName(section.name);
+  const handle = normalizeHandle(section.handle);
+  const confidenceMeta = section.confidence
+    ? `${section.confidence.label} ${section.confidence.value}%`
+    : undefined;
+  const artifacts = section.artifacts ?? [];
+
+  return (
+    <Card label={section.eyebrow} meta={confidenceMeta}>
+      <div className="ds-gen-profile-head">
+        <span className="ds-gen-profile-monogram" aria-hidden="true">
+          {monogram}
+        </span>
+        <div className="ds-gen-profile-identity">
+          <h2 className="ds-gen-profile-name">{section.name}</h2>
+          {section.body && (
+            <p className="ds-gen-profile-body">{section.body}</p>
+          )}
+        </div>
+        {handle && (
+          <code className="ds-gen-profile-handle">[{handle}]</code>
+        )}
+      </div>
+      {artifacts.length > 0 && (
+        <div className="ds-gen-profile-artifacts">
+          <div className="ds-gen-profile-artifacts-head">RECENT</div>
+          <ul className="ds-gen-receipt-list">
+            {artifacts.map((item) => (
+              <li key={item.id} className="ds-gen-receipt-row">
+                <code className="ds-gen-receipt-id">{item.id}</code>
+                <span className="ds-gen-receipt-label">{item.label}</span>
+                <InlineStatus tone="default">{item.state}</InlineStatus>
+                {item.timestamp && (
+                  <time className="ds-gen-receipt-time">{item.timestamp}</time>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </Card>
   );
 }

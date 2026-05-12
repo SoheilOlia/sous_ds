@@ -85,6 +85,21 @@ needs a real edge function / API route mirroring the middleware. The
 client code (`fetch("/api/plan", …)`) is already deploy-ready; only
 the server-side handler has to be ported.
 
+## Roster recipe (multi-person)
+
+The `Profile` recipe (shipped in v0.12.0) handles one person. A multi-person
+roster surface — team page, directory of teams, attendee list — is the
+natural companion and was implied by R-COMPOSE-006's "crew manifest" framing.
+
+**Workaround in v0.12.0:** compose a page with multiple `Profile` sections.
+Declare `dials.rhythm` ≥ 4 since a multi-Profile page is no longer
+single-archetype (technically R-COMPOSE-002 fires after 3 Profiles). Up to 3
+people is composable inline; beyond that we need a `Roster` recipe.
+
+**If we graduate it:** runs R-FAMILY-001. Open questions: row shape (the
+full Profile head per row, or a compact one-line variant?), sort/filter
+controls (none — R-COMPOSE-005/006 stay in force), pagination strategy.
+
 ## `<Pill variant="wordmark">` for source-system provenance chiprows
 
 Reflective surfaces (knowledge layers, weekly status, team rosters) often

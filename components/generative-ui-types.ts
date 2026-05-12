@@ -12,7 +12,8 @@ export type RecipeName =
   | "PipelineMap"
   | "MilestoneStrip"
   | "AgentLog"
-  | "ReceiptStack";
+  | "ReceiptStack"
+  | "Profile";
 
 export type StageState = "done" | "live" | "queued";
 
@@ -103,13 +104,29 @@ export interface ReceiptStackSection {
   items: ReceiptItem[];
 }
 
+export interface ProfileConfidence {
+  label: string;
+  value: number; // 0..100
+}
+
+export interface ProfileSection {
+  recipe: "Profile";
+  eyebrow: string;
+  name: string;
+  handle?: string;
+  body?: string;
+  artifacts?: ReceiptItem[];
+  confidence?: ProfileConfidence;
+}
+
 export type Section =
   | MetricWallSection
   | RAGStatusSection
   | PipelineMapSection
   | MilestoneStripSection
   | AgentLogSection
-  | ReceiptStackSection;
+  | ReceiptStackSection
+  | ProfileSection;
 
 export interface CompositionJSON {
   pageTitle: string;

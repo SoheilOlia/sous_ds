@@ -43,7 +43,7 @@ import fixturesData from "./generative-ui-fixtures.json";
 /* Constants                                                          */
 /* ------------------------------------------------------------------ */
 
-const VERSION = "v0.10.0";
+const VERSION = "v0.12.0";
 const DEFAULT_MODEL = "claude-sonnet-4-6";
 
 const QUICK_PROMPTS: string[] = [

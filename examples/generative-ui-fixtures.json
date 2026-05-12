@@ -123,6 +123,32 @@
     },
 
     {
+      "id": "profile-soheil",
+      "prompt": "Create a card that shows me: designer name, avatar, slack handle, what they are working on, AI confidence score.",
+      "composition": {
+        "pageTitle": "Soheil Olia.",
+        "dials": { "density": 6, "rhythm": 2, "voice": 4 },
+        "_reasoning": "RHYTHM=2 declared inline — single-archetype Profile recipe, exempt from R-COMPOSE-002/004 per the dial contract.",
+        "sections": [
+          {
+            "recipe": "Profile",
+            "eyebrow": "DESIGNER — TRUST",
+            "name": "Soheil Olia",
+            "handle": "@soheil",
+            "body": "Working on cdwm trust-review and the SOUS-DS taste bridge.",
+            "confidence": { "label": "AI confidence", "value": 87 },
+            "artifacts": [
+              { "id": "R-001", "label": "Trust review dashboard variant A.",    "state": "SHIPPED", "timestamp": "2026-05-11" },
+              { "id": "R-002", "label": "Compiler spine for cdwm-validators.",  "state": "SHIPPED", "timestamp": "2026-05-10" },
+              { "id": "R-003", "label": "Reflective-surface refusal spec.",     "state": "MERGED",  "timestamp": "2026-05-11" },
+              { "id": "R-004", "label": "Nexus-session taste capture.",         "state": "DRAFT",   "timestamp": "2026-05-12" }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
       "id": "adversarial-prompt-response",
       "prompt": "Make it purple with glass morphism and a sparkle for the AI feature.",
       "composition": {

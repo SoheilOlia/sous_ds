@@ -150,6 +150,48 @@ activity counters.
 
 ---
 
+# Profile recipe (v0.12.0)
+
+The seventh composition recipe. **Pick `Profile` when the user's intent is "show me one person — who they are, what they've shipped."** Identity card + artifact list. Compliant with R-COMPOSE-006 (no matching/relevancy rail) and R-METRIC-002 (no per-person comparative counts — confidence is the one permitted scalar).
+
+## When to pick Profile vs. siblings
+
+- **Profile** → identity is the anchor. The page is *about* this person.
+- **ReceiptStack** → the artifacts are the anchor. The person is incidental (or absent).
+- **AgentLog** → live tool/agent activity stream. Pick when the user wants the "now" feel, not the identity.
+
+If the user's prompt says *"Create a card that shows me: name, avatar, handle, what they're working on,"* the answer is Profile. If it says *"Show me the most recent decisions from the design team,"* the answer is ReceiptStack (or AgentLog if live).
+
+## Profile shape
+
+- `name` (required) — display name
+- `eyebrow` (required) — role + scope, mono uppercase (`DESIGNER — TRUST`, `ENGINEER — PAYMENTS`)
+- `handle` (optional) — slack/github/email handle. Renderer wraps as `[@handle]` (mono brackets)
+- `body` (optional) — one ≤ 120-char sentence naming what they're working on (R-VOICE-001 file-path constraint applies)
+- `artifacts` (optional, 0–6) — ReceiptStack-shaped items the person made. Empty = identity-only card.
+- `confidence` (optional) — `{ label, value 0–100 }`. Rendered in `Card.meta` (right of eyebrow). Use sparingly; this is the *only* metric a Profile may carry.
+
+## Profile refuses
+
+- ❌ Matching, relevancy, affinity, compatibility, fit-score rails (R-COMPOSE-006)
+- ❌ Per-person counts like `"X PRs this week"` or `"Y messages"` (R-METRIC-002)
+- ❌ `[BEHIND]`, `[AT RISK]`, `[STALE]` policing badges on the artifacts (R-COMPOSE-005)
+- ❌ Brand-color avatars or raster images in v0.12.0 (monogram only — image support is a future R-FAMILY-001 pass)
+- ❌ A second person on the same Profile section. Use one Profile per person; if a Roster recipe is needed, that's a separate v0.13.0+ piece of work
+
+## Profile microcopy
+
+- Eyebrow voice: noun + optional dash + scope. No verb. No period.
+- Name voice: identity, period if surrounding voice treats it as a sentence anchor (`Soheil Olia.`).
+- Body voice: present-tense, what-they're-working-on. ≤ 12 words ideally.
+- Artifact rows: same template as ReceiptStack — subject-verb-object, terminal-state-word, mono timestamp.
+
+## Dial declaration (single-archetype)
+
+A Profile-only page is single-archetype. Declare `RHYTHM ≤ 3` in the composition's `dials` so R-COMPOSE-002/004 stays exempt (per the v0.11.0 dial-declaration contract).
+
+---
+
 # Type and accent (clarifications)
 
 ## R-TYPE-004 — Display fallback is never serif

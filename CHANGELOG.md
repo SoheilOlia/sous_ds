@@ -8,6 +8,47 @@ All notable changes to `sous-ds`. Format follows [Keep a Changelog](https://keep
 
 ---
 
+## [0.12.0] — 2026-05-12
+
+**Profile recipe (seventh recipe).** First R-FAMILY-001 pass on the recipes family since the v2 catalogue shipped, and the first to exercise Step 7 (register the new primitive in both decision trees — `SKILL.md`'s intent→component table AND `generative-ui-planner.md`'s recipe/component vocabulary — added in v0.11.0).
+
+**Forced by:** v0.11.0 user dogfood prompt *"Create a card that shows me: designer name, avatar, slack handle, what they are working on, AI confidence score"* failed schema validation because no existing recipe maps "one person." R-COMPOSE-006 (added in v0.11.0) refused the wrong shape but didn't propose the right one. Profile closes the gap.
+
+### Added
+
+- **`docs/specs/2026-05-12-profile-recipe-design.md`** — R-FAMILY-001 design pass: motif, vocabulary, three variants A/B/C, glance-test plan.
+- **`Profile` composition recipe (the seventh)** — identity-head row + ReceiptStack-style artifact body. Compliant with R-COMPOSE-006 (no matching/relevancy rail), R-METRIC-002 (no per-person comparative counts; confidence is the one permitted scalar), R-COMPOSE-005 (no policing chrome on the artifacts).
+- **`ProfileSection` schema** in `docs/specs/generative-ui-schema.json` — `name` (required), `eyebrow`, optional `handle` (regex `^@?[A-Za-z0-9._-]+$`), `body`, `artifacts[]` (0–6 ReceiptItem-shaped), `confidence` (`{ label, value 0..100 }`).
+- **`renderProfile()`** in `components/GenerativeRenderer.tsx` — identity head with monogram circle + name + body + handle; optional `RECENT` subsection with ReceiptStack-style rows; confidence in `Card.meta`.
+- **Monogram circle** CSS pattern (`.ds-gen-profile-monogram`) — 40px, 1px-bordered, mono initial centered, neutral text-primary. The first in-system identity primitive. Not a new component; a CSS pattern inside the renderer. Future raster-avatar work would graduate it via R-FAMILY-001.
+- **Profile section in `docs/specs/planner-taste.md`** — when to pick Profile vs. ReceiptStack vs. AgentLog; what Profile refuses.
+- **Profile entry in `generative-ui-planner.md`** — added to the recipe catalog and the component vocabulary table.
+- **Profile row in `SKILL.md`** — composition-recipes table and intent→component decision tree (Step 7 of R-FAMILY-001).
+- **`profile-soheil` fixture** in `examples/generative-ui-fixtures.json` — exercises every Profile field; uses `dials.rhythm: 2` to demonstrate the single-archetype declaration.
+- **TASTE_LOG.md ENTRY 012** documenting the design pass and the protocol exercise.
+- **GAPS.md — Roster recipe** filed as next R-FAMILY-001 candidate (multi-person companion).
+
+### Changed
+
+- **`docs/specs/sous-ds-v2-composition-recipes.md`** — new full "7. Profile" spec section with JSX skeleton, microcopy template, density quotas, failure modes replaced, forbidden substitutes.
+- **`examples/generative-ui-playground.tsx`** — `VERSION` constant bumped to `v0.12.0` so the topbar chip reflects the current release.
+- **`package.json`** — version `0.11.0 → 0.12.0`.
+
+### Verified
+
+- Schema validates 5/5 fixtures (including new `profile-soheil`).
+- Lint clean (51 files, 0 errors, 0 warnings).
+- tsc --noEmit strict, 0 errors.
+- Glance test (R-FAMILY-001 step 5): Profile rendered side-by-side with ReceiptStack via the browse skill — reads as sibling. Same Card chrome, same eyebrow style, same artifact-row template. Differences are intentional and recipe-specific.
+
+### Notes
+
+- **First exercise of R-FAMILY-001 Step 7** (added in v0.11.0): Profile is registered in both decision trees. The protocol held — without Step 7 the planner would never reach the new primitive.
+- The "rhythm: 2" single-archetype declaration in the `profile-soheil` fixture demonstrates the v0.11.0 dial-declaration exemption from R-COMPOSE-002/004 working as designed.
+- Confidence in `Card.meta` is intentionally compact; if the recipe sees adoption and the meta slot reads cramped, the v0.13.0 follow-up moves it to a strip below the head row.
+
+---
+
 ## [0.11.0] — 2026-05-12
 
 **Taste bridge + reflective-surface refusals.** Closes the architectural seam between `TASTE_LOG.md` (human audit trail) and the runtime planner LLM. Adds three new refusals naming a structural distinction the system had implicit but never encoded: **reflective surfaces ≠ status surfaces**. Source of the refusals: Nexus design-critique session 2026-05-11, captured in the structured handoff format.
